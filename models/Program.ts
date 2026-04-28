@@ -1,9 +1,11 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface IProgram extends Document {
-  name: string;
+  title: string;
+  slug: string;
   description: string;
   courses: mongoose.Types.ObjectId[];
+  duration?: string;
   thumbnail?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -11,9 +13,14 @@ export interface IProgram extends Document {
 
 const ProgramSchema = new Schema<IProgram>(
   {
-    name: {
+    title: {
       type: String,
-      required: [true, "Please provide a program name"],
+      required: [true, "Please provide a program title"],
+    },
+    slug: {
+      type: String,
+      required: [true, "Please provide a program slug"],
+      unique: true,
     },
     description: {
       type: String,
@@ -25,6 +32,9 @@ const ProgramSchema = new Schema<IProgram>(
         ref: "Course",
       },
     ],
+    duration: {
+      type: String,
+    },
     thumbnail: {
       type: String,
     },

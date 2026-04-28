@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/utils/db";
 import Quiz from "@/models/Quiz";
+import Course from "@/models/Course";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 
@@ -19,11 +20,16 @@ export async function GET(
     const { id } = resolvedParams;
     
     if (!id) {
-      return NextResponse.json({ error: "Quiz ID is required" }, { status: 400 });
+      return NextResponse.json({ error: "Quiz ID or slug is required" }, { status: 400 });
     }
 
     await dbConnect();
-    const quiz = await Quiz.findById(id).populate("courseId");
+    
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+    const quiz = isObjectId 
+      ? await Quiz.findById(id).populate("courseId")
+      : await Quiz.findOne({ slug: id }).populate("courseId");
+
 
     if (!quiz) {
       return NextResponse.json({ error: "Quiz not found" }, { status: 404 });

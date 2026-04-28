@@ -10,7 +10,7 @@ export async function GET(req: Request) {
     }
 
     await dbConnect();
-    const programs = await Program.find({}).sort({ createdAt: -1 });
+    const programs = await Program.find({}).populate("courses").sort({ createdAt: -1 });
     return NextResponse.json(programs);
   } catch (error) {
     console.error("API Programs GET Error:", error);
@@ -25,17 +25,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    const { name, description, courses, thumbnail } = await req.json();
+    const { title, slug, description, courses, duration, thumbnail } = await req.json();
 
-    if (!name || !description) {
-      return NextResponse.json({ error: "Name and description are required" }, { status: 400 });
+    if (!title || !slug || !description) {
+      return NextResponse.json({ error: "Title, slug, and description are required" }, { status: 400 });
     }
 
     await dbConnect();
     const newProgram = await Program.create({
-      name,
+      title,
+      slug,
       description,
       courses: courses || [],
+      duration,
       thumbnail
     });
 

@@ -2,19 +2,11 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/utils/db";
 import Quiz from "@/models/Quiz";
 import Attempt from "@/models/Attempt";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]/route";
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     await dbConnect();
-    const { quizId, courseId, answers, startTime, endTime } = await req.json();
-    const userId = session.user.id;
+    const { userId, quizId, courseId, answers, startTime, endTime } = await req.json();
 
     const quiz = await Quiz.findById(quizId);
     if (!quiz) {

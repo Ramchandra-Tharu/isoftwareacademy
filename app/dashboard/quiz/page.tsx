@@ -20,7 +20,6 @@ import {
 } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 
 export default function QuizDashboardPage() {
   const { data: session } = useSession();
@@ -138,9 +137,9 @@ export default function QuizDashboardPage() {
                           <span className="text-[10px] text-gray-400 font-bold max-w-[80px] leading-tight">Reward Unlockable</span>
                        </div>
                        
-                       <Link href={`/dashboard/quiz/${quiz._id}`} className="px-4 py-2 bg-[#EBBB54] text-black rounded-xl text-xs font-bold hover:scale-105 transition-all flex items-center gap-2">
+                       <button className="px-4 py-2 bg-[#EBBB54] text-black rounded-xl text-xs font-bold hover:scale-105 transition-all flex items-center gap-2">
                           Start Assessment <ArrowRight size={14} />
-                       </Link>
+                       </button>
                     </div>
                  </div>
               </div>
