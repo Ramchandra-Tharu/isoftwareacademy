@@ -6,6 +6,7 @@ export interface IQuiz extends Document {
   title: string;
   slug: string;
   description: string;
+  image?: string;
   questions: {
     question: string;
     options: string[];
@@ -40,6 +41,9 @@ const QuizSchema = new Schema<IQuiz>(
       required: [true, "Please provide a quiz slug"],
     },
     description: {
+      type: String,
+    },
+    image: {
       type: String,
     },
     questions: [
