@@ -1,0 +1,68 @@
+@startuml
+skinparam shadowing false
+skinparam backgroundColor white
+
+actor Student
+participant "App (UI)" as UI
+participant "Auth Service" as Auth
+participant "Course Service" as Course
+participant "Quiz Service" as Quiz
+participant "Certificate Service" as Cert
+participant "Comment Service" as Comment
+
+database "User DB" as D1
+database "Course DB" as D2
+database "Cert DB" as D3
+database "Asset Storage" as D4
+
+' ================= LOGIN FLOW =================
+Student -> UI : Open App / Login
+UI -> Auth : Request Google Login
+Auth -> "Google OAuth" : Authenticate
+"Google OAuth" --> Auth : User Profile
+Auth -> D1 : Save/Update User
+Auth --> UI : Login Success
+UI --> Student : Dashboard
+
+' ================= COURSE FLOW =================
+Student -> UI : Select Course
+UI -> Course : Get Course Content
+Course -> D2 : Fetch Text/Code
+Course -> D4 : Fetch Images
+D2 --> Course : Course Data
+D4 --> Course : Visual Assets
+Course --> UI : Content Response
+UI --> Student : Display Learning
+
+' ================= QUIZ FLOW =================
+Student -> UI : Start Quiz
+UI -> Quiz : Request Questions
+Quiz -> D2 : Get Questions
+D2 --> Quiz : Questions Data
+Quiz --> UI : Show Questions
+
+Student -> UI : Submit Answers
+UI -> Quiz : Evaluate Answers
+Quiz -> D1 : Save Score
+Quiz --> UI : Result
+UI --> Student : Display Result
+
+' ================= CERTIFICATE FLOW =================
+alt If Passed
+    UI -> Cert : Generate Certificate
+    Cert -> D1 : Get User Info
+    Cert -> D3 : Save Certificate
+    Cert --> UI : Certificate PDF
+    UI --> Student : Download Certificate
+else If Failed
+    UI --> Student : Retry Quiz
+end
+
+' ================= COMMENT FLOW =================
+Student -> UI : Add Comment
+UI -> Comment : Submit Comment
+Comment -> D2 : Store Comment
+Comment --> UI : Updated Comments
+UI --> Student : Show Discussion
+
+@enduml
