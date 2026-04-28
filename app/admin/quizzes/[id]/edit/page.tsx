@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { 
-  ArrowLeft, Save, Loader2, CheckCircle, AlertCircle, Type, Link as LinkIcon, Clock, Target, Plus, Trash2
+  ArrowLeft, Save, Loader2, CheckCircle, AlertCircle, Type, Link as LinkIcon, Clock, Target, Plus, Trash2, Image as ImageIcon, Upload
 } from "lucide-react";
 import Link from "next/link";
 
@@ -15,12 +15,14 @@ export default function EditQuizPage() {
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [courses, setCourses] = useState<any[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
     description: "",
+    image: "",
     courseId: "",
     duration: "30m",
     passingScore: 80,
@@ -57,6 +59,7 @@ export default function EditQuizPage() {
             title: quizData.title || "",
             slug: quizData.slug || "",
             description: quizData.description || "",
+            image: quizData.image || "",
             courseId: quizData.courseId?._id || quizData.courseId || "",
             duration: quizData.duration || "30m",
             passingScore: quizData.passingScore || 80,
@@ -111,6 +114,34 @@ export default function EditQuizPage() {
     const newQuestions = [...formData.questions];
     newQuestions[qIndex].options[oIndex] = value;
     setFormData({ ...formData, questions: newQuestions });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    const formDataUpload = new FormData();
+    formDataUpload.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formDataUpload,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setFormData({ ...formData, image: data.url });
+      } else {
+        alert("Failed to upload image");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error uploading image");
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -197,6 +228,27 @@ export default function EditQuizPage() {
             <div className="space-y-2">
               <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Description</label>
               <textarea rows={2} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="BRIEF_OVERVIEW..." className="w-full bg-white/[0.02] border border-white/10 rounded-[24px] py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all resize-none" />
+            </div>
+
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                <ImageIcon size={12} /> Quiz_Cover_Image
+              </label>
+              <div className="flex items-center gap-4">
+                <div className="relative flex-1">
+                  <input type="text" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} placeholder="IMAGE_URL..." className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-5 pr-12 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all" />
+                  {formData.image && (
+                    <img src={formData.image} alt="Preview" className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 rounded object-cover border border-white/20" />
+                  )}
+                </div>
+                <div className="relative">
+                  <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                  <div className="flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl h-[54px] px-6 transition-all text-white font-bold text-xs uppercase tracking-widest gap-2">
+                    {uploadingImage ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                    {uploadingImage ? "UPLOADING..." : "UPLOAD"}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
