@@ -38,11 +38,7 @@ export default function UserManagement() {
   };
 
   const toggleRole = async (id: string, currentRole: string) => {
-    let newRole = "student";
-    if (currentRole === "student") newRole = "instructor";
-    else if (currentRole === "instructor") newRole = "admin";
-    else if (currentRole === "admin") newRole = "student";
-
+    const newRole = currentRole === "admin" ? "student" : "admin";
     try {
       const res = await fetch("/api/admin/users", {
         method: "PUT",
@@ -93,7 +89,6 @@ export default function UserManagement() {
         </div>
       </div>
 
-      {/* Filters & Search */}
       <div className="bg-black border border-white/5 p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center">
         <div className="relative flex-1 w-full group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-[#EBBB54] transition-colors" size={18} />
@@ -107,7 +102,6 @@ export default function UserManagement() {
         </div>
       </div>
 
-      {/* User Table */}
       <div className="bg-black border border-white/5 rounded-2xl overflow-hidden">
         <table className="w-full text-left border-collapse">
           <thead>
@@ -136,9 +130,7 @@ export default function UserManagement() {
                   <button 
                     onClick={() => toggleRole(user._id, user.role)}
                     className={`px-3 py-1 rounded text-[10px] font-black uppercase tracking-widest border transition-all ${
-                      user.role === "admin" ? "bg-[#EBBB54]/10 border-[#EBBB54]/20 text-[#EBBB54]" : 
-                      user.role === "instructor" ? "bg-blue-500/10 border-blue-500/20 text-blue-500" :
-                      "bg-white/5 border-white/10 text-gray-500"
+                      user.role === "admin" ? "bg-[#EBBB54]/10 border-[#EBBB54]/20 text-[#EBBB54]" : "bg-white/5 border-white/10 text-gray-500"
                     }`}
                   >
                     {user.role}

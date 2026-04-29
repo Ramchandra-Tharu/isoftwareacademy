@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { 
   ArrowLeft, 
@@ -24,14 +24,11 @@ export default function NewCoursePage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-  const [instructors, setInstructors] = useState<any[]>([]);
-
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
     description: "",
     instructorName: "",
-    instructorId: "",
     category: "",
     thumbnail: "",
     totalLessons: 0,
@@ -40,19 +37,6 @@ export default function NewCoursePage() {
     isPublished: false,
     price: 0,
   });
-
-  useEffect(() => {
-    fetchInstructors();
-  }, []);
-
-  const fetchInstructors = async () => {
-    try {
-      const res = await fetch("/api/instructors");
-      if (res.ok) setInstructors(await res.json());
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const generateSlug = (title: string) => {
     return title
@@ -130,7 +114,6 @@ export default function NewCoursePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Section 1: Core Identity */}
           <div className="space-y-8">
             <h2 className="text-xs font-black text-[#EBBB54] uppercase tracking-[0.3em] border-l-2 border-[#EBBB54] pl-3">01. CORE_IDENTITY</h2>
             
@@ -146,24 +129,17 @@ export default function NewCoursePage() {
 
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><User size={12} /> Lead_Instructor</label>
-              <select 
+              <input 
                 required
-                value={formData.instructorId}
-                onChange={(e) => {
-                  const inst = instructors.find(i => i._id === e.target.value);
-                  setFormData({ ...formData, instructorId: e.target.value, instructorName: inst?.name || "" });
-                }}
-                className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all appearance-none"
-              >
-                <option value="">SELECT_INSTRUCTOR</option>
-                {instructors.map(inst => (
-                  <option key={inst._id} value={inst._id}>{inst.name.toUpperCase()}</option>
-                ))}
-              </select>
+                type="text" 
+                value={formData.instructorName}
+                onChange={(e) => setFormData({ ...formData, instructorName: e.target.value })}
+                placeholder="E.G. DR. ROOT_ADMIN"
+                className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all"
+              />
             </div>
           </div>
 
-          {/* Section 2: Technical Metadata */}
           <div className="space-y-8">
             <h2 className="text-xs font-black text-[#EBBB54] uppercase tracking-[0.3em] border-l-2 border-[#EBBB54] pl-3">02. TECHNICAL_META</h2>
             
@@ -195,7 +171,6 @@ export default function NewCoursePage() {
           </div>
         </div>
 
-        {/* Full Width Fields */}
         <div className="space-y-8 pt-8 border-t border-white/5">
           <div className="space-y-2">
             <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Content_Description</label>

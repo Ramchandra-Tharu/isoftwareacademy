@@ -11,9 +11,8 @@ import {
   Shield,
   Loader2,
   Mail,
-  Github,
-  Linkedin,
-  Twitter,
+  Code2,
+  Link2,
   Trash2
 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
@@ -108,9 +107,9 @@ export default function AdminInstructorsPage() {
                      <h3 className="text-xl font-black text-white uppercase tracking-tighter group-hover:text-blue-500 transition-colors">{inst.name}</h3>
                      <p className="text-[8px] text-gray-500 font-bold uppercase tracking-widest">{inst.email}</p>
                      <div className="flex gap-2 pt-2">
-                        {inst.socialLinks?.github && <Github size={14} className="text-gray-700 hover:text-white cursor-pointer" />}
-                        {inst.socialLinks?.linkedin && <Linkedin size={14} className="text-gray-700 hover:text-white cursor-pointer" />}
-                        {inst.socialLinks?.twitter && <Twitter size={14} className="text-gray-700 hover:text-white cursor-pointer" />}
+                        {inst.socialLinks?.github && <Code2 size={14} className="text-gray-700 hover:text-white cursor-pointer" />}
+                        {inst.socialLinks?.linkedin && <Link2 size={14} className="text-gray-700 hover:text-white cursor-pointer" />}
+                        {inst.socialLinks?.twitter && <Link2 size={14} className="text-gray-700 hover:text-white cursor-pointer" />}
                      </div>
                   </div>
                </div>
