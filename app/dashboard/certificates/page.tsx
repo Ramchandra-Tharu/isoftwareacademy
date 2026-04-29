@@ -132,11 +132,21 @@ export default function CertificatesPage() {
                     </div>
                     
                     <div className="flex items-center gap-2">
-                       <button className="p-2 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white rounded-lg transition-colors border border-white/10">
+                       <button 
+                          onClick={() => {
+                            navigator.clipboard.writeText(`${window.location.origin}/certificates/${cert.certificateId}`);
+                            alert("Verification link copied to clipboard!");
+                          }}
+                          className="p-2 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white rounded-lg transition-colors border border-white/10"
+                          title="Copy Verification Link"
+                       >
                           <ExternalLink size={16} />
                        </button>
-                       <button className="flex items-center gap-2 px-4 py-2 bg-[#EBBB54] text-black rounded-xl text-xs font-bold hover:scale-105 transition-all shadow-lg">
-                          <Download size={14} /> Download
+                       <button 
+                          onClick={() => window.open(`/certificates/${cert.certificateId}`, '_blank')}
+                          className="flex items-center gap-2 px-4 py-2 bg-[#EBBB54] text-black rounded-xl text-xs font-bold hover:scale-105 transition-all shadow-lg"
+                       >
+                          <Download size={14} /> View & Print
                        </button>
                     </div>
                  </div>

@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/utils/db";
 import Quiz from "@/models/Quiz";
 import Attempt from "@/models/Attempt";
+import Certificate from "@/models/Certificate";
+import User from "@/models/User";
+import Course from "@/models/Course";
 
 export async function POST(req: Request) {
   try {
@@ -40,7 +43,42 @@ export async function POST(req: Request) {
       endTime,
     });
 
-    return NextResponse.json(attempt);
+    let certificateGenerated = false;
+    let newCertificateId = null;
+
+    if (passed) {
+      // Check if a certificate already exists for this user and course
+      const existingCert = await Certificate.findOne({ userId, courseId });
+      
+      if (!existingCert) {
+        const user = await User.findById(userId);
+        const course = await Course.findById(courseId);
+        
+        if (user && course) {
+          const certificateId = `ISL-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+          
+          await Certificate.create({
+            userId,
+            courseId,
+            certificateId,
+            metadata: {
+              studentName: user.name,
+              courseTitle: course.title,
+              grade: `${percentage.toFixed(0)}%`,
+            },
+          });
+          
+          certificateGenerated = true;
+          newCertificateId = certificateId;
+        }
+      }
+    }
+
+    return NextResponse.json({
+      attempt,
+      certificateGenerated,
+      newCertificateId
+    });
   } catch (error: any) {
     console.error("Submit quiz error:", error);
     return NextResponse.json(

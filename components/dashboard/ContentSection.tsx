@@ -23,9 +23,25 @@ interface ContentSectionProps {
   blocks: ContentBlock[];
   duration: string;
   isCompleted?: boolean;
+  onToggleComplete?: () => void;
 }
 
-export default function ContentSection({ title, blocks, duration, isCompleted = false }: ContentSectionProps) {
+export default function ContentSection({ 
+  title, 
+  blocks, 
+  duration, 
+  isCompleted = false,
+  onToggleComplete 
+}: ContentSectionProps) {
+  const [loading, setLoading] = React.useState(false);
+
+  const handleComplete = async () => {
+    if (!onToggleComplete || loading) return;
+    setLoading(true);
+    await onToggleComplete();
+    setLoading(false);
+  };
+
   return (
     <div className="bg-[#1a1a1a]/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Lesson Header */}
@@ -48,8 +64,16 @@ export default function ContentSection({ title, blocks, duration, isCompleted = 
            <button className="p-2.5 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white rounded-xl border border-white/10 transition-all">
               <Share2 size={20} />
            </button>
-           <button className="flex items-center gap-2 px-6 py-2.5 bg-[#EBBB54] text-black font-bold rounded-xl hover:scale-105 transition-all shadow-[0_0_20px_rgba(235,187,84,0.2)]">
-              Mark Completed
+           <button 
+             onClick={handleComplete}
+             disabled={loading}
+             className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold hover:scale-105 transition-all shadow-[0_0_20px_rgba(235,187,84,0.2)] ${
+               isCompleted 
+                 ? "bg-green-500/20 text-green-500 border border-green-500/30" 
+                 : "bg-[#EBBB54] text-black"
+             }`}
+           >
+              {loading ? "Saving..." : isCompleted ? "Completed" : "Mark Completed"}
            </button>
         </div>
       </div>

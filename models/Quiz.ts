@@ -89,6 +89,10 @@ const QuizSchema = new Schema<IQuiz>(
   }
 );
 
-const Quiz: Model<IQuiz> = mongoose.models.Quiz || mongoose.model<IQuiz>("Quiz", QuizSchema);
+if (mongoose.models.Quiz) {
+  delete mongoose.models.Quiz;
+}
+
+const Quiz: Model<IQuiz> = mongoose.model<IQuiz>("Quiz", QuizSchema);
 
 export default Quiz;

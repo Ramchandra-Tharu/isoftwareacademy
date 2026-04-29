@@ -16,7 +16,7 @@ import {
 import StatsCard from "@/components/dashboard/StatsCard";
 
 export default function ProgressTrackingPage() {
-  const [courses, setCourses] = useState<any[]>([]);
+  const [progressData, setProgressData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Helper because of constant issues
@@ -25,19 +25,21 @@ export default function ProgressTrackingPage() {
   const BOOK_OPEN = BookOpen;
   const AWARD = Award;
 
+  const totalFinished = progressData.reduce((acc, curr) => acc + (curr.completedLessons?.length || 0), 0);
+
   const learningStats = [
     { title: "Learning Streak", value: "12 Days", icon: TRENDING_UP, description: "consistent learning", trend: "Hot!", trendType: "positive" },
     { title: "Total Time", value: "84.5h", icon: CLOCK, description: "spent learning", trend: "+12h", trendType: "positive" },
-    { title: "Modules Finished", value: 38, icon: BOOK_OPEN, description: "across all courses", trend: "On track", trendType: "positive" },
+    { title: "Modules Finished", value: totalFinished, icon: BOOK_OPEN, description: "across all courses", trend: "On track", trendType: "positive" },
     { title: "Achievements", value: 15, icon: AWARD, description: "points & badges", trend: "Level 4", trendType: "positive" },
   ] as const;
 
   useEffect(() => {
     const fetchProgress = async () => {
       try {
-        const res = await fetch("/api/courses");
+        const res = await fetch("/api/progress");
         const data = await res.json();
-        setCourses(data);
+        setProgressData(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Failed to fetch progress:", err);
       } finally {
@@ -136,26 +138,26 @@ export default function ProgressTrackingPage() {
               <div className="col-span-full h-32 flex items-center justify-center">
                  <Loader2 className="animate-spin text-[#EBBB54]" />
               </div>
-            ) : courses.length > 0 ? (
-              courses.map((course, i) => (
-                <div key={i} className="flex items-center justify-between p-6 bg-[#1a1a1a] border border-white/5 rounded-3xl hover:border-white/10 transition-all group">
+            ) : progressData.length > 0 ? (
+              progressData.map((item, i) => (
+                <Link key={i} href={`/dashboard/courses/${item.courseId?.slug || ''}`} className="flex items-center justify-between p-6 bg-[#1a1a1a] border border-white/5 rounded-3xl hover:border-white/10 transition-all group">
                    <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-[#EBBB54] group-hover:scale-110 transition-transform">
                          <BookOpen size={20} />
                       </div>
                       <div>
-                         <h4 className="text-sm font-bold text-white">{course.title}</h4>
-                         <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">{course.totalLessons} total lessons</p>
+                         <h4 className="text-sm font-bold text-white">{item.courseId?.title || "Course"}</h4>
+                         <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">{item.courseId?.totalLessons || 0} total lessons</p>
                       </div>
                    </div>
                    <div className="flex items-center gap-4">
                       <div className="text-right">
-                         <p className="text-sm font-bold text-white">{course.progress || 0}%</p>
+                         <p className="text-sm font-bold text-white">{item.percentage || 0}%</p>
                          <p className="text-[10px] text-gray-600 font-bold uppercase tracking-tighter">progress</p>
                       </div>
                       <ChevronRight className="text-gray-700 group-hover:text-[#EBBB54] transition-colors" size={20} />
                    </div>
-                </div>
+                </Link>
               ))
             ) : (
               <div className="col-span-full h-32 border-2 border-dashed border-white/5 rounded-3xl flex items-center justify-center text-gray-600 italic">

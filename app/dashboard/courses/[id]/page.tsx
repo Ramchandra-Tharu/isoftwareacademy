@@ -25,6 +25,19 @@ export default function CourseViewerPage() {
   const [course, setCourse] = useState<any>(null);
   const [activeLesson, setActiveLesson] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState<any>({ completedLessons: [], percentage: 0 });
+
+  const fetchProgress = async (courseId: string) => {
+    try {
+      const res = await fetch(`/api/progress?courseId=${courseId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setProgress(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch progress", err);
+    }
+  };
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -43,6 +56,9 @@ export default function CourseViewerPage() {
           if (lessons.length > 0) {
             setActiveLesson(lessons[0]);
           }
+
+          // Fetch real progress
+          await fetchProgress(foundCourse._id);
         }
       } catch (err) {
         console.error("Failed to fetch course data:", err);
@@ -55,6 +71,30 @@ export default function CourseViewerPage() {
        fetchCourseData();
     }
   }, [params.id]);
+
+  const handleToggleComplete = async (lessonId: string) => {
+    if (!course?._id) return;
+    try {
+      const res = await fetch("/api/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          courseId: course._id,
+          lessonId,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setProgress(data.progress);
+        if (data.certificateGenerated) {
+          alert("Congratulations! You've earned a certificate for this course!");
+        }
+      }
+    } catch (err) {
+      console.error("Error updating progress", err);
+    }
+  };
 
   if (loading) {
     return (
@@ -89,50 +129,53 @@ export default function CourseViewerPage() {
                  <span className="flex items-center gap-1 text-[#EBBB54]"><Award size={14} /> Certificate included</span>
               </div>
            </div>
-
+ 
            <div className="space-y-2">
               <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-[#EBBB54]">
                  <span>Overall Progress</span>
-                 <span>{course.progress || 0}%</span>
+                 <span>{progress.percentage || 0}%</span>
               </div>
               <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                  <div 
                    className="h-full bg-gradient-to-r from-[#EBBB54] to-[#f5d085] rounded-full transition-all duration-1000 ease-out" 
-                   style={{ width: `${course.progress || 0}%` }}
+                   style={{ width: `${progress.percentage || 0}%` }}
                  ></div>
               </div>
            </div>
         </div>
-
+ 
         <nav className="flex-1 px-4 space-y-1 pb-10 custom-scrollbar">
            <div className="px-4 py-2 text-[10px] uppercase tracking-widest text-gray-600 font-bold">Curriculum</div>
-           {course.lessons?.map((lesson: any) => (
-             <button 
-               key={lesson._id} 
-               onClick={() => setActiveLesson(lesson)}
-               className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition-all group ${
-                 activeLesson?._id === lesson._id 
-                   ? "bg-[#EBBB54]/10 border border-[#EBBB54]/20 text-[#EBBB54]" 
-                   : "text-gray-400 hover:bg-white/5 hover:text-white"
-               }`}
-             >
-                <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center border ${
-                   activeLesson?._id === lesson._id ? "bg-[#EBBB54] border-[#EBBB54] text-black" : 
-                   lesson.completed ? "bg-green-500/10 border-green-500/20 text-green-500" :
-                   "bg-white/5 border-white/5"
-                }`}>
-                   {lesson.completed ? <CheckCircle size={16} /> : activeLesson?._id === lesson._id ? <PlayCircle size={16} /> : <span className="text-[10px] font-bold">{lesson.order}</span>}
-                </div>
-                
-                <div className="flex-1 text-left">
-                   <p className="text-sm font-bold truncate">{lesson.title}</p>
-                   <p className="text-[10px] opacity-60 flex items-center gap-1"><Clock size={10} /> {lesson.duration}</p>
-                </div>
-             </button>
-           ))}
+           {course.lessons?.map((lesson: any) => {
+             const isCompleted = progress.completedLessons.includes(lesson._id);
+             return (
+              <button 
+                key={lesson._id} 
+                onClick={() => setActiveLesson(lesson)}
+                className={`w-full flex items-center gap-4 px-4 py-4 rounded-xl transition-all group ${
+                  activeLesson?._id === lesson._id 
+                    ? "bg-[#EBBB54]/10 border border-[#EBBB54]/20 text-[#EBBB54]" 
+                    : "text-gray-400 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                 <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center border ${
+                    activeLesson?._id === lesson._id ? "bg-[#EBBB54] border-[#EBBB54] text-black" : 
+                    isCompleted ? "bg-green-500/10 border-green-500/20 text-green-500" :
+                    "bg-white/5 border-white/5"
+                 }`}>
+                    {isCompleted ? <CheckCircle size={16} /> : activeLesson?._id === lesson._id ? <PlayCircle size={16} /> : <span className="text-[10px] font-bold">{lesson.order}</span>}
+                 </div>
+                 
+                 <div className="flex-1 text-left">
+                    <p className="text-sm font-bold truncate">{lesson.title}</p>
+                    <p className="text-[10px] opacity-60 flex items-center gap-1"><Clock size={10} /> {lesson.duration}</p>
+                 </div>
+              </button>
+             );
+           })}
         </nav>
       </aside>
-
+ 
       {/* Main Lesson Content */}
       <main className="flex-1 p-8 lg:p-12 overflow-y-auto">
         <div className="max-w-5xl mx-auto space-y-10">
@@ -142,18 +185,20 @@ export default function CourseViewerPage() {
               <h4 className="text-sm font-bold text-white truncate max-w-[200px]">{course.title}</h4>
               <button className="p-2.5 bg-white/5 text-gray-400 rounded-xl"><Settings size={24} /></button>
            </div>
-
+ 
            {/* Lesson Component */}
            {activeLesson ? (
              <ContentSection 
                title={activeLesson.title} 
                blocks={activeLesson.content} 
                duration={activeLesson.duration} 
-               isCompleted={activeLesson.completed || false} 
+               isCompleted={progress.completedLessons.includes(activeLesson._id)} 
+               onToggleComplete={() => handleToggleComplete(activeLesson._id)}
              />
            ) : (
              <div className="h-96 flex items-center justify-center text-gray-500 italic">Select a lesson to begin learning.</div>
            )}
+
 
            {/* Interactive Footer */}
            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-10 border-t border-white/5">
