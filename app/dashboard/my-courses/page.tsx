@@ -10,10 +10,18 @@ import {
   TrendingUp,
   Clock,
   Layout,
-  Loader2
+  Loader2,
+  ArrowRight,
+  Plus
 } from "lucide-react";
 import CourseCard from "@/components/dashboard/CourseCard";
 import Link from "next/link";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 export default function MyCoursesPage() {
   const [courses, setCourses] = useState<any[]>([]);
@@ -27,60 +35,69 @@ export default function MyCoursesPage() {
         const data = await res.json();
         setCourses(data);
       } catch (err) {
-        console.error("Failed to fetch courses:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchCourses();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+        <Loader2 className="animate-spin text-blue-600" size={40} />
+        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Syncing Personal Catalog...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-12 pb-20 font-sans">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
         <div>
-           <h1 className="text-4xl font-bold font-serif text-white mb-2">My Courses</h1>
-           <p className="text-gray-400">Continue where you left off and master new skills.</p>
+           <h1 className="text-4xl font-black tracking-tight text-gray-900 uppercase">My_Curriculum</h1>
+           <p className="text-gray-500 font-medium mt-1">Manage your active learning modules and skill milestones.</p>
         </div>
         
-        <div className="flex items-center gap-3">
-           <div className="relative group flex-1 md:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-[#EBBB54] transition-colors" size={18} />
+        <div className="flex flex-wrap items-center gap-4">
+           <div className="relative group w-full md:w-72">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={18} />
               <input 
                 type="text" 
-                placeholder="Search my courses..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#EBBB54]/50 transition-all"
+                placeholder="SEARCH_CATALOG..."
+                className="w-full bg-white border border-gray-100 rounded-2xl py-3 pl-12 pr-4 text-[10px] font-black tracking-widest uppercase focus:outline-none focus:border-blue-100 shadow-sm shadow-gray-900/5"
               />
            </div>
            
-           <button className="p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-gray-400 hover:text-white transition-all">
-              <Filter size={18} />
+           <button className="p-3 bg-white border border-gray-100 rounded-2xl text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
+              <Filter size={20} />
            </button>
            
-           <div className="flex items-center p-1 bg-white/5 border border-white/10 rounded-xl">
-              <button className="p-1.5 bg-[#EBBB54] text-black rounded-lg shadow-lg">
-                 <Grid size={16} />
+           <div className="flex items-center p-1 bg-white border border-gray-100 rounded-2xl shadow-sm">
+              <button className="p-2 bg-blue-50 text-blue-600 rounded-xl shadow-sm">
+                 <Grid size={18} />
               </button>
-              <button className="p-1.5 text-gray-400 hover:text-white">
-                 <List size={16} />
+              <button className="p-2 text-gray-300 hover:text-gray-500">
+                 <List size={18} />
               </button>
            </div>
         </div>
       </div>
 
       {/* Categories / Tabs */}
-      <div className="flex items-center gap-4 overflow-x-auto pb-2 custom-scrollbar no-scrollbar">
-         {["All Courses", "In Progress", "Completed", "Wishlist", "Archived"].map((tab) => (
+      <div className="flex items-center gap-2 overflow-x-auto pb-4 no-scrollbar">
+         {["All Courses", "In Progress", "Completed", "Wishlist"].map((tab) => (
            <button 
              key={tab} 
              onClick={() => setActiveTab(tab)}
-             className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap border ${
+             className={cn(
+               "px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border whitespace-nowrap",
                activeTab === tab 
-                ? "bg-[#EBBB54] text-black border-[#EBBB44] shadow-[0_0_15px_rgba(235,187,84,0.3)]" 
-                : "bg-white/5 text-gray-400 border-white/10 hover:border-white/20 hover:text-white"
-             }`}
+                ? "bg-blue-600 text-white border-blue-600 shadow-xl shadow-blue-600/20" 
+                : "bg-white text-gray-400 border-gray-100 hover:border-blue-100 hover:text-blue-600"
+             )}
            >
              {tab}
            </button>
@@ -88,35 +105,36 @@ export default function MyCoursesPage() {
       </div>
 
       {/* Courses Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 pb-10">
-         {loading ? (
-           <div className="col-span-full h-64 flex flex-col items-center justify-center text-gray-500 gap-4">
-              <Loader2 className="animate-spin text-[#EBBB54]" size={40} />
-              <p className="font-medium animate-pulse">Loading your curriculum...</p>
-           </div>
-         ) : courses.length > 0 ? (
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+         {courses.length > 0 ? (
            courses.map((course) => (
              <CourseCard key={course._id} {...course} id={course.slug} />
            ))
          ) : (
-           <div className="col-span-full h-64 border-2 border-dashed border-white/5 rounded-3xl flex flex-col items-center justify-center text-gray-600 gap-2">
-              <BookOpen size={40} className="opacity-20" />
-              <p>No courses found. Try browsing the catalog!</p>
+           <div className="col-span-full h-80 card-premium border-dashed flex flex-col items-center justify-center text-gray-400 gap-6">
+              <BookOpen size={60} className="opacity-10" />
+              <div className="text-center">
+                 <p className="text-[10px] font-black uppercase tracking-widest">Registry Empty</p>
+                 <p className="text-xs text-gray-400 mt-2">No active course deployments found in this segment.</p>
+              </div>
+              <Link href="/dashboard/browse" className="btn-primary text-xs">Browse Library</Link>
            </div>
          )}
          
          {/* Browse More Card */}
          <Link 
            href="/dashboard/browse" 
-           className="group border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center p-10 hover:border-[#EBBB54]/40 hover:bg-[#EBBB54]/5 transition-all duration-300 min-h-[350px]"
+           className="card-premium border-2 border-dashed border-gray-100 flex flex-col items-center justify-center p-12 hover:border-blue-100 hover:bg-blue-50/30 transition-all duration-300 min-h-[400px] group"
          >
-            <div className="w-16 h-16 rounded-full bg-white/5 group-hover:bg-[#EBBB54]/10 flex items-center justify-center text-gray-400 group-hover:text-[#EBBB54] transition-all mb-4">
-               <BookOpen size={30} />
+            <div className="w-20 h-20 rounded-full bg-gray-50 group-hover:bg-blue-100 flex items-center justify-center text-gray-300 group-hover:text-blue-600 transition-all mb-8 shadow-sm">
+               <Plus size={40} />
             </div>
-            <h3 className="text-xl font-bold text-white mb-2">Explore Catalog</h3>
-            <p className="text-gray-500 text-center text-sm max-w-[200px]">Find your next course and level up your skills.</p>
-            <div className="mt-6 px-6 py-2 bg-white/5 group-hover:bg-[#EBBB54] text-white group-hover:text-black font-bold rounded-xl transition-all border border-white/10 group-hover:border-transparent">
-               Browse All
+            <div className="text-center space-y-2">
+               <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tighter">Expand_Library</h3>
+               <p className="text-xs text-gray-400 font-medium max-w-[220px] mx-auto">Discover new academic modules and accelerate your growth path.</p>
+            </div>
+            <div className="mt-10 px-8 py-3.5 bg-white border border-gray-100 group-hover:bg-blue-600 text-gray-400 group-hover:text-white text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all shadow-sm group-hover:shadow-xl group-hover:shadow-blue-600/20">
+               Access Catalog
             </div>
          </Link>
       </div>

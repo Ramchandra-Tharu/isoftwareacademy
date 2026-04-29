@@ -13,14 +13,21 @@ import {
   Layers,
   Clock,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  ChevronRight,
+  Filter
 } from "lucide-react";
 import Link from "next/link";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 export default function CourseManagement() {
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -31,14 +38,9 @@ export default function CourseManagement() {
     try {
       setLoading(true);
       const res = await fetch("/api/courses");
-      if (res.ok) {
-        const data = await res.json();
-        setCourses(data);
-      } else {
-        setError("Failed to fetch courses");
-      }
+      if (res.ok) setCourses(await res.json());
     } catch (err) {
-      setError("An error occurred while fetching courses");
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -49,130 +51,124 @@ export default function CourseManagement() {
     c.category?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const stats = {
-    total: courses.length,
-    published: courses.filter(c => c.isPublished).length,
-    drafts: courses.filter(c => !c.isPublished).length,
-  };
-
   const deleteCourse = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this course? This action cannot be undone.")) return;
+    if (!confirm("Are you sure?")) return;
     try {
       const res = await fetch(`/api/courses/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setCourses(courses.filter(c => c._id !== id));
-      } else {
-        alert("Failed to delete course");
-      }
+      if (res.ok) setCourses(courses.filter(c => c._id !== id));
     } catch (err) {
-      console.error("Delete course error:", err);
+      console.error(err);
     }
   };
 
   if (loading) {
     return (
-      <div className="h-[60vh] flex items-center justify-center">
-        <Loader2 className="animate-spin text-[#EBBB54]" size={40} />
+      <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+        <Loader2 className="animate-spin text-blue-600" size={40} />
+        <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Fetching Asset Catalog...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 font-mono">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-10 pb-20 font-sans">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tighter uppercase">
-            COURSE <span className="text-[#EBBB54]">MANAGEMENT</span>
-          </h1>
-          <p className="text-gray-500 text-sm mt-1 uppercase font-bold tracking-widest">Build and organize your education modules</p>
+          <h1 className="text-3xl font-black tracking-tight text-gray-900">Course_Management</h1>
+          <p className="text-sm text-gray-500 font-medium mt-1">Develop and organize your academic curriculum.</p>
         </div>
-        <Link href="/admin/courses/new" className="flex items-center gap-2 px-6 py-3 bg-[#EBBB54] text-black font-black rounded-xl hover:scale-105 transition-all shadow-xl shadow-[#EBBB54]/10 uppercase text-xs">
-          <Plus size={18} />
-          <span>New_Course</span>
+        <Link href="/admin/courses/new" className="btn-primary flex items-center gap-2 text-xs">
+          <Plus size={18} /> Create New Course
         </Link>
       </div>
 
-      {/* Course Stats Overview */}
+      {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { label: "Total Courses", val: stats.total, icon: BookOpen, color: "text-blue-500", bg: "bg-blue-500/10" },
-          { label: "Published", val: stats.published, icon: Globe, color: "text-green-500", bg: "bg-green-500/10" },
-          { label: "Drafts", val: stats.drafts, icon: Layers, color: "text-[#EBBB54]", bg: "bg-[#EBBB54]/10" },
+          { label: "Total Asset Units", val: courses.length, icon: BookOpen, color: "text-blue-600", bg: "bg-blue-50" },
+          { label: "Live Deployment", val: courses.filter(c => c.isPublished).length, icon: Globe, color: "text-emerald-600", bg: "bg-emerald-50" },
+          { label: "Development Drafts", val: courses.filter(c => !c.isPublished).length, icon: Layers, color: "text-amber-600", bg: "bg-amber-50" },
         ].map((item, i) => (
-          <div key={i} className="p-6 bg-black border border-white/5 rounded-2xl flex items-center gap-4 group">
-             <div className={`p-3 rounded-xl ${item.bg} ${item.color} group-hover:scale-110 transition-transform`}><item.icon size={24} /></div>
+          <div key={i} className="card-premium p-8 flex items-center gap-6 group">
+             <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm", item.bg, item.color)}>
+                <item.icon size={24} />
+             </div>
              <div>
-               <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">{item.label}</p>
-               <h3 className="text-xl font-black text-white">{item.val}</h3>
+                <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{item.label}</p>
+                <h3 className="text-2xl font-black text-gray-900 leading-none mt-1">{item.val}</h3>
              </div>
           </div>
         ))}
       </div>
 
-      {/* Filters & Search */}
-      <div className="bg-black border border-white/5 p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center">
+      {/* Filter Bar */}
+      <div className="card-premium p-4 flex flex-col md:flex-row gap-4 items-center">
         <div className="relative flex-1 w-full group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-[#EBBB54] transition-colors" size={18} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={18} />
           <input 
             type="text" 
-            placeholder="SEARCH_COURSES..." 
+            placeholder="FILTER_COURSES..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white/[0.02] border border-white/10 rounded-xl py-3 pl-12 pr-4 text-xs font-bold tracking-widest focus:outline-none focus:border-[#EBBB54]/30 focus:bg-white/5 transition-all"
+            className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 pl-12 pr-4 text-xs font-bold tracking-widest focus:outline-none focus:border-blue-100 focus:bg-white transition-all"
           />
         </div>
+        <button className="px-6 py-3 bg-white border border-gray-100 rounded-xl text-xs font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50 transition-all flex items-center gap-2">
+           <Filter size={16} /> Filter_Config
+        </button>
       </div>
 
-      {/* Course Cards Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Course Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {filteredCourses.map((course) => (
-          <div key={course._id} className="bg-black border border-white/5 hover:border-white/20 rounded-3xl p-6 transition-all group relative overflow-hidden">
-             <div className="flex justify-between items-start mb-6">
-                <div className="space-y-1">
-                  <span className="px-2.5 py-1 bg-white/5 text-gray-500 text-[10px] font-bold rounded uppercase tracking-widest">{course.category || "General"}</span>
-                  <h3 className="text-xl font-black text-white group-hover:text-[#EBBB54] transition-colors uppercase tracking-tight">{course.title}</h3>
+          <div key={course._id} className="card-premium group relative overflow-hidden flex flex-col">
+             <div className="p-10 space-y-6 flex-1">
+                <div className="flex justify-between items-start">
+                   <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                         <span className="px-3 py-1 bg-gray-50 text-gray-400 text-[10px] font-black rounded-full uppercase tracking-widest border border-gray-100">{course.category || "General"}</span>
+                         {course.isPublished ? (
+                            <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-full uppercase tracking-widest border border-emerald-100 flex items-center gap-1.5">
+                               <div className="w-1 h-1 bg-emerald-600 rounded-full animate-pulse" /> Live
+                            </span>
+                         ) : (
+                            <span className="px-3 py-1 bg-amber-50 text-amber-600 text-[10px] font-black rounded-full uppercase tracking-widest border border-amber-100">Draft</span>
+                         )}
+                      </div>
+                      <h3 className="text-2xl font-black text-gray-900 group-hover:text-blue-600 transition-colors tracking-tighter uppercase">{course.title}</h3>
+                   </div>
+                   <button className="text-gray-300 hover:text-gray-900 p-2"><MoreVertical size={20} /></button>
                 </div>
-                <button className="text-gray-600 hover:text-white p-2">
-                  <MoreVertical size={18} />
-                </button>
+
+                <div className="flex items-center gap-6">
+                   <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                      <Clock size={14} /> Updated {new Date(course.updatedAt).toLocaleDateString()}
+                   </div>
+                </div>
              </div>
 
-             <div className="flex items-center gap-6 mb-6">
+             <div className="p-8 border-t border-gray-50 bg-gray-50/30 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Clock size={16} className="text-gray-700" />
-                  <span className="text-[10px] font-bold text-gray-600 uppercase">Updated {new Date(course.updatedAt).toLocaleDateString()}</span>
-                </div>
-             </div>
-
-             <div className="flex items-center justify-between pt-6 border-t border-white/5">
-                <div className="flex items-center gap-2">
-                  {course.isPublished ? (
-                    <span className="flex items-center gap-1.5 text-[10px] text-green-500 font-black uppercase tracking-widest">
-                      <Globe size={14} /> LIVE
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1.5 text-[10px] text-gray-700 font-black uppercase tracking-widest">
-                      <Edit2 size={14} /> DRAFT
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-3">
-                   <button className="p-2.5 text-gray-600 hover:text-white bg-white/5 rounded-xl transition-all">
+                   <Link href={`/courses/${course.slug || course._id}`} className="p-2.5 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
                       <Eye size={18} />
-                   </button>
-                   <Link href={`/admin/courses/${course._id}/edit`} className="p-2.5 text-gray-600 hover:text-[#EBBB54] bg-white/5 rounded-xl transition-all block">
+                   </Link>
+                   <Link href={`/admin/courses/${course._id}/edit`} className="p-2.5 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
                       <Edit2 size={18} />
                    </Link>
-                   <button 
-                    onClick={() => deleteCourse(course._id)}
-                    className="p-2.5 text-gray-600 hover:text-red-500 bg-white/5 rounded-xl transition-all"
-                   >
-                      <Trash2 size={18} />
-                   </button>
                 </div>
+                <button 
+                  onClick={() => deleteCourse(course._id)}
+                  className="p-2.5 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-red-600 hover:border-red-100 transition-all shadow-sm"
+                >
+                   <Trash2 size={18} />
+                </button>
              </div>
           </div>
         ))}
+        {filteredCourses.length === 0 && (
+           <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-100 rounded-[3rem] text-gray-400 italic font-bold uppercase tracking-widest text-[10px]">No education assets found.</div>
+        )}
       </div>
     </div>
   );

@@ -5,8 +5,15 @@ import {
   BookOpen, 
   PlayCircle, 
   MoreVertical,
-  Star
+  Star,
+  ArrowRight
 } from "lucide-react";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 interface CourseCardProps {
   id: string;
@@ -32,71 +39,69 @@ export default function CourseCard({
   rating = 4.8
 }: CourseCardProps) {
   return (
-    <div className="group bg-[#1a1a1a] border border-white/5 rounded-2xl overflow-hidden hover:border-[#EBBB54]/30 hover:bg-[#222222] transition-all duration-300 flex flex-col h-full">
+    <div className="card-premium group flex flex-col h-full overflow-hidden bg-white hover:shadow-2xl hover:shadow-blue-600/5 transition-all duration-500">
       {/* Thumbnail */}
       <div className="relative aspect-video overflow-hidden">
         <img 
           src={thumbnail} 
           alt={title} 
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-100"
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
         />
-        <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-md rounded-lg text-[10px] font-bold text-white uppercase tracking-wider border border-white/10">
+        <div className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[9px] font-black text-gray-900 uppercase tracking-widest border border-white/20 shadow-sm">
           {category}
-        </div>
-        <div className="absolute top-3 right-3 text-white/50 hover:text-white transition-colors cursor-pointer">
-          <MoreVertical size={20} />
         </div>
         
         {/* Play Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
-           <div className="w-12 h-12 rounded-full bg-[#EBBB54] flex items-center justify-center text-black shadow-2xl scale-75 group-hover:scale-100 transition-transform">
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-blue-600/10 backdrop-blur-[2px]">
+           <div className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-2xl scale-75 group-hover:scale-100 transition-all duration-300">
               <PlayCircle size={24} fill="currentColor" />
            </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-5 flex-1 flex flex-col">
-        <div className="flex items-center gap-1 mb-2 text-[#EBBB54]">
-           <Star size={12} fill="currentColor" />
-           <span className="text-[10px] font-bold">{rating}</span>
+      <div className="p-8 flex-1 flex flex-col space-y-4">
+        <div className="flex items-center justify-between">
+           <div className="flex items-center gap-1 text-amber-400">
+              <Star size={12} fill="currentColor" />
+              <span className="text-[10px] font-black text-gray-400">{rating} (428 reviews)</span>
+           </div>
+           <button className="text-gray-300 hover:text-gray-900 transition-colors"><MoreVertical size={16} /></button>
         </div>
         
-        <h3 className="text-lg font-bold text-white mb-1 line-clamp-2 group-hover:text-[#EBBB54] transition-colors">
-          {title}
-        </h3>
-        <p className="text-sm text-gray-500 mb-4 italic">by {instructor}</p>
+        <div className="space-y-1">
+           <h3 className="text-xl font-black text-gray-900 group-hover:text-blue-600 transition-colors leading-tight uppercase tracking-tighter">
+             {title}
+           </h3>
+           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Lead Instructor: {instructor}</p>
+        </div>
 
-        <div className="mt-auto space-y-4">
+        <div className="pt-6 border-t border-gray-50 mt-auto space-y-6">
            {/* Progress Bar */}
-           <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-xs">
-                 <span className="text-gray-400">Progress</span>
-                 <span className="font-bold text-white">{progress}%</span>
+           <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Deployment Progress</span>
+                 <span className="text-[10px] font-black text-blue-600">{progress}%</span>
               </div>
-              <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-2 w-full bg-gray-50 rounded-full overflow-hidden border border-gray-100">
                  <div 
-                   className="h-full bg-gradient-to-r from-[#EBBB54] to-[#f5d085] rounded-full transition-all duration-1000 ease-out" 
+                   className="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" 
                    style={{ width: `${progress}%` }}
                  ></div>
               </div>
            </div>
 
-           {/* Meta Info */}
-           <div className="flex items-center justify-between text-[11px] text-gray-500 pt-2 border-t border-white/5">
-              <div className="flex items-center gap-3">
-                 <span className="flex items-center gap-1">
-                    <BookOpen size={14} /> {lessonsCount} Lessons
-                 </span>
-                 <span className="flex items-center gap-1">
-                    <Clock size={14} /> {duration}
-                 </span>
+           {/* Footer */}
+           <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4 text-[10px] font-black text-gray-300 uppercase tracking-widest">
+                 <span className="flex items-center gap-1.5"><BookOpen size={14} /> {lessonsCount} Units</span>
+                 <span className="flex items-center gap-1.5"><Clock size={14} /> {duration}</span>
               </div>
               <Link 
                 href={`/dashboard/courses/${id}`}
-                className="text-[#EBBB54] font-bold hover:underline"
+                className="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-widest group/btn"
               >
-                {progress > 0 ? "Continue" : "Start"}
+                {progress > 0 ? "Resume" : "Initialize"} <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
               </Link>
            </div>
         </div>

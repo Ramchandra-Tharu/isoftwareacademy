@@ -5,24 +5,28 @@ import Link from "next/link";
 import { 
   Users, 
   BookOpen, 
-  HelpCircle, 
   Award, 
   TrendingUp, 
-  ArrowUpRight, 
-  ArrowDownRight,
-  MoreVertical,
   Plus,
-  ArrowLeft,
   BarChart3,
   Loader2,
-  ShieldAlert,
   Activity,
-  Terminal,
   Cpu,
-  Globe
+  Globe,
+  ArrowUpRight,
+  Search,
+  MoreHorizontal,
+  CreditCard,
+  MessageSquare
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession();
@@ -41,139 +45,179 @@ export default function AdminDashboard() {
       if (status === "authenticated" && session?.user?.role === "admin") {
         try {
           const res = await fetch("/api/admin/stats");
-          if (res.ok) {
-            const data = await res.json();
-            setAdminData(data);
-          }
+          if (res.ok) setAdminData(await res.json());
         } catch (error) {
-          console.error("Failed to fetch admin stats:", error);
+          console.error(error);
         } finally {
           setLoading(false);
         }
       }
     };
-
     fetchAdminStats();
   }, [status, session]);
 
   if (status === "loading" || loading) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-black text-white gap-4 font-mono">
-        <Cpu className="animate-pulse text-[#EBBB54]" size={48} />
-        <p className="text-gray-500 font-bold tracking-[0.3em] uppercase text-xs animate-pulse">Initializing Administrative Node...</p>
+      <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+        <Loader2 className="animate-spin text-blue-600" size={40} />
+        <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Synchronizing Ecosystem...</p>
       </div>
     );
   }
 
-  if (session?.user?.role !== "admin") return null;
+  const stats = [
+    { label: "Total Students", value: adminData?.totalStudents || "0", icon: Users, color: "bg-blue-50 text-blue-600" },
+    { label: "Active Courses", value: adminData?.totalCourses || "0", icon: BookOpen, color: "bg-indigo-50 text-indigo-600" },
+    { label: "Rev Revenue", value: "₹4.2L", icon: CreditCard, color: "bg-emerald-50 text-emerald-600" },
+    { label: "Certifications", value: adminData?.totalCertificates || "0", icon: Award, color: "bg-amber-50 text-amber-600" },
+  ];
 
   return (
-    <div className="space-y-10 pb-12 font-mono">
-      {/* 1. TOP HEADER - COMMAND CENTER */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-white/10 pb-10">
-        <div className="space-y-2">
-           <div className="flex items-center gap-3">
-              <span className="px-3 py-1 bg-red-600 text-white text-[10px] font-black rounded uppercase">Live</span>
-              <h1 className="text-4xl font-black text-white tracking-tighter uppercase">
-                MISSION <span className="text-[#EBBB54]">CONTROL</span>
-              </h1>
-           </div>
-           <p className="text-gray-500 text-sm max-w-xl">
-             Node: <span className="text-white">Admin-HQ-01</span> | Session: <span className="text-white truncate max-w-[100px] inline-block align-bottom">{session?.user?.id}</span> | Status: <span className="text-green-500">OPTIMAL</span>
-           </p>
+    <div className="space-y-10 pb-20">
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-black tracking-tight text-gray-900">Dashboard_Overview</h1>
+          <p className="text-sm text-gray-500 font-medium mt-1">Welcome back, {session?.user?.name || "Administrator"}. Here's what's happening today.</p>
         </div>
-        
-        <div className="flex flex-wrap items-center gap-4">
-           <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-ping"></div>
-              <span className="text-xs font-bold text-gray-400">DB CONNECTED</span>
+        <div className="flex items-center gap-3">
+           <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white border border-gray-100 rounded-xl shadow-sm">
+              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">System Optimal</span>
            </div>
-           <button className="px-6 py-3 bg-[#EBBB54] text-black font-black rounded-xl hover:scale-105 transition-all shadow-xl shadow-[#EBBB54]/10 flex items-center gap-2">
-             <Plus size={18} />
-             <span>NEW_ASSET</span>
-           </button>
+           <Link href="/admin/courses/new" className="btn-primary flex items-center gap-2 text-xs">
+              <Plus size={16} /> Create Course
+           </Link>
         </div>
       </div>
 
-      {/* 2. CORE METRICS - GRID 4 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: "Total Users", val: adminData?.totalStudents || "0", icon: Users, color: "text-blue-500" },
-          { label: "Total Courses", val: adminData?.totalCourses || "0", icon: BookOpen, color: "text-[#EBBB54]" },
-          { label: "Total Programs", val: adminData?.totalPrograms || "0", icon: BarChart3, color: "text-green-500" },
-          { label: "Total Certificates", val: adminData?.totalCertificates || "0", icon: Award, color: "text-purple-500" },
-        ].map((item, i) => (
-          <div key={i} className="bg-black border border-white/5 p-6 hover:border-white/20 transition-all group relative">
-             <div className="flex items-center justify-between mb-4">
-                <item.icon className={item.color} size={24} />
-                <span className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">LIVE_METRIC</span>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map((stat, i) => (
+          <div key={i} className="card-premium p-8 group">
+             <div className="flex items-center justify-between mb-6">
+                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", stat.color)}>
+                   <stat.icon size={22} />
+                </div>
+                <div className="flex items-center gap-1 text-emerald-500 text-xs font-bold">
+                   <TrendingUp size={14} /> +12%
+                </div>
              </div>
-             <h3 className="text-3xl font-black text-white group-hover:text-[#EBBB54] transition-colors">{item.val}</h3>
-             <p className="text-xs text-gray-500 mt-2 font-bold uppercase tracking-widest">{item.label}</p>
-             <div className="absolute bottom-0 left-0 w-full h-[1px] bg-white/5 group-hover:bg-[#EBBB54]/50 transition-all"></div>
+             <h3 className="text-4xl font-black tracking-tighter text-gray-900">{stat.value}</h3>
+             <p className="text-xs font-black uppercase tracking-widest text-gray-500 mt-2">{stat.label}</p>
           </div>
         ))}
       </div>
 
-      {/* 3. BENTO CONTROL GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Main Analytics - 8 cols */}
-        <div className="lg:col-span-8 bg-black border border-white/5 p-8 relative overflow-hidden group">
-           <div className="absolute top-0 right-0 p-4 opacity-5"><Globe size={150} /></div>
-           <div className="flex items-center justify-between mb-10">
-              <h3 className="text-xl font-black flex items-center gap-3">
-                <Activity className="text-[#EBBB54]" /> SYSTEM_LOAD
-              </h3>
+      {/* Main Grid */}
+      <div className="grid lg:grid-cols-12 gap-8">
+        {/* Performance Chart Placeholder */}
+        <div className="lg:col-span-8 card-premium p-10 space-y-8 relative overflow-hidden">
+           <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                 <h4 className="text-xl font-black tracking-tight">Growth_Analytics</h4>
+                 <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">User Engagement & Enrollment metrics</p>
+              </div>
               <div className="flex gap-2">
-                 <div className="w-8 h-8 bg-white/5 rounded border border-white/5 flex items-center justify-center"><BarChart3 size={14} /></div>
-                 <div className="w-8 h-8 bg-[#EBBB54]/10 rounded border border-[#EBBB54]/20 flex items-center justify-center text-[#EBBB54]"><Terminal size={14} /></div>
+                 <button className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 rounded-lg">Monthly</button>
+                 <button className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:bg-gray-50 rounded-lg">Yearly</button>
               </div>
            </div>
            
-           <div className="aspect-[21/9] bg-white/[0.01] border border-white/5 rounded-xl flex items-center justify-center relative">
-              {/* Fake Graph */}
-              <div className="flex items-end gap-1 h-32">
-                 {[30, 45, 60, 40, 80, 95, 70, 50, 40, 60, 85, 90, 100].map((h, i) => (
-                   <div key={i} className="w-4 bg-[#EBBB54]/20 border-t border-[#EBBB54]/40 hover:bg-[#EBBB54] transition-all" style={{ height: `${h}%` }}></div>
-                 ))}
-              </div>
-              <div className="absolute top-4 left-4 text-[10px] text-gray-600">THROUGHPUT: 1.2GB/S</div>
-           </div>
-        </div>
-
-        {/* Action Logs - 4 cols */}
-        <div className="lg:col-span-4 bg-black border border-white/5 p-8 flex flex-col gap-6">
-           <h3 className="text-xl font-bold uppercase tracking-tighter">Event_Stream</h3>
-           <div className="space-y-6 flex-1">
-              {adminData?.recentActivities?.map((act: any) => (
-                <div key={act.id} className="border-l-2 border-[#EBBB54]/30 pl-4 py-1">
-                   <p className="text-xs text-white font-bold leading-relaxed">
-                     {act.user} <span className="text-gray-500 px-1">»</span> {act.action} <span className="text-gray-500 px-1">»</span> {act.target}
-                   </p>
-                   <p className="text-[10px] text-gray-600 mt-1 uppercase font-black">{act.time}</p>
+           <div className="h-[300px] w-full flex items-end gap-3 pt-10">
+              {[40, 60, 45, 90, 65, 80, 55, 75, 95, 100, 85, 70].map((h, i) => (
+                <div key={i} className="flex-1 group/bar relative">
+                   <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[8px] font-black px-2 py-1 rounded opacity-0 group-hover/bar:opacity-100 transition-opacity whitespace-nowrap">
+                      Value: {h}%
+                   </div>
+                   <div 
+                     className="w-full bg-blue-100 group-hover/bar:bg-blue-600 rounded-t-lg transition-all duration-500" 
+                     style={{ height: `${h}%` }}
+                   />
                 </div>
               ))}
            </div>
-           <button className="w-full py-4 border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-white/5 transition-all">
-              Download_Full_Logs
+        </div>
+
+        {/* Activity Stream */}
+        <div className="lg:col-span-4 card-premium p-10 flex flex-col space-y-8">
+           <div className="flex items-center justify-between">
+              <h4 className="text-xl font-black tracking-tight">System_Logs</h4>
+              <MoreHorizontal size={20} className="text-gray-300 cursor-pointer" />
+           </div>
+           
+           <div className="space-y-8 flex-1">
+              {adminData?.recentActivities?.slice(0, 5).map((act: any) => (
+                <div key={act.id} className="flex gap-4 group">
+                   <div className="w-10 h-10 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 group-hover:text-blue-600 group-hover:bg-blue-50 transition-colors shrink-0">
+                      <Activity size={16} />
+                   </div>
+                   <div className="space-y-1">
+                      <p className="text-xs font-bold text-gray-900 leading-tight">
+                         {act.user} <span className="text-gray-400 font-medium">performed</span> {act.action}
+                      </p>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{act.time}</p>
+                   </div>
+                </div>
+              ))}
+           </div>
+
+           <button className="w-full py-4 bg-gray-50 border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-100 transition-all">
+              View All Logs
            </button>
         </div>
       </div>
 
-      {/* 4. SECURITY & SYSTEM STATUS */}
-      <div className="p-10 bg-red-600/5 border border-red-600/20 rounded-2xl flex flex-col md:flex-row items-center gap-8">
-         <div className="p-4 bg-red-600/10 text-red-600 rounded-full">
-            <ShieldAlert size={40} />
+      {/* Recent Modules / Tables Section */}
+      <div className="card-premium overflow-hidden">
+         <div className="p-8 border-b border-gray-50 flex items-center justify-between">
+            <h4 className="text-xl font-black tracking-tight">Active_Modules</h4>
+            <div className="flex items-center gap-4">
+               <div className="relative">
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input className="pl-9 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold focus:outline-none focus:border-blue-100 transition-all" placeholder="Search Assets..." />
+               </div>
+            </div>
          </div>
-         <div className="flex-1 space-y-2">
-            <h4 className="text-lg font-bold text-red-500 uppercase tracking-tighter">Security_Protocol_Active</h4>
-            <p className="text-sm text-gray-500 leading-relaxed font-medium">
-               Current session is restricted to administrative IP ranges. All modifications to <span className="text-white">COURSE_DB</span> and <span className="text-white">USER_SCHEMA</span> are mirrored to the cold-storage vault.
-            </p>
-         </div>
-         <div className="text-right">
-            <p className="text-[10px] text-gray-600 font-black">ENCRYPTION: AES-256</p>
-            <p className="text-[10px] text-gray-600 font-black">SSL: VERIFIED</p>
+         <div className="overflow-x-auto">
+            <table className="w-full text-left">
+               <thead>
+                  <tr className="bg-gray-50/50">
+                     <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Entity</th>
+                     <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Category</th>
+                     <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</th>
+                     <th className="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Operations</th>
+                  </tr>
+               </thead>
+               <tbody className="divide-y divide-gray-50">
+                  {adminData?.recentCourses?.map((course: any) => (
+                    <tr key={course._id} className="group hover:bg-gray-50/30 transition-colors">
+                       <td className="px-8 py-6">
+                          <div className="flex items-center gap-3">
+                             <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 group-hover:text-blue-600 transition-colors">
+                                <BookOpen size={18} />
+                             </div>
+                             <span className="text-sm font-bold text-gray-900">{course.title}</span>
+                          </div>
+                       </td>
+                       <td className="px-8 py-6">
+                          <span className="px-3 py-1 bg-gray-100 text-[10px] font-black uppercase tracking-widest text-gray-500 rounded-full">
+                             {course.category}
+                          </span>
+                       </td>
+                       <td className="px-8 py-6">
+                          <div className="flex items-center gap-2">
+                             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                             <span className="text-xs font-bold text-gray-900">Active</span>
+                          </div>
+                       </td>
+                       <td className="px-8 py-6 text-right">
+                          <button className="text-xs font-bold text-blue-600 hover:underline">Manage</button>
+                       </td>
+                    </tr>
+                  ))}
+               </tbody>
+            </table>
          </div>
       </div>
     </div>

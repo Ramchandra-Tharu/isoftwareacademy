@@ -12,12 +12,21 @@ import {
   TrendingUp,
   MessageSquare,
   Ghost,
-  Loader2
+  Loader2,
+  Zap,
+  Target,
+  Sparkles,
+  ChevronRight
 } from "lucide-react";
-import StatsCard from "@/components/dashboard/StatsCard";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 export default function StudentDashboardOverview() {
   const { data: session, status } = useSession();
@@ -35,12 +44,9 @@ export default function StudentDashboardOverview() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // Fetch courses for 'Recently Accessed'
         const courseRes = await fetch("/api/courses?featured=true");
         const courses = await courseRes.json();
         setRecentCourses(courses.slice(0, 3));
-
-        // Fetch user stats (Total enrolled, certs, etc.)
         setStatsData({
            enrolled: courses.length,
            completed: 48, 
@@ -48,171 +54,165 @@ export default function StudentDashboardOverview() {
            certs: 3 
         });
       } catch (err) {
-        console.error("Dashboard fetch error:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchDashboardData();
   }, []);
 
-  const stats = [
-    { 
-      title: "Enrolled Courses", 
-      value: statsData?.enrolled || 0, 
-      icon: BookOpen, 
-      trend: "+2 this month", 
-      trendType: "positive", 
-      description: "active courses" 
-    },
-    { 
-      title: "Completed Lessons", 
-      value: statsData?.completed || 0, 
-      icon: CheckCircle, 
-      trend: "85%", 
-      trendType: "positive", 
-      description: "total lessons" 
-    },
-    { 
-      title: "Average Quiz Score", 
-      value: statsData?.avgScore || "0%", 
-      icon: BarChart2, 
-      trend: "High Score", 
-      trendType: "positive", 
-      description: "across all quizzes" 
-    },
-    { 
-      title: "Earned Certificates", 
-      value: statsData?.certs || 0, 
-      icon: Award, 
-      trend: "Level Up!", 
-      trendType: "positive", 
-      description: "professional certs" 
-    },
-  ] as const;
-
   if (loading) {
     return (
-      <div className="h-[80vh] flex flex-col items-center justify-center gap-4">
-        <Loader2 className="animate-spin text-[#EBBB54]" size={48} />
-        <p className="text-gray-500 font-medium animate-pulse">Initializing your learning environment...</p>
+      <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+        <Loader2 className="animate-spin text-blue-600" size={40} />
+        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Loading Learning Path...</p>
       </div>
     );
   }
 
-  const userName = session?.user?.name?.trim() || "";
+  const stats = [
+    { label: "Active Courses", val: statsData?.enrolled || 0, icon: BookOpen, color: "bg-blue-50 text-blue-600" },
+    { label: "Lessons Done", val: statsData?.completed || 0, icon: CheckCircle, color: "bg-emerald-50 text-emerald-600" },
+    { label: "Average Score", val: statsData?.avgScore || "0%", icon: BarChart2, color: "bg-indigo-50 text-indigo-600" },
+    { label: "Certificates", val: statsData?.certs || 0, icon: Award, color: "bg-amber-50 text-amber-600" },
+  ];
 
   return (
-    <div className="space-y-10 pb-10">
+    <div className="space-y-12 pb-20 font-sans">
       {/* Welcome Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-           <h1 className="text-4xl md:text-5xl font-bold font-serif text-white mb-2">
-             Welcome back, <span className="text-[#EBBB54]">
-               {userName || "Student"}
-             </span>!
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+        <div className="space-y-2">
+           <div className="flex items-center gap-3">
+              <div className="px-3 py-1 bg-blue-600 text-white text-[10px] font-black rounded-full uppercase tracking-widest shadow-lg shadow-blue-600/20">
+                 Student Dashboard
+              </div>
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">v2.0.4 Premium</span>
+           </div>
+           <h1 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 leading-none uppercase">
+             Good Day, <span className="text-blue-600">{session?.user?.name || "Learner"}</span>.
            </h1>
-           <p className="text-gray-400 text-lg">Next milestone: Master <span className="text-white font-bold underline decoration-[#EBBB54]">Modern React Patterns</span>.</p>
+           <p className="text-gray-500 font-medium">Continue your journey to mastery. You're <span className="text-gray-900 font-black">48% closer</span> to your next certificate.</p>
         </div>
         
-        <div className="flex items-center gap-3">
-           <div className="px-5 py-3 bg-[#EBBB54]/10 border border-[#EBBB54]/20 rounded-2xl flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#EBBB54] flex items-center justify-center text-black font-bold">Lvl 4</div>
-              <div className="space-y-1">
-                 <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Current Status</p>
-                 <p className="text-sm font-bold text-white">Intermediate Learner</p>
-              </div>
+        <div className="card-premium p-6 flex items-center gap-6 group cursor-pointer hover:border-blue-100">
+           <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+              <Target size={24} />
            </div>
+           <div>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Next Milestone</p>
+              <p className="text-sm font-black text-gray-900 uppercase">React Design Patterns</p>
+           </div>
+           <ChevronRight size={18} className="text-gray-300 group-hover:text-blue-600 transition-colors" />
         </div>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-         {stats.map((stat, i) => (
-           <StatsCard key={i} {...stat} />
-         ))}
+        {stats.map((stat, i) => (
+          <div key={i} className="card-premium p-8 group">
+             <div className="flex items-center justify-between mb-6">
+                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", stat.color)}>
+                   <stat.icon size={22} />
+                </div>
+                <div className="flex items-center gap-1 text-emerald-500 text-xs font-bold">
+                   <TrendingUp size={14} /> +8%
+                </div>
+             </div>
+             <h3 className="text-4xl font-black tracking-tighter text-gray-900">{stat.val}</h3>
+             <p className="text-xs font-black uppercase tracking-widest text-gray-500 mt-2">{stat.label}</p>
+          </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
         {/* Recently Accessed Courses */}
-        <div className="xl:col-span-2 space-y-6">
+        <div className="xl:col-span-8 space-y-8">
            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                <PlayCircle className="text-[#EBBB54]" /> Recently Accessed
+              <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
+                <PlayCircle className="text-blue-600" /> Continue_Learning
               </h2>
-              <Link href="/dashboard/my-courses" className="text-sm text-[#EBBB54] hover:underline flex items-center gap-1 font-bold">
-                View all <ArrowRight size={14} />
+              <Link href="/dashboard/my-courses" className="text-[10px] font-black uppercase tracking-widest text-blue-600 flex items-center gap-1 hover:gap-3 transition-all">
+                View Catalog <ArrowRight size={14} />
               </Link>
            </div>
            
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {recentCourses.length > 0 ? recentCourses.map((course) => (
-                <div key={course._id} className="group bg-[#1a1a1a] border border-white/5 rounded-3xl p-6 hover:border-[#EBBB54]/30 hover:bg-[#222222] transition-all duration-300 relative overflow-hidden h-full flex flex-col">
-                   <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-10 transition-opacity">
+                <div key={course._id} className="card-premium group p-8 flex flex-col h-full relative overflow-hidden">
+                   <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:opacity-10 transition-opacity">
                       <BookOpen size={120} />
                    </div>
-                   <div className="relative z-10 space-y-4 flex-1 flex flex-col">
+                   <div className="relative z-10 flex-1 flex flex-col space-y-6">
                       <div className="flex items-center justify-between">
-                         <span className="px-3 py-1 bg-white/5 rounded-full text-[10px] font-bold text-gray-500 uppercase tracking-wider">{course.category}</span>
-                         <span className="text-[10px] font-bold text-[#EBBB54] flex items-center gap-1"><Clock size={12} /> {course.duration}</span>
+                         <span className="px-3 py-1 bg-gray-50 border border-gray-100 rounded-full text-[10px] font-black text-gray-400 uppercase tracking-widest">{course.category}</span>
+                         <span className="text-[10px] font-black text-blue-600 flex items-center gap-1 uppercase tracking-widest"><Clock size={12} /> {course.duration}</span>
                       </div>
-                      <h3 className="text-xl font-bold text-white group-hover:text-[#EBBB54] transition-colors">{course.title}</h3>
-                      <div className="mt-auto pt-4 flex items-center justify-between">
-                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 group-hover:text-[#EBBB54]">
+                      <h3 className="text-2xl font-black text-gray-900 group-hover:text-blue-600 transition-colors tracking-tighter uppercase leading-tight">{course.title}</h3>
+                      <div className="mt-auto pt-8 border-t border-gray-50 flex items-center justify-between">
+                         <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
                                <TrendingUp size={16} />
                             </div>
-                            <span className="text-xs font-bold text-gray-500">{course.progress || 0}% Complete</span>
+                            <div>
+                               <p className="text-[10px] font-black text-gray-900 uppercase">{course.progress || 0}% Done</p>
+                               <div className="w-24 h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
+                                  <div className="h-full bg-blue-600 rounded-full" style={{ width: `${course.progress || 0}%` }} />
+                               </div>
+                            </div>
                          </div>
-                         <Link href={`/dashboard/courses/${course.slug}`} className="p-2 bg-[#EBBB54] text-black rounded-lg hover:scale-110 transition-transform">
+                         <Link href={`/dashboard/courses/${course.slug}`} className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-xl shadow-blue-600/20">
                             <ArrowRight size={20} />
                          </Link>
                       </div>
                    </div>
                 </div>
               )) : (
-                <div className="col-span-full h-48 border-2 border-dashed border-white/5 rounded-3xl flex flex-col items-center justify-center text-gray-600 gap-2">
-                   <Ghost size={40} className="opacity-20" />
-                   <p>No recent activity. Start your first course today!</p>
+                <div className="col-span-full h-64 card-premium border-dashed flex flex-col items-center justify-center text-gray-400 gap-4">
+                   <Ghost size={48} className="opacity-10" />
+                   <p className="text-[10px] font-black uppercase tracking-widest">No active deployments found.</p>
+                   <Link href="/courses" className="btn-primary text-xs">Start Your First Course</Link>
                 </div>
               )}
            </div>
         </div>
 
-        {/* Community Feed / Quick Activity */}
-        <div className="space-y-6">
-           <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-             <MessageSquare className="text-[#EBBB54]" /> Community Feed
+        {/* Community / Social Side Bar */}
+        <div className="xl:col-span-4 space-y-8">
+           <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
+             <MessageSquare className="text-blue-600" /> Community_Sync
            </h2>
 
-           <div className="bg-[#1a1a1a] border border-white/5 rounded-[2.5rem] p-8 space-y-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-[0.02]"><MessageSquare size={100} /></div>
+           <div className="card-premium p-10 space-y-10 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-[0.02] pointer-events-none"><MessageSquare size={120} /></div>
               
-              <div className="space-y-6 relative z-10">
+              <div className="space-y-8 relative z-10">
                  {[
-                   { user: "Ramchandra Tharu", action: "Just finished Module 4", time: "2m ago", points: "+50" },
-                   { user: "Sandeep Tharu", action: "Replied to your doubt", time: "15m ago", points: "REPLY" },
-                   { user: "John Doe", action: "Earned Certification", time: "1h ago", points: "CERT" }
+                   { user: "Ramchandra Tharu", action: "Completed Lesson 14", time: "2m ago", points: "+50 XP", icon: <Sparkles size={14}/> },
+                   { user: "Sandeep Tharu", action: "Answered your doubt", time: "15m ago", points: "REPLY", icon: <MessageSquare size={14}/> },
+                   { user: "System Core", action: "Weekly Challenge Live", time: "1h ago", points: "EVENT", icon: <Zap size={14}/> }
                  ].map((activity, i) => (
-                   <div key={i} className="flex items-center gap-4 group cursor-pointer hover:translate-x-2 transition-transform">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-[#EBBB54] font-bold border border-white/10 group-hover:border-[#EBBB54]">
+                   <div key={i} className="flex items-center gap-5 group cursor-pointer">
+                      <div className="w-12 h-12 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 font-black text-lg group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors shadow-sm">
                          {activity.user.charAt(0)}
                       </div>
                       <div className="flex-1">
-                         <p className="text-sm font-bold text-white leading-tight">{activity.user}</p>
-                         <p className="text-xs text-gray-500">{activity.action}</p>
+                         <p className="text-sm font-black text-gray-900 uppercase tracking-tight leading-tight">{activity.user}</p>
+                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{activity.action}</p>
                       </div>
                       <div className="text-right">
-                         <p className="text-[10px] text-[#EBBB54] font-bold">{activity.points}</p>
-                         <p className="text-[10px] text-gray-600">{activity.time}</p>
+                         <div className="flex items-center justify-end gap-1 text-[10px] text-blue-600 font-black uppercase tracking-widest">
+                            {activity.icon} {activity.points}
+                         </div>
+                         <p className="text-[8px] text-gray-300 font-black uppercase tracking-widest mt-1">{activity.time}</p>
                       </div>
                    </div>
                  ))}
               </div>
 
-              <Link href="/dashboard/comments" className="block w-full py-4 bg-white/5 hover:bg-white/10 text-white text-center font-bold rounded-2xl border border-white/10 transition-all text-sm mt-4">
-                 Join the Discussion
+              <Link href="/dashboard/comments" className="w-full py-4 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 hover:scale-105 transition-all shadow-xl shadow-blue-600/20">
+                 Explore Discussion Hub
               </Link>
            </div>
         </div>

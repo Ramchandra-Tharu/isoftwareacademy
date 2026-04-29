@@ -13,8 +13,11 @@ import {
   Settings, 
   LogOut,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ShieldCheck,
+  Cpu
 } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -23,16 +26,13 @@ function cn(...inputs: ClassValue[]) {
 }
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+  { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
   { icon: BookOpen, label: "My Courses", href: "/dashboard/my-courses" },
-  { icon: BarChart2, label: "Progress", href: "/dashboard/progress" },
-  { icon: HelpCircle, label: "Quiz", href: "/dashboard/quiz" },
+  { icon: BarChart2, label: "Analytics", href: "/dashboard/progress" },
+  { icon: HelpCircle, label: "Assessments", href: "/dashboard/quiz" },
   { icon: Award, label: "Certificates", href: "/dashboard/certificates" },
-  { icon: MessageSquare, label: "Comments", href: "/dashboard/comments" },
+  { icon: MessageSquare, label: "Community", href: "/dashboard/comments" },
 ];
-
-import { useSession } from "next-auth/react";
-import { ShieldCheck } from "lucide-react";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -42,34 +42,51 @@ export default function Sidebar() {
   return (
     <aside 
       className={cn(
-        "relative flex flex-col bg-[#111111] border-r border-white/5 transition-all duration-300 ease-in-out",
-        isCollapsed ? "w-20" : "w-64"
+        "relative flex flex-col bg-white border-r border-gray-100 transition-all duration-300 ease-in-out",
+        isCollapsed ? "w-20" : "w-72"
       )}
     >
-      <div className="flex items-center justify-between h-20 px-6 border-b border-white/5">
+      {/* Sidebar Header */}
+      <div className={cn(
+        "flex items-center h-20 px-6 border-b border-gray-50 bg-gray-50/30",
+        isCollapsed ? "justify-center" : "justify-between"
+      )}>
         {!isCollapsed && (
-          <span className="text-xl font-bold bg-gradient-to-r from-[#EBBB54] to-[#f5d085] bg-clip-text text-transparent">
-            iSoftware Lab
-          </span>
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-600/20 group-hover:rotate-6 transition-transform">
+               <Cpu size={18} />
+            </div>
+            <span className="text-[11px] font-black tracking-tighter uppercase text-gray-900">
+               ACADEMY_<span className="text-blue-600">STUDENT</span>
+            </span>
+          </Link>
         )}
         <button 
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 transition-colors"
+          className={cn(
+            "p-1.5 rounded-lg bg-white border border-gray-200 text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm",
+            isCollapsed && "mt-2"
+          )}
         >
-          {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
       </div>
 
-      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
+      {/* Navigation */}
+      <nav className="flex-1 px-4 py-8 space-y-1.5 overflow-y-auto custom-scrollbar">
         {session?.user?.role === "admin" && (
           <Link
             href="/admin"
-            className="flex items-center gap-3 px-3 py-3 rounded-xl bg-red-600/10 text-red-500 border border-red-600/20 hover:bg-red-600/20 transition-all group mb-6"
+            className={cn(
+              "flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all group mb-6",
+              isCollapsed && "justify-center"
+            )}
           >
-            <ShieldCheck size={22} className="group-hover:scale-110 transition-transform" />
-            {!isCollapsed && <span className="font-bold uppercase tracking-tighter">Admin Panel</span>}
+            <ShieldCheck size={20} className="group-hover:scale-110 transition-transform shrink-0" />
+            {!isCollapsed && <span className="text-xs font-black uppercase tracking-widest">Admin Control</span>}
           </Link>
         )}
+
         {menuItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -77,39 +94,45 @@ export default function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group",
+                "flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group",
                 isActive 
-                  ? "bg-[#EBBB54] text-black shadow-[0_0_20px_rgba(235,187,84,0.3)]" 
-                  : "text-gray-400 hover:bg-white/5 hover:text-white"
+                  ? "bg-blue-50 text-blue-600 font-bold shadow-sm shadow-blue-600/5" 
+                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
               )}
             >
-              <item.icon size={22} className={cn(isActive ? "text-black" : "group-hover:text-[#EBBB54]")} />
-              {!isCollapsed && <span className="font-medium">{item.label}</span>}
+              <item.icon size={20} className={cn(
+                "transition-colors shrink-0",
+                isActive ? "text-blue-600" : "text-gray-400 group-hover:text-blue-500"
+              )} />
+              {!isCollapsed && <span className="text-sm tracking-tight">{item.label}</span>}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 space-y-2 border-t border-white/5">
+      {/* Footer */}
+      <div className="p-4 border-t border-gray-50">
         <Link 
           href="/dashboard/settings"
           className={cn(
-            "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group",
-            pathname === "/dashboard/settings" 
-              ? "bg-white/10 text-white" 
-              : "text-gray-400 hover:bg-white/5 hover:text-white"
+            "flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 group mb-1",
+            pathname === "/dashboard/settings" && "bg-gray-50 text-gray-900 font-bold",
+            isCollapsed && "justify-center"
           )}
         >
-          <Settings size={22} className="group-hover:text-[#EBBB54]" />
-          {!isCollapsed && <span className="font-medium">Settings</span>}
+          <Settings size={20} className="group-hover:text-blue-600" />
+          {!isCollapsed && <span className="text-sm">Account Settings</span>}
         </Link>
-        <Link 
-          href="/get-started"
-          className="flex items-center w-full gap-3 px-3 py-3 text-gray-400 rounded-xl hover:bg-white/5 hover:text-red-400 transition-all duration-200 group"
+        <button 
+          onClick={() => {}}
+          className={cn(
+            "flex items-center w-full gap-3 px-4 py-3 text-gray-400 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all duration-200 group",
+            isCollapsed && "justify-center"
+          )}
         >
-          <LogOut size={22} className="group-hover:text-red-400" />
-          {!isCollapsed && <span className="font-medium">Logout</span>}
-        </Link>
+          <LogOut size={20} className="group-hover:text-red-600" />
+          {!isCollapsed && <span className="text-sm font-medium">Logout</span>}
+        </button>
       </div>
     </aside>
   );

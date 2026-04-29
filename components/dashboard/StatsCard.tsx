@@ -1,5 +1,5 @@
 import React from "react";
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, TrendingUp, TrendingDown } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -25,30 +25,28 @@ export default function StatsCard({
   description 
 }: StatsCardProps) {
   return (
-    <div className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-[#EBBB54]/30 hover:bg-white/[0.07] transition-all duration-300 relative overflow-hidden">
-      {/* Decorative background glow */}
-      <div className="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-[#EBBB54]/5 rounded-full blur-2xl group-hover:bg-[#EBBB54]/10 transition-all duration-500"></div>
-      
-      <div className="flex items-start justify-between relative z-10">
-        <div>
-          <p className="text-sm font-medium text-gray-500 mb-1">{title}</p>
-          <h3 className="text-3xl font-bold text-white tracking-tight">{value}</h3>
+    <div className="group p-8 rounded-[1.5rem] bg-white border border-gray-100 hover:border-blue-100 hover:shadow-xl hover:shadow-blue-600/5 transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
+      <div className="flex items-start justify-between relative z-10 mb-6">
+        <div className="space-y-1">
+           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{title}</p>
+           <h3 className="text-3xl font-black text-gray-900 tracking-tighter">{value}</h3>
         </div>
-        <div className="p-3 rounded-xl bg-white/5 group-hover:bg-[#EBBB54]/10 text-gray-400 group-hover:text-[#EBBB54] transition-all">
-          <Icon size={24} />
+        <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all shadow-sm">
+          <Icon size={22} />
         </div>
       </div>
       
-      <div className="mt-4 flex items-center gap-2 relative z-10">
+      <div className="flex items-center gap-2 relative z-10 pt-4 border-t border-gray-50">
         {trend && (
-          <span className={cn(
-            "text-xs font-semibold px-2 py-0.5 rounded-full",
-            trendType === "positive" ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
+          <div className={cn(
+            "flex items-center gap-1 text-[10px] font-black uppercase tracking-widest",
+            trendType === "positive" ? "text-emerald-500" : "text-red-500"
           )}>
+            {trendType === "positive" ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
             {trend}
-          </span>
+          </div>
         )}
-        <span className="text-xs text-gray-500">{description}</span>
+        <span className="text-[10px] text-gray-300 font-bold uppercase tracking-widest">{description}</span>
       </div>
     </div>
   );

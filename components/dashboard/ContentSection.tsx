@@ -8,8 +8,17 @@ import {
   Clock, 
   Download,
   Share2,
-  Bookmark
+  Bookmark,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink
 } from "lucide-react";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 interface ContentBlock {
   type: "text" | "code" | "image" | "video";
@@ -43,37 +52,44 @@ export default function ContentSection({
   };
 
   return (
-    <div className="bg-[#1a1a1a]/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 font-sans">
       {/* Lesson Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-white/5">
-        <div className="space-y-2">
-           <div className="flex items-center gap-2 text-[#EBBB54] text-xs font-bold uppercase tracking-widest">
-              <FileText size={14} /> Lesson Content
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-10 border-b border-gray-100">
+        <div className="space-y-4">
+           <div className="flex items-center gap-3">
+              <span className="px-3 py-1 bg-blue-50 text-blue-600 text-[9px] font-black uppercase tracking-widest rounded-full border border-blue-100 shadow-sm">
+                 Unit_Content
+              </span>
+              <div className="flex items-center gap-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                 <span className="flex items-center gap-1.5"><Clock size={14} /> {duration}</span>
+                 <span className={cn(
+                   "flex items-center gap-1.5",
+                   isCompleted ? "text-emerald-500" : "text-gray-400"
+                 )}>
+                    <CheckCircle2 size={14} /> {isCompleted ? "Verified" : "Pending"}
+                 </span>
+              </div>
            </div>
-           <h1 className="text-3xl font-bold font-serif text-white">{title}</h1>
-           <div className="flex items-center gap-4 text-sm text-gray-500">
-              <span className="flex items-center gap-1.5"><Clock size={16} /> {duration}</span>
-              <span className="flex items-center gap-1.5"><CheckCircle2 size={16} className={isCompleted ? "text-green-500" : "text-gray-600"} /> {isCompleted ? "Completed" : "In Progress"}</span>
-           </div>
+           <h1 className="text-4xl font-black tracking-tight text-gray-900 uppercase leading-none">
+             {title}
+           </h1>
         </div>
         
         <div className="flex items-center gap-3">
-           <button className="p-2.5 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white rounded-xl border border-white/10 transition-all">
+           <button className="p-3 bg-white border border-gray-100 text-gray-400 hover:text-blue-600 hover:border-blue-100 rounded-2xl transition-all shadow-sm">
               <Bookmark size={20} />
-           </button>
-           <button className="p-2.5 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white rounded-xl border border-white/10 transition-all">
-              <Share2 size={20} />
            </button>
            <button 
              onClick={handleComplete}
              disabled={loading}
-             className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold hover:scale-105 transition-all shadow-[0_0_20px_rgba(235,187,84,0.2)] ${
+             className={cn(
+               "flex items-center gap-3 px-8 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl",
                isCompleted 
-                 ? "bg-green-500/20 text-green-500 border border-green-500/30" 
-                 : "bg-[#EBBB54] text-black"
-             }`}
+                 ? "bg-emerald-500 text-white shadow-emerald-500/20" 
+                 : "bg-blue-600 text-white shadow-blue-600/20 hover:scale-105"
+             )}
            >
-              {loading ? "Saving..." : isCompleted ? "Completed" : "Mark Completed"}
+              {loading ? <span className="animate-pulse">Syncing...</span> : isCompleted ? <><CheckCircle2 size={16} /> Completed</> : "Mark_Complete"}
            </button>
         </div>
       </div>
@@ -84,24 +100,24 @@ export default function ContentSection({
           switch (block.type) {
             case "text":
               return (
-                <div key={i} className="prose prose-invert max-w-none">
-                  <p className="text-gray-300 leading-relaxed text-lg whitespace-pre-wrap">
+                <div key={i} className="max-w-none">
+                  <p className="text-gray-600 leading-relaxed text-lg whitespace-pre-wrap font-medium">
                     {block.content}
                   </p>
                 </div>
               );
             case "code":
               return (
-                <div key={i} className="space-y-4">
-                  <div className="flex items-center justify-between px-4 py-2 bg-[#2a2a2a] rounded-t-xl border-b border-white/5 border-x border-white/5">
+                <div key={i} className="space-y-0 rounded-3xl overflow-hidden border border-gray-100 shadow-sm">
+                  <div className="flex items-center justify-between px-6 py-3 bg-gray-50 border-b border-gray-100">
                      <div className="flex items-center gap-2">
-                        <Code size={16} className="text-[#EBBB54]" />
-                        <span className="text-xs font-mono text-gray-400 uppercase tracking-widest">{block.language || "code"}</span>
+                        <Code size={16} className="text-blue-600" />
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{block.language || "Terminal"}</span>
                      </div>
-                     <button className="text-[10px] text-gray-500 hover:text-white font-bold uppercase tracking-wider transition-colors">Copy Code</button>
+                     <button className="text-[9px] font-black text-gray-400 hover:text-blue-600 uppercase tracking-widest transition-colors">Copy_Code</button>
                   </div>
-                  <pre className="p-6 bg-[#0c0c0c] border border-white/5 rounded-b-xl overflow-x-auto custom-scrollbar">
-                    <code className="text-sm font-mono text-[#EBBB54]/90 whitespace-pre">
+                  <pre className="p-8 bg-[#0F172A] overflow-x-auto custom-scrollbar">
+                    <code className="text-sm font-mono text-blue-200/90 whitespace-pre">
                       {block.content}
                     </code>
                   </pre>
@@ -110,36 +126,37 @@ export default function ContentSection({
             case "image":
               return (
                 <div key={i} className="space-y-4">
-                   <div className="relative group rounded-2xl overflow-hidden border border-white/10 bg-white/5 aspect-video flex items-center justify-center">
+                   <div className="relative group rounded-[2.5rem] overflow-hidden border border-gray-100 bg-gray-50 aspect-video flex items-center justify-center shadow-lg">
                       <img 
                         src={block.content} 
-                        alt={block.caption || "Lesson Illustration"} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90 group-hover:opacity-100"
+                        alt={block.caption || "Asset"} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-                         <div className="flex items-center gap-2 p-2 bg-black/40 backdrop-blur-md rounded-xl text-white/70 hover:text-white transition-all cursor-pointer">
-                            <ImageIcon size={20} />
-                            <span className="text-xs font-medium">Click to Enlarge</span>
+                      <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                         <div className="bg-white/90 backdrop-blur-md px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-xl">
+                            Expand_View
                          </div>
                       </div>
                    </div>
                    {block.caption && (
-                     <p className="text-center text-sm text-gray-500 italic">
-                       {block.caption}
+                     <p className="text-center text-[10px] font-black text-gray-400 uppercase tracking-widest italic">
+                       // {block.caption}
                      </p>
                    )}
                 </div>
               );
             case "video":
               return (
-                <div key={i} className="relative aspect-video rounded-3xl overflow-hidden group border border-white/10 shadow-2xl">
-                   <div className="absolute inset-0 bg-gradient-to-br from-[#EBBB54]/20 via-transparent to-black/60 z-0"></div>
-                   <img src={block.content} className="w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-1000" alt="Video Placeholder" />
+                <div key={i} className="relative aspect-video rounded-[3rem] overflow-hidden group shadow-2xl shadow-blue-600/10 border border-gray-100">
+                   <div className="absolute inset-0 bg-blue-600/5 z-0"></div>
+                   <img src={block.content} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" alt="Stream" />
                    <div className="absolute inset-0 flex flex-col items-center justify-center space-y-6 z-10">
-                      <div className="w-20 h-20 bg-[#EBBB54] rounded-full flex items-center justify-center text-black shadow-[0_0_50px_rgba(235,187,84,0.5)] scale-90 group-hover:scale-100 transition-all duration-300 cursor-pointer">
+                      <div className="w-24 h-24 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-2xl shadow-blue-600/40 scale-90 group-hover:scale-100 transition-all duration-300 cursor-pointer">
                          <Play size={32} fill="currentColor" className="ml-1" />
                       </div>
-                      <p className="text-sm font-bold text-white uppercase tracking-widest bg-black/40 px-4 py-2 rounded-full backdrop-blur-md border border-white/10">Play Lesson Video</p>
+                      <div className="px-6 py-2 bg-white/90 backdrop-blur-md rounded-full border border-gray-100 text-[10px] font-black uppercase tracking-widest text-gray-900 shadow-xl">
+                         Initialize_Stream
+                      </div>
                    </div>
                 </div>
               );
@@ -149,34 +166,40 @@ export default function ContentSection({
         })}
       </div>
 
-      {/* Footer Navigation */}
-      <div className="flex items-center justify-between pt-10 border-t border-white/5">
-         <button className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl border border-white/10 transition-all group">
-            <span className="opacity-50 group-hover:-translate-x-1 transition-transform">←</span> Previous Lesson
-         </button>
-         <button className="flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl border border-white/10 transition-all group">
-            Next Lesson <span className="opacity-50 group-hover:translate-x-1 transition-transform">→</span>
-         </button>
-      </div>
-      
       {/* Resources Widget */}
-      <div className="bg-[#EBBB54]/5 rounded-3xl p-8 border border-[#EBBB54]/10 space-y-4">
-         <h3 className="text-xl font-bold text-white flex items-center gap-2">
-            <Download size={20} className="text-[#EBBB54]" /> Downloadable Resources
-         </h3>
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-gray-50 rounded-[3rem] p-10 border border-gray-100 space-y-8">
+         <div className="flex items-center justify-between">
+            <h3 className="text-xl font-black text-gray-900 uppercase tracking-tighter flex items-center gap-3">
+               <Download size={22} className="text-blue-600" /> Resource_Vault
+            </h3>
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">4 Assets Available</span>
+         </div>
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
-              "Lecture Slides (PDF)",
-              "Source Code (.zip)",
-              "Course Cheatsheet",
-              "Reference Documentation"
+              { label: "Lecture Slides", type: "PDF", size: "2.4 MB" },
+              { label: "Asset Manifest", type: "JSON", size: "12 KB" },
+              { label: "Source Protocol", type: "ZIP", size: "45.8 MB" },
+              { label: "Reference Manual", type: "MD", size: "120 KB" }
             ].map((res) => (
-              <div key={res} className="p-4 bg-black/40 rounded-2xl flex items-center justify-between group cursor-pointer hover:bg-black/60 transition-colors border border-white/5">
-                 <span className="text-sm text-gray-400 group-hover:text-white transition-colors">{res}</span>
-                 <Download size={16} className="text-gray-600 group-hover:text-[#EBBB54] transition-colors" />
+              <div key={res.label} className="p-6 bg-white rounded-2xl flex items-center justify-between group cursor-pointer hover:border-blue-100 border border-gray-100 transition-all shadow-sm">
+                 <div className="space-y-1">
+                    <p className="text-sm font-black text-gray-900 uppercase tracking-tight">{res.label}</p>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase">{res.type} // {res.size}</p>
+                 </div>
+                 <Download size={18} className="text-gray-300 group-hover:text-blue-600 transition-colors" />
               </div>
             ))}
          </div>
+      </div>
+
+      {/* Navigation */}
+      <div className="flex items-center justify-between pt-12 border-t border-gray-100">
+         <button className="flex items-center gap-3 px-8 py-4 bg-white border border-gray-100 text-gray-400 hover:text-blue-600 hover:border-blue-100 text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all group shadow-sm">
+            <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Previous_Unit
+         </button>
+         <button className="flex items-center gap-3 px-8 py-4 bg-white border border-gray-100 text-gray-400 hover:text-blue-600 hover:border-blue-100 text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all group shadow-sm">
+            Next_Unit <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+         </button>
       </div>
     </div>
   );

@@ -16,7 +16,9 @@ import {
   Lock,
   Cpu,
   Eye,
-  Type
+  Type,
+  ChevronRight,
+  ShieldAlert
 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -41,12 +43,9 @@ export default function SettingsPage() {
   const fetchSettings = async () => {
     try {
       const res = await fetch("/api/admin/settings");
-      if (res.ok) {
-        const data = await res.json();
-        setFormData(data);
-      }
+      if (res.ok) setFormData(await res.json());
     } catch (err) {
-      console.error("Failed to fetch settings", err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -88,107 +87,100 @@ export default function SettingsPage() {
   if (loading) {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
-        <Loader2 className="animate-spin text-[#EBBB54]" size={48} />
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600">Querying_System_Configs...</p>
+        <Loader2 className="animate-spin text-blue-600" size={40} />
+        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Loading System Configuration...</p>
       </div>
     );
   }
 
-  const tabs: { id: Tab; label: string; icon: any }[] = [
-    { id: "general", label: "General", icon: Globe },
-    { id: "security", label: "Security", icon: Shield },
-    { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "appearance", label: "Appearance", icon: Palette },
+  const tabs: { id: Tab; label: string; icon: any; desc: string }[] = [
+    { id: "general", label: "General", icon: Globe, desc: "Site identity and contact info" },
+    { id: "security", label: "Security", icon: Shield, desc: "Access control and hardening" },
+    { id: "notifications", label: "Notifications", icon: Bell, desc: "Alert protocols and SMTP" },
+    { id: "appearance", label: "Appearance", icon: Palette, desc: "Visual skin and accenting" },
   ];
 
   return (
-    <div className="space-y-10 pb-20 font-mono">
+    <div className="space-y-10 pb-20 font-sans">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-white/10 pb-10">
-        <div className="space-y-2">
-           <div className="flex items-center gap-3">
-              <span className="px-3 py-1 bg-white/5 text-gray-400 text-[10px] font-black rounded uppercase tracking-widest border border-white/10">Admin</span>
-              <h1 className="text-4xl font-black text-white tracking-tighter uppercase">
-                SYSTEM_<span className="text-[#EBBB54]">SETTINGS</span>
-              </h1>
-           </div>
-           <p className="text-gray-500 text-xs font-bold uppercase tracking-[0.2em]">
-             Target: <span className="text-white">Global-Config</span> | Access: <span className="text-white">Full-Privilege</span>
-           </p>
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div>
+           <h1 className="text-3xl font-black tracking-tight text-gray-900">System_Settings</h1>
+           <p className="text-sm text-gray-500 font-medium mt-1">Configure global parameters and security protocols.</p>
         </div>
         
         <div className="flex items-center gap-4">
            {status === "success" && (
-             <div className="flex items-center gap-2 text-green-500 text-[10px] font-black uppercase tracking-widest animate-pulse">
-                <CheckCircle size={14} /> CONFIG_SYNCED
-             </div>
-           )}
-           {status === "error" && (
-             <div className="flex items-center gap-2 text-red-500 text-[10px] font-black uppercase tracking-widest">
-                <AlertCircle size={14} /> SYNC_FAILED
+             <div className="flex items-center gap-2 text-emerald-600 text-[10px] font-black uppercase tracking-widest bg-emerald-50 px-4 py-2 rounded-xl">
+                <CheckCircle size={14} /> Synced
              </div>
            )}
            <button 
              onClick={handleSubmit}
              disabled={saving}
-             className="px-8 py-3 bg-[#EBBB54] text-black font-black rounded-xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#EBBB54]/10 flex items-center gap-2 uppercase text-xs tracking-widest disabled:opacity-50"
+             className="btn-primary flex items-center gap-2 disabled:opacity-50"
            >
              {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-             <span>SAVE_CHANGES</span>
+             <span>Save Configuration</span>
            </button>
         </div>
       </div>
 
-      {/* Main Settings Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Navigation Sidebar */}
-        <div className="lg:col-span-3 space-y-2">
+        <div className="lg:col-span-4 space-y-3">
            {tabs.map((tab) => (
              <button
                key={tab.id}
                onClick={() => setActiveTab(tab.id)}
                className={cn(
-                 "w-full flex items-center gap-3 px-6 py-4 rounded-2xl transition-all uppercase text-[10px] font-black tracking-widest border",
+                 "w-full flex items-center gap-4 px-6 py-5 rounded-[1.5rem] transition-all text-left border",
                  activeTab === tab.id 
-                   ? "bg-[#EBBB54] text-black border-[#EBBB54] shadow-lg shadow-[#EBBB54]/20" 
-                   : "bg-black border-white/5 text-gray-500 hover:border-white/10 hover:text-white"
+                   ? "bg-white border-blue-100 shadow-xl shadow-blue-600/5" 
+                   : "bg-transparent border-transparent text-gray-400 hover:bg-white hover:border-gray-50 hover:text-gray-600"
                )}
              >
-               <tab.icon size={16} />
-               <span>{tab.label}</span>
+               <div className={cn(
+                 "w-10 h-10 rounded-xl flex items-center justify-center transition-colors",
+                 activeTab === tab.id ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-400"
+               )}>
+                  <tab.icon size={20} />
+               </div>
+               <div className="flex-1">
+                  <p className={cn("text-sm font-black uppercase tracking-tight", activeTab === tab.id ? "text-gray-900" : "text-gray-500")}>{tab.label}</p>
+                  <p className="text-[10px] font-medium text-gray-400">{tab.desc}</p>
+               </div>
+               {activeTab === tab.id && <ChevronRight size={16} className="text-blue-600" />}
              </button>
            ))}
         </div>
 
         {/* Form Content */}
-        <div className="lg:col-span-9 bg-black border border-white/5 rounded-[2.5rem] p-10 relative overflow-hidden group">
+        <div className="lg:col-span-8 card-premium p-10 relative overflow-hidden group">
            <div className="absolute top-0 right-0 p-10 opacity-[0.02] pointer-events-none group-hover:opacity-[0.05] transition-opacity">
               <Cpu size={200} />
            </div>
 
            <form onSubmit={handleSubmit} className="space-y-12 relative z-10">
               {activeTab === "general" && (
-                <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-                   <h3 className="text-xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
-                      <Globe className="text-[#EBBB54]" /> Site_Identity
-                   </h3>
+                <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
+                   <div className="space-y-1">
+                      <h3 className="text-xl font-black text-gray-900 tracking-tight">Site_Identity</h3>
+                      <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Public-facing credentials</p>
+                   </div>
                    
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-2">
-                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><Type size={12} /> Website_Name</label>
-                         <input name="siteName" value={formData.siteName} onChange={handleChange} className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/30 focus:bg-white/5 transition-all" />
+                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">Website_Name</label>
+                         <input name="siteName" value={formData.siteName} onChange={handleChange} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-6 text-sm font-bold focus:outline-none focus:border-blue-100 focus:bg-white transition-all" />
                       </div>
                       <div className="space-y-2">
-                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><Layout size={12} /> Website_Logo_URL</label>
-                         <input name="siteLogo" value={formData.siteLogo} onChange={handleChange} className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/30 focus:bg-white/5 transition-all" />
+                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">Website_Logo_URL</label>
+                         <input name="siteLogo" value={formData.siteLogo} onChange={handleChange} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-6 text-sm font-bold focus:outline-none focus:border-blue-100 focus:bg-white transition-all" />
                       </div>
                       <div className="space-y-2">
-                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><Mail size={12} /> Public_Contact_Email</label>
-                         <input name="contactEmail" value={formData.contactEmail} onChange={handleChange} className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/30 focus:bg-white/5 transition-all" />
-                      </div>
-                      <div className="space-y-2">
-                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">HQ_Address</label>
-                         <input name="address" value={formData.address} onChange={handleChange} className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/30 focus:bg-white/5 transition-all" />
+                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2">Public_Email</label>
+                         <input name="contactEmail" value={formData.contactEmail} onChange={handleChange} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-6 text-sm font-bold focus:outline-none focus:border-blue-100 focus:bg-white transition-all" />
                       </div>
                    </div>
                 </div>
@@ -196,59 +188,55 @@ export default function SettingsPage() {
 
               {activeTab === "security" && (
                 <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
-                   <h3 className="text-xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
-                      <Shield className="text-[#EBBB54]" /> System_Hardening
-                   </h3>
+                   <div className="space-y-1">
+                      <h3 className="text-xl font-black text-gray-900 tracking-tight">Access_Hardening</h3>
+                      <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Global security protocols</p>
+                   </div>
 
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <div className="space-y-2">
-                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><Lock size={12} /> Password_Min_Length</label>
-                         <input type="number" name="passwordMinLength" value={formData.passwordMinLength} onChange={handleChange} className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/30 focus:bg-white/5 transition-all" />
-                      </div>
-
-                      <div className="flex items-center justify-between p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
-                         <div>
-                            <p className="text-[10px] font-black text-white uppercase tracking-widest">Complex_Passwords</p>
-                            <p className="text-[9px] text-gray-600 font-bold mt-1 uppercase tracking-wider">Require special characters</p>
+                   <div className="grid grid-cols-1 gap-6">
+                      <div className="flex items-center justify-between p-8 bg-gray-50/50 border border-gray-100 rounded-[2rem]">
+                         <div className="space-y-1">
+                            <p className="text-sm font-black text-gray-900 uppercase tracking-tight">Require_Complex_Passwords</p>
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Mandatory special characters and length</p>
                          </div>
                          <button type="button" onClick={() => handleToggle("requireSpecialChars")} className={cn(
                            "w-12 h-6 rounded-full relative transition-all duration-300",
-                           formData.requireSpecialChars ? "bg-[#EBBB54]" : "bg-white/10"
+                           formData.requireSpecialChars ? "bg-blue-600" : "bg-gray-200"
                          )}>
                             <div className={cn(
-                              "absolute top-1 w-4 h-4 rounded-full bg-white transition-all",
+                              "absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm",
                               formData.requireSpecialChars ? "right-1" : "left-1"
                             )} />
                          </button>
                       </div>
 
-                      <div className="flex items-center justify-between p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
-                         <div>
-                            <p className="text-[10px] font-black text-white uppercase tracking-widest">Two-Factor_Auth</p>
-                            <p className="text-[9px] text-gray-600 font-bold mt-1 uppercase tracking-wider">Extra layer of protection</p>
+                      <div className="flex items-center justify-between p-8 bg-gray-50/50 border border-gray-100 rounded-[2rem]">
+                         <div className="space-y-1">
+                            <p className="text-sm font-black text-gray-900 uppercase tracking-tight">Two-Factor_Authentication</p>
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Extra layer of protection for admin accounts</p>
                          </div>
                          <button type="button" onClick={() => handleToggle("twoFactorAuth")} className={cn(
                            "w-12 h-6 rounded-full relative transition-all duration-300",
-                           formData.twoFactorAuth ? "bg-[#EBBB54]" : "bg-white/10"
+                           formData.twoFactorAuth ? "bg-blue-600" : "bg-gray-200"
                          )}>
                             <div className={cn(
-                              "absolute top-1 w-4 h-4 rounded-full bg-white transition-all",
+                              "absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm",
                               formData.twoFactorAuth ? "right-1" : "left-1"
                             )} />
                          </button>
                       </div>
 
-                      <div className="flex items-center justify-between p-6 bg-red-600/5 border border-red-600/10 rounded-2xl">
-                         <div>
-                            <p className="text-[10px] font-black text-red-500 uppercase tracking-widest">Maintenance_Mode</p>
-                            <p className="text-[9px] text-gray-600 font-bold mt-1 uppercase tracking-wider">Take system offline</p>
+                      <div className="flex items-center justify-between p-8 bg-red-50 border border-red-100 rounded-[2rem]">
+                         <div className="space-y-1">
+                            <p className="text-sm font-black text-red-600 uppercase tracking-tight flex items-center gap-2"><ShieldAlert size={16} /> Maintenance_Mode</p>
+                            <p className="text-[10px] text-red-400 font-bold uppercase tracking-widest">Take the platform offline for updates</p>
                          </div>
                          <button type="button" onClick={() => handleToggle("maintenanceMode")} className={cn(
                            "w-12 h-6 rounded-full relative transition-all duration-300",
-                           formData.maintenanceMode ? "bg-red-600" : "bg-white/10"
+                           formData.maintenanceMode ? "bg-red-600" : "bg-gray-200"
                          )}>
                             <div className={cn(
-                              "absolute top-1 w-4 h-4 rounded-full bg-white transition-all",
+                              "absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm",
                               formData.maintenanceMode ? "right-1" : "left-1"
                             )} />
                          </button>
@@ -259,39 +247,24 @@ export default function SettingsPage() {
 
               {activeTab === "notifications" && (
                 <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
-                   <h3 className="text-xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
-                      <Bell className="text-[#EBBB54]" /> Signal_Protocols
-                   </h3>
+                   <div className="space-y-1">
+                      <h3 className="text-xl font-black text-gray-900 tracking-tight">Communication_Logic</h3>
+                      <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">SMTP and In-app alert triggers</p>
+                   </div>
 
                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-8 bg-white/[0.02] border border-white/5 rounded-[2rem]">
+                      <div className="flex items-center justify-between p-8 bg-gray-50/50 border border-gray-100 rounded-[2rem]">
                          <div className="space-y-1">
-                            <p className="text-xs font-black text-white uppercase tracking-widest">Email_Alerts</p>
-                            <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Send system updates via SMTP</p>
+                            <p className="text-sm font-black text-gray-900 uppercase tracking-tight">Global_Email_Alerts</p>
+                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Dispatch system updates via SMTP gateway</p>
                          </div>
                          <button type="button" onClick={() => handleToggle("enableEmailAlerts")} className={cn(
-                           "w-14 h-7 rounded-full relative transition-all duration-300",
-                           formData.enableEmailAlerts ? "bg-[#EBBB54]" : "bg-white/10"
+                           "w-12 h-6 rounded-full relative transition-all duration-300",
+                           formData.enableEmailAlerts ? "bg-blue-600" : "bg-gray-200"
                          )}>
                             <div className={cn(
-                              "absolute top-1 w-5 h-5 rounded-full bg-white transition-all",
+                              "absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm",
                               formData.enableEmailAlerts ? "right-1" : "left-1"
-                            )} />
-                         </button>
-                      </div>
-
-                      <div className="flex items-center justify-between p-8 bg-white/[0.02] border border-white/5 rounded-[2rem]">
-                         <div className="space-y-1">
-                            <p className="text-xs font-black text-white uppercase tracking-widest">In-App_Broadcasts</p>
-                            <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Show popups in student dashboard</p>
-                         </div>
-                         <button type="button" onClick={() => handleToggle("enableInAppNotifications")} className={cn(
-                           "w-14 h-7 rounded-full relative transition-all duration-300",
-                           formData.enableInAppNotifications ? "bg-[#EBBB54]" : "bg-white/10"
-                         )}>
-                            <div className={cn(
-                              "absolute top-1 w-5 h-5 rounded-full bg-white transition-all",
-                              formData.enableInAppNotifications ? "right-1" : "left-1"
                             )} />
                          </button>
                       </div>
@@ -301,22 +274,23 @@ export default function SettingsPage() {
 
               {activeTab === "appearance" && (
                 <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
-                   <h3 className="text-xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
-                      <Palette className="text-[#EBBB54]" /> Visual_Skin
-                   </h3>
+                   <div className="space-y-1">
+                      <h3 className="text-xl font-black text-gray-900 tracking-tight">Visual_Experience</h3>
+                      <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Global skin and accenting</p>
+                   </div>
 
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                       <div className="space-y-4">
-                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest flex items-center gap-2"><Eye size={12} /> Master_Theme</label>
-                         <div className="grid grid-cols-3 gap-3">
-                            {["dark", "light", "glass"].map((t) => (
+                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Master_Theme</label>
+                         <div className="grid grid-cols-2 gap-3">
+                            {["light", "glass"].map((t) => (
                               <button 
                                 key={t}
                                 type="button"
                                 onClick={() => setFormData({ ...formData, theme: t })}
                                 className={cn(
-                                  "py-3 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all",
-                                  formData.theme === t ? "bg-[#EBBB54] text-black border-[#EBBB54]" : "bg-white/5 border-white/10 text-gray-600"
+                                  "py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all",
+                                  formData.theme === t ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/20" : "bg-gray-50 border-gray-100 text-gray-400"
                                 )}
                               >
                                 {t}
@@ -326,10 +300,10 @@ export default function SettingsPage() {
                       </div>
 
                       <div className="space-y-4">
-                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Primary_Accent_HEX</label>
+                         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Primary_Accent</label>
                          <div className="flex items-center gap-4">
-                            <input name="primaryColor" value={formData.primaryColor} onChange={handleChange} className="flex-1 bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-6 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/30 transition-all" />
-                            <div className="w-14 h-14 rounded-2xl border border-white/10" style={{ backgroundColor: formData.primaryColor }}></div>
+                            <input name="primaryColor" value={formData.primaryColor} onChange={handleChange} className="flex-1 bg-gray-50 border border-gray-100 rounded-2xl py-4 px-6 text-sm font-bold focus:outline-none focus:border-blue-100 transition-all" />
+                            <div className="w-14 h-14 rounded-2xl border border-gray-100" style={{ backgroundColor: formData.primaryColor }}></div>
                          </div>
                       </div>
                    </div>

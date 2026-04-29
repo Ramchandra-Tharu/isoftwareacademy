@@ -10,13 +10,20 @@ import {
   BarChart3, 
   MoreVertical,
   Settings2,
-  Play,
-  RotateCcw,
   CheckSquare,
   Trash2,
-  Loader2
+  Loader2,
+  Filter,
+  ChevronRight,
+  Zap
 } from "lucide-react";
 import Link from "next/link";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 export default function QuizManagement() {
   const [quizzes, setQuizzes] = useState<any[]>([]);
@@ -25,13 +32,9 @@ export default function QuizManagement() {
 
   const fetchQuizzes = async () => {
     try {
+      setLoading(true);
       const res = await fetch("/api/quizzes");
-      if (res.ok) {
-        const data = await res.json();
-        setQuizzes(data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch quizzes", error);
+      if (res.ok) setQuizzes(await res.json());
     } finally {
       setLoading(false);
     }
@@ -42,17 +45,12 @@ export default function QuizManagement() {
   }, []);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this quiz?")) return;
+    if (!confirm("Are you sure?")) return;
     try {
       const res = await fetch(`/api/quizzes/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        fetchQuizzes();
-      } else {
-        alert("Failed to delete quiz");
-      }
-    } catch (error) {
-      console.error("Delete error", error);
-      alert("Failed to delete quiz");
+      if (res.ok) fetchQuizzes();
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -61,100 +59,102 @@ export default function QuizManagement() {
     quiz.courseId?.title?.toLowerCase().includes(search.toLowerCase())
   );
 
+  if (loading) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+        <Loader2 className="animate-spin text-blue-600" size={40} />
+        <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Accessing Evaluation Core...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-10 pb-20 font-sans">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-white">Quiz Management</h1>
-          <p className="text-gray-400 mt-1">Design assessments and monitor student performance.</p>
+          <h1 className="text-3xl font-black tracking-tight text-gray-900">Quiz_Architecture</h1>
+          <p className="text-sm text-gray-500 font-medium mt-1">Design cognitive assessments and track performance metrics.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/admin/quizzes/question-bank" className="flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-xl transition-all border border-white/10">
-            <FileText size={18} />
-            <span>Question Bank</span>
+          <Link href="/admin/quizzes/question-bank" className="px-6 py-3 bg-white border border-gray-100 text-gray-500 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
+            <FileText size={16} /> Question Bank
           </Link>
-          <Link href="/admin/quizzes/new" className="flex items-center gap-2 px-5 py-2.5 bg-[#EBBB54] hover:bg-[#d9ab4b] text-black font-semibold rounded-xl transition-all shadow-lg shadow-[#EBBB54]/10">
-            <Plus size={18} />
-            <span>Create Quiz</span>
+          <Link href="/admin/quizzes/new" className="btn-primary flex items-center gap-2 text-xs">
+            <Plus size={18} /> Create Quiz
           </Link>
         </div>
       </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="animate-spin text-[#EBBB54]" size={40} />
+      {/* Filter Bar */}
+      <div className="card-premium p-4 flex flex-col md:flex-row gap-4 items-center">
+        <div className="relative flex-1 w-full group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" size={18} />
+          <input 
+            type="text" 
+            placeholder="FILTER_ASSESSMENTS..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 pl-12 pr-4 text-xs font-bold tracking-widest focus:outline-none focus:border-blue-100 focus:bg-white transition-all"
+          />
         </div>
-      ) : filteredQuizzes.length === 0 ? (
-        <div className="text-center py-20 text-gray-500 bg-white/5 rounded-2xl border border-white/10">
-          <FileText size={48} className="mx-auto mb-4 opacity-50" />
-          <p className="text-lg font-bold">No Quizzes Found</p>
-          <p className="text-sm mt-2">Create your first quiz to get started.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-6">
-          {filteredQuizzes.map((quiz) => (
-            <div key={quiz._id} className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/[0.07] transition-all group relative">
-              {!quiz.isPublished && (
-                <div className="absolute top-4 right-4 px-2 py-1 bg-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-widest rounded">
-                  Draft
-                </div>
-              )}
-              <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden bg-purple-500/10 text-purple-500 shrink-0 border border-white/5 relative">
-                  {quiz.image ? (
-                    <img src={quiz.image} alt={quiz.title} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <HelpCircle size={32} />
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-3 pr-20">
-                      <h3 className="text-xl font-bold text-white group-hover:text-[#EBBB54] transition-colors">{quiz.title}</h3>
-                      <span className="px-2 py-0.5 bg-white/5 text-gray-500 text-[10px] font-bold rounded uppercase tracking-widest border border-white/5">
-                        {quiz.courseId?.title || "No Course"}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-6">
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
-                          <CheckSquare size={16} />
-                          <span>{quiz.questions?.length || 0} Questions</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
-                          <Clock size={16} />
-                          <span>{quiz.duration || "N/A"} Limit</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
-                          <BarChart3 size={16} />
-                          <span>{quiz.attemptsCount || 0} Total Attempts</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
-                          <Settings2 size={16} />
-                          <span>Passing: {quiz.passingScore || 80}%</span>
-                        </div>
-                    </div>
-                </div>
+        <button className="px-6 py-3 bg-white border border-gray-100 rounded-xl text-xs font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50 transition-all flex items-center gap-2">
+           <Filter size={16} /> Filter_Config
+        </button>
+      </div>
 
-                <div className="flex items-center gap-3 border-t lg:border-t-0 lg:border-l border-white/10 pt-6 lg:pt-0 lg:pl-6">
-                    <Link href={`/admin/quizzes/${quiz._id}/analytics`} className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-sm font-bold transition-all text-white">
-                        <RotateCcw size={16} />
-                        <span>Analytics</span>
-                    </Link>
-                    <Link href={`/admin/quizzes/${quiz._id}/edit`} className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-[#EBBB54]/10 hover:bg-[#EBBB54]/20 text-[#EBBB54] rounded-xl text-sm font-bold transition-all">
-                        <Settings2 size={16} />
-                        <span>Edit Quiz</span>
-                    </Link>
-                    <button onClick={() => handleDelete(quiz._id)} className="p-2.5 text-red-500 hover:text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded-xl transition-all">
-                        <Trash2 size={18} />
-                    </button>
-                </div>
+      {/* Quiz List */}
+      <div className="grid grid-cols-1 gap-6">
+        {filteredQuizzes.length === 0 ? (
+          <div className="card-premium p-20 text-center space-y-4">
+             <HelpCircle className="mx-auto text-gray-100" size={60} />
+             <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px] italic">No active assessment modules found.</p>
+          </div>
+        ) : (
+          filteredQuizzes.map((quiz) => (
+            <div key={quiz._id} className="card-premium p-8 group relative overflow-hidden flex flex-col lg:flex-row lg:items-center gap-8">
+              <div className="w-20 h-20 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shrink-0 shadow-sm transition-transform group-hover:scale-110">
+                 {quiz.image ? (
+                   <img src={quiz.image} className="w-full h-full object-cover rounded-2xl" />
+                 ) : (
+                   <Zap size={32} />
+                 )}
+              </div>
+              
+              <div className="flex-1 space-y-4">
+                 <div className="flex flex-wrap items-center gap-3">
+                    <h3 className="text-xl font-black text-gray-900 uppercase tracking-tighter group-hover:text-blue-600 transition-colors">{quiz.title}</h3>
+                    <span className="px-3 py-1 bg-gray-50 border border-gray-100 text-[8px] font-black uppercase tracking-widest text-gray-400 rounded-full">
+                       {quiz.courseId?.title || "Independent"}
+                    </span>
+                    {!quiz.isPublished && (
+                       <span className="px-3 py-1 bg-amber-50 border border-amber-100 text-amber-600 text-[8px] font-black uppercase tracking-widest rounded-full">Draft</span>
+                    )}
+                 </div>
+                 
+                 <div className="flex flex-wrap items-center gap-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                    <div className="flex items-center gap-2"><CheckSquare size={14} /> {quiz.questions?.length || 0} Questions</div>
+                    <div className="flex items-center gap-2"><Clock size={14} /> {quiz.duration || "N/A"} Limit</div>
+                    <div className="flex items-center gap-2"><BarChart3 size={14} /> {quiz.attemptsCount || 0} Attempts</div>
+                    <div className="flex items-center gap-2"><Settings2 size={14} /> Pass: {quiz.passingScore || 80}%</div>
+                 </div>
+              </div>
+
+              <div className="flex items-center gap-3 shrink-0 pt-6 lg:pt-0 border-t lg:border-t-0 lg:border-l border-gray-50 lg:pl-8">
+                 <Link href={`/admin/quizzes/${quiz._id}/analytics`} className="p-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
+                    <BarChart3 size={20} />
+                 </Link>
+                 <Link href={`/admin/quizzes/${quiz._id}/edit`} className="p-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
+                    <Settings2 size={20} />
+                 </Link>
+                 <button onClick={() => handleDelete(quiz._id)} className="p-3 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-red-600 hover:border-red-100 transition-all shadow-sm">
+                    <Trash2 size={20} />
+                 </button>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        )}
+      </div>
     </div>
   );
 }

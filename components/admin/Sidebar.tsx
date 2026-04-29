@@ -16,8 +16,8 @@ import {
   ChevronRight,
   CreditCard,
   BarChart3,
-  Ticket,
-  Shield
+  Shield,
+  Cpu
 } from "lucide-react";
 
 import { clsx, type ClassValue } from "clsx";
@@ -28,15 +28,15 @@ function cn(...inputs: ClassValue[]) {
 }
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Overview", href: "/admin" },
-  { icon: Users, label: "Student Management", href: "/admin/users" },
-  { icon: BookOpen, label: "Course Management", href: "/admin/courses" },
-  { icon: BarChart3, label: "Programs Management", href: "/admin/programs" },
-  { icon: HelpCircle, label: "Quiz Management", href: "/admin/quizzes" },
-  { icon: Award, label: "Certifications", href: "/admin/certifications" },
-  { icon: CreditCard, label: "Payments & Enroll", href: "/admin/payments" },
+  { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
+  { icon: Users, label: "Users", href: "/admin/users" },
+  { icon: BookOpen, label: "Courses", href: "/admin/courses" },
+  { icon: BarChart3, label: "Programs", href: "/admin/programs" },
+  { icon: HelpCircle, label: "Quiz", href: "/admin/quizzes" },
+  { icon: Award, label: "Certificates", href: "/admin/certifications" },
+  { icon: CreditCard, label: "Payments", href: "/admin/payments" },
   { icon: MessageSquare, label: "Moderation", href: "/admin/comments" },
-  { icon: Settings, label: "System Settings", href: "/admin/settings" },
+  { icon: Settings, label: "Settings", href: "/admin/settings" },
 ];
 
 export default function Sidebar() {
@@ -46,33 +46,38 @@ export default function Sidebar() {
   return (
     <aside 
       className={cn(
-        "relative flex flex-col bg-neutral-950 border-r border-white/10 transition-all duration-300 ease-in-out font-mono",
+        "relative flex flex-col bg-white border-r border-gray-100 transition-all duration-300 ease-in-out",
         isCollapsed ? "w-20" : "w-72"
       )}
     >
-      <div className="flex items-center justify-between h-24 px-6 border-b border-white/5 bg-white/[0.01]">
+      {/* Sidebar Header */}
+      <div className={cn(
+        "flex items-center h-20 px-6 border-b border-gray-50 bg-gray-50/30",
+        isCollapsed ? "justify-center" : "justify-between"
+      )}>
         {!isCollapsed && (
-          <div className="flex flex-col">
-            <span className="text-xl font-black text-[#EBBB54] tracking-tighter uppercase">
-              ROOT@SYS
-            </span>
-            <div className="flex items-center gap-1.5 mt-1">
-               <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-               <span className="text-[9px] text-gray-500 font-bold tracking-widest uppercase">
-                 Privilege: Level-0
-               </span>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-600/20">
+               <Cpu size={18} />
             </div>
+            <span className="text-sm font-black tracking-tighter uppercase text-gray-900">
+               ADMIN_<span className="text-blue-600">PANEL</span>
+            </span>
           </div>
         )}
         <button 
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 transition-colors"
+          className={cn(
+            "p-1.5 rounded-lg bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm",
+            isCollapsed && "mt-2"
+          )}
         >
-          {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
       </div>
 
-      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
+      {/* Navigation Links */}
+      <nav className="flex-1 px-4 py-8 space-y-1.5 overflow-y-auto custom-scrollbar">
         {menuItems.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -80,26 +85,33 @@ export default function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group",
+                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group",
                 isActive 
-                  ? "bg-[#EBBB54] text-black" 
-                  : "text-gray-400 hover:bg-white/5 hover:text-white"
+                  ? "bg-blue-50 text-blue-600 font-bold shadow-sm shadow-blue-600/5" 
+                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
               )}
             >
-              <item.icon size={22} className={cn(isActive ? "text-black" : "group-hover:text-[#EBBB54]")} />
-              {!isCollapsed && <span className="font-medium">{item.label}</span>}
+              <item.icon size={20} className={cn(
+                "transition-colors",
+                isActive ? "text-blue-600" : "text-gray-400 group-hover:text-blue-500"
+              )} />
+              {!isCollapsed && <span className="text-sm tracking-tight">{item.label}</span>}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t border-white/5">
+      {/* Sidebar Footer */}
+      <div className="p-4 border-t border-gray-50">
         <Link 
-          href="/get-started"
-          className="flex items-center w-full gap-3 px-3 py-3 text-gray-400 rounded-xl hover:bg-white/5 hover:text-red-400 transition-all duration-200 group"
+          href="/api/auth/signout"
+          className={cn(
+            "flex items-center w-full gap-3 px-4 py-3 text-gray-500 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all duration-200 group",
+            isCollapsed && "justify-center"
+          )}
         >
-          <LogOut size={22} className="group-hover:text-red-400" />
-          {!isCollapsed && <span className="font-medium">Logout</span>}
+          <LogOut size={20} className="group-hover:text-red-600" />
+          {!isCollapsed && <span className="text-sm font-medium">Logout</span>}
         </Link>
       </div>
     </aside>
