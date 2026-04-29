@@ -200,31 +200,16 @@ export default function CourseViewerPage() {
            )}
 
 
+import CommentSection from "@/components/dashboard/CommentSection";
+
+// ... inside the component, where the discussion thread was:
+
            {/* Interactive Footer */}
            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-10 border-t border-white/5">
               <div className="space-y-6">
-                 <h3 className="text-xl font-bold font-serif text-white flex items-center gap-3">
-                   <MessageCircle className="text-[#EBBB54]" size={24} /> Discussion Thread
-                 </h3>
-                 <div className="space-y-4">
-                    {[1, 2].map((i) => (
-                      <div key={i} className="flex gap-4 p-5 bg-[#1a1a1a] rounded-2xl border border-white/5 group hover:border-[#EBBB54]/20 transition-all">
-                         <div className="w-10 h-10 rounded-full bg-gray-800 flex-shrink-0 flex items-center justify-center text-[#EBBB54] font-bold border border-white/10">JD</div>
-                         <div className="space-y-1 flex-1">
-                            <div className="flex items-center justify-between">
-                               <p className="text-sm font-bold text-white group-hover:text-[#EBBB54] transition-colors">John Doe</p>
-                               <p className="text-[10px] text-gray-600 uppercase tracking-widest">3h ago</p>
-                            </div>
-                            <p className="text-sm text-gray-400 leading-relaxed italic">"Can I use Server Actions inside Client Components if I import them? I'm getting a little confused about..."</p>
-                            <div className="flex items-center gap-4 pt-2">
-                               <button className="text-[10px] text-gray-500 hover:text-white uppercase font-bold tracking-widest">Reply</button>
-                               <button className="text-[10px] text-gray-500 hover:text-white uppercase font-bold tracking-widest">Like (12)</button>
-                            </div>
-                         </div>
-                      </div>
-                    ))}
-                    <button className="w-full py-4 text-sm font-bold text-gray-500 hover:text-white bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 border-dashed transition-all">Load More Comments</button>
-                 </div>
+                 {activeLesson && (
+                    <CommentSection courseId={course._id} lessonId={activeLesson._id} />
+                 )}
               </div>
 
               <div className="space-y-6">
