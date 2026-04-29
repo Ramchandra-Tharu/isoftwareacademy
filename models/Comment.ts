@@ -8,7 +8,19 @@ export interface IComment extends Document {
   parentId?: mongoose.Types.ObjectId; // For nested replies
   likes: number;
   likedBy: mongoose.Types.ObjectId[];
+  dislikes: number;
+  dislikedBy: mongoose.Types.ObjectId[];
+  status: "pending" | "approved" | "rejected";
+  rating?: number; // 1-5 for reviews
+  isPinned: boolean;
+  isSpam: boolean;
+  reports: {
+    userId: mongoose.Types.ObjectId;
+    reason: string;
+    createdAt: Date;
+  }[];
   isDeleted: boolean;
+  deletedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -37,6 +49,7 @@ const CommentSchema = new Schema<IComment>(
     parentId: {
       type: Schema.Types.ObjectId,
       ref: "Comment",
+      default: null
     },
     likes: {
       type: Number,
@@ -48,9 +61,47 @@ const CommentSchema = new Schema<IComment>(
         ref: "User",
       },
     ],
+    dislikes: {
+      type: Number,
+      default: 0,
+    },
+    dislikedBy: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
+    rating: {
+      type: Number,
+      min: 1,
+      max: 5,
+    },
+    isPinned: {
+      type: Boolean,
+      default: false,
+    },
+    isSpam: {
+      type: Boolean,
+      default: false,
+    },
+    reports: [
+      {
+        userId: { type: Schema.Types.ObjectId, ref: "User" },
+        reason: String,
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    deletedAt: {
+      type: Date,
     },
   },
   {
