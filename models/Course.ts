@@ -4,7 +4,8 @@ export interface ICourse extends Document {
   title: string;
   slug: string;
   description: string;
-  instructor: string;
+  instructorName: string;
+  instructorId?: mongoose.Types.ObjectId;
   category: string;
   thumbnail: string;
   totalLessons: number;
@@ -14,6 +15,7 @@ export interface ICourse extends Document {
   enrolledCount: number;
   featured: boolean;
   isPublished: boolean;
+  price: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -33,9 +35,18 @@ const CourseSchema = new Schema<ICourse>(
       type: String,
       required: [true, "Please provide a course description"],
     },
-    instructor: {
+    instructorName: {
       type: String,
       required: [true, "Please provide an instructor name"],
+    },
+    instructorId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    price: {
+      type: Number,
+      required: [true, "Please provide a course price"],
+      default: 0,
     },
     category: {
       type: String,

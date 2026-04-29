@@ -38,7 +38,11 @@ export default function UserManagement() {
   };
 
   const toggleRole = async (id: string, currentRole: string) => {
-    const newRole = currentRole === "admin" ? "student" : "admin";
+    let newRole = "student";
+    if (currentRole === "student") newRole = "instructor";
+    else if (currentRole === "instructor") newRole = "admin";
+    else if (currentRole === "admin") newRole = "student";
+
     try {
       const res = await fetch("/api/admin/users", {
         method: "PUT",
@@ -132,7 +136,9 @@ export default function UserManagement() {
                   <button 
                     onClick={() => toggleRole(user._id, user.role)}
                     className={`px-3 py-1 rounded text-[10px] font-black uppercase tracking-widest border transition-all ${
-                      user.role === "admin" ? "bg-[#EBBB54]/10 border-[#EBBB54]/20 text-[#EBBB54]" : "bg-white/5 border-white/10 text-gray-500"
+                      user.role === "admin" ? "bg-[#EBBB54]/10 border-[#EBBB54]/20 text-[#EBBB54]" : 
+                      user.role === "instructor" ? "bg-blue-500/10 border-blue-500/20 text-blue-500" :
+                      "bg-white/5 border-white/10 text-gray-500"
                     }`}
                   >
                     {user.role}

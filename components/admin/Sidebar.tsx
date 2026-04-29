@@ -16,7 +16,8 @@ import {
   ChevronRight,
   CreditCard,
   BarChart3,
-  Ticket
+  Ticket,
+  Shield
 } from "lucide-react";
 
 import { clsx, type ClassValue } from "clsx";
@@ -29,6 +30,7 @@ function cn(...inputs: ClassValue[]) {
 const menuItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/admin" },
   { icon: Users, label: "Student Management", href: "/admin/users" },
+  { icon: Shield, label: "Instructors", href: "/admin/instructors" },
   { icon: BookOpen, label: "Course Management", href: "/admin/courses" },
   { icon: BarChart3, label: "Programs Management", href: "/admin/programs" },
   { icon: HelpCircle, label: "Quiz Management", href: "/admin/quizzes" },

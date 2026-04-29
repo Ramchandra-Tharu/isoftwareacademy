@@ -5,7 +5,13 @@ export interface IUser extends Document {
   email: string;
   password?: string;
   image?: string;
-  role: "student" | "admin";
+  role: "student" | "admin" | "instructor";
+  bio?: string;
+  socialLinks?: {
+    github?: string;
+    linkedin?: string;
+    twitter?: string;
+  };
   isVerified: boolean;
   verificationToken?: string;
   verificationTokenExpiry?: Date;
@@ -35,9 +41,18 @@ const UserSchema = new Schema<IUser>(
     image: {
       type: String,
     },
+    bio: {
+      type: String,
+      maxLength: [500, "Bio cannot exceed 500 characters"],
+    },
+    socialLinks: {
+      github: String,
+      linkedin: String,
+      twitter: String,
+    },
     role: {
       type: String,
-      enum: ["student", "admin"],
+      enum: ["student", "admin", "instructor"],
       default: "student",
     },
     isVerified: {
