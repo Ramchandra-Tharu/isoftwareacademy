@@ -15,7 +15,8 @@ import {
   ChevronLeft,
   ChevronRight,
   CreditCard,
-  BarChart3
+  BarChart3,
+  Ticket
 } from "lucide-react";
 
 import { clsx, type ClassValue } from "clsx";
@@ -33,6 +34,7 @@ const menuItems = [
   { icon: HelpCircle, label: "Quiz Management", href: "/admin/quizzes" },
   { icon: Award, label: "Certifications", href: "/admin/certifications" },
   { icon: CreditCard, label: "Payments & Enroll", href: "/admin/payments" },
+  { icon: Ticket, label: "Coupons", href: "/admin/coupons" },
   { icon: MessageSquare, label: "Moderation", href: "/admin/comments" },
   { icon: Settings, label: "System Settings", href: "/admin/settings" },
 ];
