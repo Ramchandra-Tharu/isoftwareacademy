@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import ContentSection from "@/components/dashboard/ContentSection";
+import CommentSection from "@/components/dashboard/CommentSection";
 import { useParams } from "next/navigation";
 
 export default function CourseViewerPage() {
@@ -198,11 +199,6 @@ export default function CourseViewerPage() {
            ) : (
              <div className="h-96 flex items-center justify-center text-gray-500 italic">Select a lesson to begin learning.</div>
            )}
-
-
-import CommentSection from "@/components/dashboard/CommentSection";
-
-// ... inside the component, where the discussion thread was:
 
            {/* Interactive Footer */}
            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-10 border-t border-white/5">

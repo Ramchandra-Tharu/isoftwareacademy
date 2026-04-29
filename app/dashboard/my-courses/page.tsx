@@ -23,7 +23,7 @@ export default function MyCoursesPage() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await fetch("/api/courses");
+        const res = await fetch("/api/enrollments/my-courses");
         const data = await res.json();
         setCourses(data);
       } catch (err) {
