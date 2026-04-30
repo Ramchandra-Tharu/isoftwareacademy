@@ -12,6 +12,16 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      profile(profile) {
+        console.log("NextAuth: Google Profile received", { name: profile.name, picture: profile.picture });
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+          role: profile.role || "student",
+        };
+      },
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -64,24 +74,27 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account, profile }: any) {
       console.log("NextAuth: signIn callback triggered", { email: user.email, name: user.name });
       if (account?.provider === "google" && user.email) {
         await dbConnect();
         const email = user.email.toLowerCase();
+        // Google profile photo is typically in profile.picture
+        const googleImage = profile?.picture || user.image;
+
         try {
           const existingUser = await User.findOne({ email });
           if (existingUser) {
             console.log("NextAuth: Updating existing user", email);
             existingUser.name = (user.name as string) || existingUser.name;
-            existingUser.image = (user.image as string) || existingUser.image;
+            if (googleImage) existingUser.image = googleImage;
             await existingUser.save();
           } else {
             console.log("NextAuth: Creating new user", email);
             await User.create({
               name: user.name as string,
               email: email,
-              image: user.image as string,
+              image: googleImage,
               password: "", 
               role: "student",
               isVerified: true, 
@@ -96,6 +109,9 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }: any) {
       console.log("NextAuth: session callback triggered", { tokenEmail: token?.email });
       if (session.user) {
+        // Carry over image/picture from token
+        session.user.image = token.picture || session.user.image;
+        
         try {
           await dbConnect();
           const email = (token.email || session.user.email)?.toLowerCase();
@@ -106,10 +122,9 @@ export const authOptions: NextAuthOptions = {
               session.user.id = dbUser._id.toString();
               session.user.role = dbUser.role;
               session.user.name = dbUser.name;
-              session.user.image = dbUser.image;
+              // Only override if DB has a specific image, else keep token image
+              if (dbUser.image) session.user.image = dbUser.image;
               session.user.email = dbUser.email;
-            } else {
-              console.warn("NextAuth: user not found in DB during session callback", email);
             }
           }
         } catch (error) {
@@ -124,13 +139,14 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.email = user.email?.toLowerCase();
         token.name = user.name;
-        token.picture = user.image;
+        token.picture = user.image || (user as any).picture;
         
         try {
           await dbConnect();
           const dbUser = await User.findOne({ email: token.email });
           if (dbUser) {
             token.role = dbUser.role;
+            if (dbUser.image) token.picture = dbUser.image;
           } else {
             token.role = "student";
           }

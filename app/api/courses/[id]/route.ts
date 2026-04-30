@@ -21,7 +21,13 @@ export async function DELETE(
     }
 
     await dbConnect();
-    const deletedCourse = await Course.findByIdAndDelete(id);
+    
+    let deletedCourse;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+      deletedCourse = await Course.findByIdAndDelete(id);
+    } else {
+      deletedCourse = await Course.findOneAndDelete({ slug: id });
+    }
 
     if (!deletedCourse) {
       return NextResponse.json({ error: "Course not found" }, { status: 404 });
@@ -52,7 +58,13 @@ export async function PATCH(
     const body = await req.json();
 
     await dbConnect();
-    const updatedCourse = await Course.findByIdAndUpdate(id, body, { new: true });
+    
+    let updatedCourse;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+      updatedCourse = await Course.findByIdAndUpdate(id, body, { new: true });
+    } else {
+      updatedCourse = await Course.findOneAndUpdate({ slug: id }, body, { new: true });
+    }
 
     if (!updatedCourse) {
       try {
@@ -83,7 +95,13 @@ export async function GET(
     }
 
     await dbConnect();
-    const course = await Course.findById(id);
+    
+    let course;
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+      course = await Course.findById(id);
+    } else {
+      course = await Course.findOne({ slug: id });
+    }
 
     if (!course) {
       return NextResponse.json({ error: "Course not found" }, { status: 404 });

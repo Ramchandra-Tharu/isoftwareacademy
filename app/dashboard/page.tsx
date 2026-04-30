@@ -33,6 +33,7 @@ export default function StudentDashboardOverview() {
   const router = useRouter();
   const [statsData, setStatsData] = useState<any>(null);
   const [recentCourses, setRecentCourses] = useState<any[]>([]);
+  const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,9 +45,25 @@ export default function StudentDashboardOverview() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
+        // Fetch courses
         const courseRes = await fetch("/api/courses?featured=true");
-        const courses = await courseRes.json();
+        let courses = await courseRes.json();
+        
+        // Fallback: If no featured courses, fetch all published courses
+        if (courses.length === 0) {
+           const allCourseRes = await fetch("/api/courses");
+           courses = await allCourseRes.json();
+        }
+
         setRecentCourses(courses.slice(0, 3));
+        
+        // Fetch real activities
+        const activityRes = await fetch("/api/dashboard/activities");
+        if (activityRes.ok) {
+           const activityData = await activityRes.json();
+           setActivities(activityData);
+        }
+
         setStatsData({
            enrolled: courses.length,
            completed: 48, 
@@ -188,27 +205,32 @@ export default function StudentDashboardOverview() {
               <div className="absolute top-0 right-0 p-4 opacity-[0.02] pointer-events-none"><MessageSquare size={120} /></div>
               
               <div className="space-y-8 relative z-10">
-                 {[
-                   { user: "Ramchandra Tharu", action: "Completed Lesson 14", time: "2m ago", points: "+50 XP", icon: <Sparkles size={14}/> },
-                   { user: "Sandeep Tharu", action: "Answered your doubt", time: "15m ago", points: "REPLY", icon: <MessageSquare size={14}/> },
-                   { user: "System Core", action: "Weekly Challenge Live", time: "1h ago", points: "EVENT", icon: <Zap size={14}/> }
-                 ].map((activity, i) => (
-                   <div key={i} className="flex items-center gap-5 group cursor-pointer">
-                      <div className="w-12 h-12 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 font-black text-lg group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors shadow-sm">
-                         {activity.user.charAt(0)}
+                 {activities.length > 0 ? activities.map((activity, i) => (
+                   <div key={activity.id || i} className="flex items-center gap-5 group cursor-pointer">
+                      <div className="w-12 h-12 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden font-black text-lg group-hover:border-blue-100 transition-all shadow-sm shrink-0">
+                         {activity.image ? (
+                            <img src={activity.image} alt={activity.user} className="w-full h-full object-cover" />
+                         ) : (
+                            <span className="text-gray-400 group-hover:text-blue-600 uppercase">{activity.user.charAt(0)}</span>
+                         )}
                       </div>
-                      <div className="flex-1">
-                         <p className="text-sm font-black text-gray-900 uppercase tracking-tight leading-tight">{activity.user}</p>
-                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{activity.action}</p>
+                      <div className="flex-1 min-w-0">
+                         <p className="text-sm font-black text-gray-900 uppercase tracking-tight leading-tight truncate">{activity.user}</p>
+                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5 truncate">{activity.action}</p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right shrink-0">
                          <div className="flex items-center justify-end gap-1 text-[10px] text-blue-600 font-black uppercase tracking-widest">
-                            {activity.icon} {activity.points}
+                            {activity.type === "Comment" ? <MessageSquare size={14}/> : <Sparkles size={14}/>} {activity.points}
                          </div>
                          <p className="text-[8px] text-gray-300 font-black uppercase tracking-widest mt-1">{activity.time}</p>
                       </div>
                    </div>
-                 ))}
+                 )) : (
+                    <div className="py-10 text-center space-y-4">
+                       <Ghost size={40} className="mx-auto text-gray-100" />
+                       <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Awaiting_Activity</p>
+                    </div>
+                 )}
               </div>
 
               <Link href="/dashboard/comments" className="w-full py-4 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 hover:scale-105 transition-all shadow-xl shadow-blue-600/20">

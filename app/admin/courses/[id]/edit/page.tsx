@@ -31,13 +31,14 @@ export default function EditCoursePage() {
     title: "",
     slug: "",
     description: "",
-    instructor: "",
+    instructorName: "",
     category: "",
     thumbnail: "",
     totalLessons: 0,
     duration: "",
     difficulty: "Beginner",
     isPublished: false,
+    price: 0,
   });
 
   useEffect(() => {
@@ -52,13 +53,14 @@ export default function EditCoursePage() {
             title: data.title || "",
             slug: data.slug || "",
             description: data.description || "",
-            instructor: data.instructor || "",
+            instructorName: data.instructorName || "",
             category: data.category || "",
             thumbnail: data.thumbnail || "",
             totalLessons: data.totalLessons || 0,
             duration: data.duration || "",
             difficulty: data.difficulty || "Beginner",
             isPublished: data.isPublished || false,
+            price: data.price || 0,
           });
         }
       } catch (err) {
@@ -204,8 +206,8 @@ export default function EditCoursePage() {
               <input 
                 required
                 type="text" 
-                value={formData.instructor}
-                onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
+                value={formData.instructorName}
+                onChange={(e) => setFormData({ ...formData, instructorName: e.target.value })}
                 placeholder="E.G. DR. ROOT_ADMIN"
                 className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all"
               />
@@ -272,7 +274,22 @@ export default function EditCoursePage() {
                   <option value="Full Stack">FULL_STACK</option>
                   <option value="Mobile Dev">MOBILE_DEV</option>
                   <option value="Backend">BACKEND</option>
+                  <option value="Data Science">DATA_SCIENCE</option>
+                  <option value="UI/UX Design">UI_UX_DESIGN</option>
                 </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                   Price (INR)
+                </label>
+                <input 
+                  required
+                  type="number" 
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                  className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all"
+                />
               </div>
             </div>
           </div>

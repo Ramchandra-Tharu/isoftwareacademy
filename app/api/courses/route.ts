@@ -8,6 +8,8 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get("category");
+    const featured = searchParams.get("featured");
+    const slug = searchParams.get("slug");
     
     const session = await getServerSession(authOptions);
     const isAdmin = session?.user?.role === "admin";
@@ -23,7 +25,18 @@ export async function GET(req: Request) {
       query.category = category;
     }
 
+    if (featured === "true") {
+      query.featured = true;
+    }
+
+    if (slug) {
+      query.slug = slug;
+    }
+
+    console.log("api/courses: Querying with", { query, isAdmin, user: session?.user?.email });
     const courses = await Course.find(query).sort({ createdAt: -1 });
+    console.log(`api/courses: Found ${courses.length} courses`);
+    
     return NextResponse.json(courses);
   } catch (error: any) {
     console.error("Fetch courses error:", error);
