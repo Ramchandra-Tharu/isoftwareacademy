@@ -33,16 +33,6 @@ const fadeIn = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
 };
 
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
 export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -119,46 +109,132 @@ export default function Home() {
 
       <main>
         {/* 2. Hero Section */}
-        <section className="relative pt-48 pb-32 px-6 overflow-hidden">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[500px] bg-blue-50 blur-[120px] rounded-full pointer-events-none -z-10" />
+        <section className="relative pt-48 pb-32 px-6 overflow-hidden flex flex-col items-center">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[600px] bg-blue-50/50 blur-[140px] rounded-full pointer-events-none -z-10" />
           
-          <div className="max-w-5xl mx-auto text-center space-y-10">
-            <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-6">
-               <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full text-blue-600 text-xs font-black uppercase tracking-widest animate-bounce">
-                  <Sparkles size={14} /> New: AI Text Summarizer Integrated
+          <div className="max-w-4xl mx-auto text-center space-y-12">
+            <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-8">
+               <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-full text-blue-600 text-[10px] font-black uppercase tracking-widest shadow-sm">
+                  <Sparkles size={14} /> The_Future_Of_Education
                </div>
-               <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-[0.95] text-gray-900">
-                  Master Code. <br /> 
-                  <span className="text-blue-600">Scale Reality.</span>
+               <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] text-gray-900 uppercase">
+                  Level Up Your <br /> 
+                  <span className="text-blue-600">Dev Career.</span>
                </h1>
-               <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto font-medium leading-relaxed">
-                  The ultimate platform for software engineers. Learn Full-Stack development through multimodal content, interactive code, and AI-powered insights.
+               <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto font-medium leading-relaxed">
+                  Join a global community of engineers mastering Full-Stack architectures. Structured learning paths designed for modern software deployment.
                </p>
             </motion.div>
 
-            {/* Input Box for Summarizer as requested */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="max-w-2xl mx-auto relative group">
-               <div className="absolute inset-0 bg-blue-600/5 blur-2xl rounded-3xl -z-10 group-focus-within:bg-blue-600/10 transition-colors" />
-               <div className="bg-white border border-gray-200 rounded-[2rem] p-3 shadow-xl flex flex-col md:flex-row gap-3">
+            {/* Centered Clean Input Box */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              transition={{ delay: 0.3 }} 
+              className="max-w-2xl mx-auto w-full relative group"
+            >
+               <div className="absolute inset-0 bg-blue-600/5 blur-3xl rounded-[3rem] -z-10 group-focus-within:bg-blue-600/10 transition-colors" />
+               <div className="bg-white border border-gray-100 rounded-[2.5rem] p-3 shadow-2xl shadow-blue-600/5 flex flex-col md:flex-row gap-3">
                   <input 
                     type="text" 
                     value={summarizerText}
                     onChange={(e) => setSummarizerText(e.target.value)}
-                    placeholder="Paste technical text here to summarize..." 
-                    className="flex-1 bg-transparent px-6 py-4 text-sm font-medium focus:outline-none"
+                    placeholder="Search for a career path or course..." 
+                    className="flex-1 bg-transparent px-8 py-5 text-sm font-bold focus:outline-none text-gray-900 placeholder:text-gray-300"
                   />
-                  <button className="btn-primary flex items-center justify-center gap-2 whitespace-nowrap">
-                    Summarize Now <Zap size={18} />
+                  <button className="btn-primary px-10 py-5 flex items-center justify-center gap-3 whitespace-nowrap text-xs tracking-widest">
+                    Start Learning <ArrowRight size={18} />
                   </button>
                </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="flex flex-wrap justify-center gap-8 pt-10 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-700">
-               <div className="flex items-center gap-2 font-black uppercase tracking-tighter text-xl">JAVA</div>
-               <div className="flex items-center gap-2 font-black uppercase tracking-tighter text-xl">REACT</div>
-               <div className="flex items-center gap-2 font-black uppercase tracking-tighter text-xl">FLUTTER</div>
-               <div className="flex items-center gap-2 font-black uppercase tracking-tighter text-xl">NODE.JS</div>
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              transition={{ delay: 0.6 }}
+              className="flex flex-wrap items-center justify-center gap-8 pt-8 opacity-40 grayscale"
+            >
+               <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">Trusted By Leads At:</div>
+               <div className="flex gap-10">
+                  <span className="font-black tracking-tighter text-xl">META</span>
+                  <span className="font-black tracking-tighter text-xl">GOOGLE</span>
+                  <span className="font-black tracking-tighter text-xl">STRIPE</span>
+               </div>
             </motion.div>
+          </div>
+        </section>
+
+        {/* 2.5 Platform Overview Section */}
+        <section className="py-24 bg-white px-6 overflow-hidden">
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
+             <motion.div 
+               initial={{ opacity: 0, x: -30 }} 
+               whileInView={{ opacity: 1, x: 0 }} 
+               viewport={{ once: true }}
+               className="space-y-10"
+             >
+                <div className="space-y-6">
+                   <h2 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.4em]">Section_01. PLATFORM_OVERVIEW</h2>
+                   <h3 className="text-5xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none uppercase">
+                      Architecture Your <br/> <span className="text-blue-600">Future Success.</span>
+                   </h3>
+                   <p className="text-lg text-gray-500 font-medium leading-relaxed max-w-xl">
+                      iSoftware Academy is more than just a course platform. It is a comprehensive ecosystem designed to bridge the gap between theoretical mastery and enterprise-scale software engineering.
+                   </p>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-8">
+                   {[
+                      { title: "Specialized Programs", desc: "Cohesive learning paths designed for career transitions.", icon: Layout },
+                      { title: "Expert Courses", desc: "Meticulously crafted modules by industry veterans.", icon: BookOpen },
+                      { title: "Verified Credentials", desc: "Blockchain-backed certifications for your resume.", icon: Award },
+                      { title: "Structured Learning", desc: "Zero-fluff curriculum focused on practical output.", icon: ShieldCheck }
+                   ].map((item, i) => (
+                      <div key={i} className="space-y-3">
+                         <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                            <item.icon size={20} />
+                         </div>
+                         <h4 className="text-xs font-black uppercase tracking-widest text-gray-900">{item.title}</h4>
+                         <p className="text-xs text-gray-400 font-medium leading-relaxed">{item.desc}</p>
+                      </div>
+                   ))}
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-6 pt-4">
+                   <Link href="/get-started" className="btn-primary px-10 py-4 text-xs tracking-widest uppercase">
+                      Get Started Free
+                   </Link>
+                   <Link href="#courses" className="px-10 py-4 border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-all">
+                      Explore Courses
+                   </Link>
+                </div>
+             </motion.div>
+
+             <motion.div 
+               initial={{ opacity: 0, scale: 0.9 }} 
+               whileInView={{ opacity: 1, scale: 1 }} 
+               viewport={{ once: true }}
+               className="relative"
+             >
+                <div className="absolute inset-0 bg-blue-600/5 blur-[100px] rounded-full -z-10" />
+                <div className="card-premium p-4 bg-white/50 backdrop-blur-xl border-white overflow-hidden shadow-2xl">
+                   <img 
+                     src="/platform_overview_visual_1777487506937.png" 
+                     alt="Platform Ecosystem Visual" 
+                     className="w-full h-auto rounded-[2rem] hover:scale-105 transition-transform duration-700"
+                   />
+                </div>
+                {/* Floating Badge */}
+                <div className="absolute -bottom-10 -right-10 bg-white p-6 rounded-[2rem] shadow-2xl border border-gray-50 flex items-center gap-4 animate-bounce duration-[3000ms]">
+                   <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
+                      <Sparkles size={24} />
+                   </div>
+                   <div>
+                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Verified Nodes</p>
+                      <p className="text-sm font-black text-gray-900 uppercase tracking-tight">5,000+ Enrolled</p>
+                   </div>
+                </div>
+             </motion.div>
           </div>
         </section>
 
@@ -205,27 +281,28 @@ export default function Home() {
                  </ul>
               </div>
 
-              <div className="bg-white p-4 rounded-[2.5rem] border border-gray-200 shadow-2xl relative">
-                 <div className="bg-gray-900 rounded-[2rem] overflow-hidden aspect-video relative flex flex-col">
-                    <div className="flex gap-2 p-4 border-b border-white/5">
-                       <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
-                       <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+              <div className="bg-white p-4 rounded-[2.5rem] border border-gray-200 shadow-2xl relative overflow-hidden group">
+                 <div className="absolute inset-0 bg-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                 <div className="bg-gray-50 rounded-[2rem] overflow-hidden aspect-video relative flex flex-col border border-gray-200">
+                    <div className="flex gap-2 p-4 border-b border-gray-200 bg-white">
+                       <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
+                       <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
                     </div>
                     <div className="flex-1 grid grid-cols-2">
-                       <div className="p-6 border-r border-white/5 font-mono text-[10px] text-blue-300">
-                          <span className="text-gray-500">// RAW_INPUT</span><br/>
+                       <div className="p-6 border-r border-gray-200 font-mono text-[10px] text-blue-600/70">
+                          <span className="text-gray-400">// RAW_INPUT_NODE</span><br/>
                           {"{"}<br/>
                           {"  "}"type": "code",<br/>
                           {"  "}"lang": "java",<br/>
-                          {"  "}"content": "print('hello')"<br/>
+                          {"  "}"content": "System.out.println('Success')"<br/>
                           {"}"}
                        </div>
-                       <div className="p-6 bg-white/5 flex flex-col items-center justify-center text-center space-y-4">
-                          <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white">
+                       <div className="p-6 bg-white flex flex-col items-center justify-center text-center space-y-4">
+                          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shadow-sm border border-blue-100">
                              <Terminal size={24} />
                           </div>
-                          <span className="text-[10px] text-white font-black uppercase tracking-widest">RENDERED_OUTPUT</span>
+                          <span className="text-[9px] text-gray-900 font-black uppercase tracking-widest">RENDERED_OUTPUT</span>
                        </div>
                     </div>
                  </div>
@@ -279,18 +356,124 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 6. Final CTA */}
+        {/* 6. About Section */}
+        <section id="about" className="py-32 bg-gray-50 px-6 overflow-hidden">
+           <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }} 
+                whileInView={{ opacity: 1, scale: 1 }} 
+                viewport={{ once: true }}
+                className="order-2 lg:order-1 relative"
+              >
+                 <div className="absolute inset-0 bg-blue-600/5 blur-[100px] rounded-full -z-10" />
+                 <div className="card-premium p-4 bg-white/50 backdrop-blur-xl border-white overflow-hidden shadow-2xl">
+                    <img 
+                      src="/about_us_visual_1777487568577.png" 
+                      alt="About iSoftware Lab" 
+                      className="w-full h-auto rounded-[2rem] hover:scale-105 transition-transform duration-700"
+                    />
+                 </div>
+              </motion.div>
+
+              <motion.div 
+                initial={{ opacity: 0, x: 30 }} 
+                whileInView={{ opacity: 1, x: 0 }} 
+                viewport={{ once: true }}
+                className="order-1 lg:order-2 space-y-8"
+              >
+                 <div className="space-y-4">
+                    <h2 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.4em]">Section_04. ABOUT_US</h2>
+                    <h3 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter leading-none uppercase">
+                       The Mission Behind <br/> <span className="text-blue-600">The Lab.</span>
+                    </h3>
+                    <p className="text-gray-500 font-medium leading-relaxed">
+                       Founded by a collective of senior engineers from top-tier tech firms, iSoftware Academy was born from a simple observation: the gap between academic theory and production-grade engineering is too wide.
+                    </p>
+                 </div>
+                 
+                 <div className="space-y-6">
+                    {[
+                      { title: "Industry Led", desc: "Every module is vetted by active software architects." },
+                      { title: "Practical Output", desc: "We focus on building real-world deployment-ready assets." },
+                      { title: "Global Community", desc: "Join thousands of developers across 40+ countries." }
+                    ].map((point, i) => (
+                      <div key={i} className="flex gap-4">
+                         <div className="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0 mt-1">
+                            <CheckCircle2 size={14} />
+                         </div>
+                         <div>
+                            <h4 className="text-[10px] font-black text-gray-900 uppercase tracking-widest">{point.title}</h4>
+                            <p className="text-xs text-gray-400 font-medium">{point.desc}</p>
+                         </div>
+                      </div>
+                    ))}
+                 </div>
+              </motion.div>
+           </div>
+        </section>
+
+        {/* 7. Contact Section */}
+        <section id="contact" className="py-32 px-6">
+           <div className="max-w-4xl mx-auto text-center space-y-16">
+              <div className="space-y-4">
+                 <h2 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.4em]">Section_05. CONTACT_INIT</h2>
+                 <h3 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter leading-none uppercase">
+                    Have an Inquiry? <br/> <span className="text-blue-600">Sync With Us.</span>
+                 </h3>
+              </div>
+
+              <div className="card-premium p-10 md:p-16 text-left space-y-8 shadow-2xl shadow-blue-600/5">
+                 <form className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Identification</label>
+                       <input type="text" placeholder="FULL_NAME" className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-6 text-xs font-bold focus:outline-none focus:border-blue-100 transition-all" />
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Communication_Email</label>
+                       <input type="email" placeholder="EMAIL_INTERFACE" className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-6 text-xs font-bold focus:outline-none focus:border-blue-100 transition-all" />
+                    </div>
+                    <div className="md:col-span-2 space-y-2">
+                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Message_Protocol</label>
+                       <textarea placeholder="HOW_CAN_WE_ASSIST_YOUR_EVOLUTION?" rows={4} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-6 text-xs font-bold focus:outline-none focus:border-blue-100 transition-all resize-none" />
+                    </div>
+                    <div className="md:col-span-2">
+                       <button className="w-full btn-primary py-5 text-[10px] uppercase tracking-[0.2em]">Dispatch_Message</button>
+                    </div>
+                 </form>
+
+                 <div className="pt-8 border-t border-gray-50 grid sm:grid-cols-3 gap-8">
+                    {[
+                      { icon: Globe, label: "Global Presence", val: "40+ Nodes" },
+                      { icon: MessageSquare, label: "Response Time", val: "< 24 Hours" },
+                      { icon: ShieldCheck, label: "Data Protection", val: "GDPR Compliant" }
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                         <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                            <item.icon size={16} />
+                         </div>
+                         <div>
+                            <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest leading-none">{item.label}</p>
+                            <p className="text-[10px] font-black text-gray-900 uppercase tracking-tight">{item.val}</p>
+                         </div>
+                      </div>
+                    ))}
+                 </div>
+              </div>
+           </div>
+        </section>
+
+        {/* 8. Final CTA */}
         <section className="py-32 px-6">
-           <div className="max-w-7xl mx-auto bg-gray-900 rounded-[3.5rem] p-16 md:p-24 text-center relative overflow-hidden group">
+           <div className="max-w-7xl mx-auto bg-blue-600 rounded-[3.5rem] p-16 md:p-24 text-center relative overflow-hidden group shadow-2xl shadow-blue-600/20">
               <div className="absolute top-0 right-0 p-20 opacity-10 text-white pointer-events-none group-hover:scale-110 transition-transform duration-1000">
                  <Globe size={400} />
               </div>
               <div className="relative z-10 space-y-10">
-                 <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter leading-none">Ready to start <br/> your <span className="text-blue-600">evolution?</span></h2>
-                 <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto font-medium">Join 5,000+ engineers mastering the future of software development on iSoftware Lab Academy.</p>
+                 <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter leading-none">Ready to start <br/> your <span className="text-blue-100">evolution?</span></h2>
+                 <p className="text-blue-50 text-lg md:text-xl max-w-2xl mx-auto font-medium">Join 5,000+ engineers mastering the future of software development on iSoftware Lab Academy.</p>
                  <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                    <Link href="/get-started" className="btn-primary px-12 py-5 text-lg">Start Learning For Free</Link>
-                    <button className="px-12 py-5 bg-white/5 border border-white/10 text-white rounded-xl text-lg font-bold hover:bg-white/10 transition-all">Contact Sales</button>
+                    <Link href="/get-started" className="bg-white text-blue-600 px-12 py-5 text-lg font-black rounded-2xl hover:scale-105 transition-all shadow-xl shadow-white/10 uppercase tracking-widest">Start Learning For Free</Link>
+                    <Link href="#contact" className="px-12 py-5 bg-blue-700/50 border border-blue-400/30 text-white rounded-2xl text-lg font-bold hover:bg-blue-700 transition-all uppercase tracking-widest">Contact Sales</Link>
                  </div>
               </div>
            </div>

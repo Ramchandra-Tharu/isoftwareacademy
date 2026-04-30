@@ -168,6 +168,25 @@ export default function NewCoursePage() {
                 <input required type="number" value={formData.price} onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })} className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all" />
               </div>
             </div>
+
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                 Category
+              </label>
+              <select 
+                required
+                value={formData.category} 
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })} 
+                className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all appearance-none"
+              >
+                <option value="">SELECT_CATEGORY</option>
+                <option value="Full Stack">FULL_STACK</option>
+                <option value="Mobile Dev">MOBILE_DEV</option>
+                <option value="Backend">BACKEND</option>
+                <option value="Data Science">DATA_SCIENCE</option>
+                <option value="UI/UX Design">UI_UX_DESIGN</option>
+              </select>
+            </div>
           </div>
         </div>
 

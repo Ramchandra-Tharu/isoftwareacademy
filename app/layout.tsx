@@ -30,7 +30,7 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${merriweather.variable} h-full antialiased`}
     >
-      <body suppressHydrationWarning className="min-h-full flex flex-col bg-[#0c0c0c] text-white font-sans">
+      <body suppressHydrationWarning className="min-h-full flex flex-col bg-white text-gray-900 font-sans">
         <NextAuthProvider>
           {children}
         </NextAuthProvider>
