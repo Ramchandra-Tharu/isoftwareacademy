@@ -16,9 +16,15 @@ export default function TopNav() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  useEffect(() => {
+    if (session) {
+      console.log("TopNav: Session User Data", session.user);
+    }
+  }, [session]);
+
   const displayName = session?.user?.name?.trim() || session?.user?.email?.split('@')[0] || "Student";
   const displayEmail = session?.user?.email?.trim() || "";
-  const userImage = session?.user?.image || null;
+  const userImage = session?.user?.image || (session?.user as any)?.picture || (session?.user as any)?.imageUrl || null;
 
   return (
     <header className="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 px-10 flex items-center justify-between sticky top-0 z-30 font-sans">
@@ -65,15 +71,11 @@ export default function TopNav() {
             </div>
             
             <div className="relative group/avatar">
-              {userImage ? (
-                <img 
-                  src={userImage} 
-                  alt={displayName} 
-                  className="w-11 h-11 rounded-2xl border border-gray-100 group-hover:border-blue-200 transition-all shadow-sm"
-                />
+              {session?.user?.image || (session?.user as any)?.picture || (session?.user as any)?.imageUrl ? (
+                <img src={session?.user?.image || (session?.user as any)?.picture || (session?.user as any)?.imageUrl} alt="Avatar" className="w-11 h-11 rounded-2xl border border-gray-100 group-hover:border-blue-200 transition-all shadow-sm" />
               ) : (
                 <div className="w-11 h-11 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-black shadow-sm group-hover:scale-105 transition-transform">
-                  {displayName.charAt(0).toUpperCase()}
+                  {session?.user?.name?.charAt(0) || "A"}
                 </div>
               )}
             </div>

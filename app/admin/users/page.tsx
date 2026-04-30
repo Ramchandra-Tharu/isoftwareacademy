@@ -131,8 +131,12 @@ export default function UserManagement() {
                 <tr key={user._id} className="hover:bg-gray-50/30 transition-colors group">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-blue-600 font-black text-xl shadow-sm group-hover:scale-110 transition-transform">
-                        {user.name?.charAt(0) || "U"}
+                      <div className="w-12 h-12 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm group-hover:scale-110 transition-transform">
+                        {user.image ? (
+                          <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-blue-600 font-black text-xl">{user.name?.charAt(0) || "U"}</span>
+                        )}
                       </div>
                       <div className="space-y-0.5">
                         <p className="text-sm font-black text-gray-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{user.name}</p>

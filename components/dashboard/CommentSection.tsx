@@ -11,9 +11,17 @@ import {
   CornerDownRight, 
   Star,
   MoreVertical,
-  AlertCircle
+  AlertCircle,
+  Clock,
+  Sparkles
 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 interface CommentSectionProps {
   courseId: string;
@@ -40,19 +48,16 @@ export default function CommentSection({ courseId, lessonId }: CommentSectionPro
       const res = await fetch(`/api/comments?lessonId=${lessonId}`);
       if (res.ok) {
         const data = await res.json();
-        // Simple nesting: separate top-level and replies
         const topLevel = data.filter((c: any) => !c.parentId);
         const replies = data.filter((c: any) => c.parentId);
-        
         const nested = topLevel.map((parent: any) => ({
           ...parent,
           replies: replies.filter((r: any) => r.parentId === parent._id)
         }));
-        
         setComments(nested);
       }
     } catch (err) {
-      console.error("Failed to fetch comments", err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -61,7 +66,7 @@ export default function CommentSection({ courseId, lessonId }: CommentSectionPro
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session) {
-      setStatusMsg({ type: "error", text: "Please login to post a comment." });
+      setStatusMsg({ type: "error", text: "AUTHENTICATION_REQUIRED" });
       return;
     }
     if (!content.trim()) return;
@@ -86,51 +91,52 @@ export default function CommentSection({ courseId, lessonId }: CommentSectionPro
         setContent("");
         setRating(0);
         setReplyTo(null);
-        setStatusMsg({ type: "success", text: "Comment submitted! It will appear after approval." });
-        // Don't immediately add to list since it's pending
-      } else {
-        const error = await res.json();
-        setStatusMsg({ type: "error", text: error.error || "Failed to post comment." });
+        setStatusMsg({ type: "success", text: "DISPATCH_SUCCESS: AWAITING_MODERATION" });
       }
-    } catch (err) {
-      setStatusMsg({ type: "error", text: "An error occurred." });
     } finally {
       setSubmitting(false);
     }
   };
 
   const renderComment = (comment: any, isReply = false) => (
-    <div key={comment._id} className={`flex gap-4 p-5 bg-[#1a1a1a] rounded-2xl border border-white/5 transition-all hover:border-white/10 ${isReply ? "ml-12 bg-[#161616]" : ""}`}>
-      <div className="w-10 h-10 rounded-full bg-gray-800 flex-shrink-0 flex items-center justify-center text-[#EBBB54] font-bold border border-white/10 overflow-hidden">
+    <div key={comment._id} className={cn(
+      "flex gap-6 p-8 bg-white border rounded-[2rem] transition-all hover:border-blue-100 shadow-sm",
+      isReply ? "ml-12 border-gray-50 bg-gray-50/30" : "border-gray-100"
+    )}>
+      <div className="w-12 h-12 rounded-2xl bg-gray-50 flex-shrink-0 flex items-center justify-center text-blue-600 font-black text-lg border border-gray-100 overflow-hidden shadow-sm">
         {comment.userId?.image ? <img src={comment.userId.image} alt={comment.userId.name} /> : (comment.userId?.name?.charAt(0) || "?")}
       </div>
-      <div className="space-y-2 flex-1">
+      <div className="space-y-4 flex-1">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-bold text-white">{comment.userId?.name}</p>
-            {comment.userId?.role === "admin" && <span className="text-[8px] bg-[#EBBB54] text-black px-1 rounded font-black uppercase">Staff</span>}
+          <div className="flex items-center gap-3">
+            <p className="text-sm font-black text-gray-900 uppercase tracking-tight">{comment.userId?.name}</p>
+            {comment.userId?.role === "admin" && (
+               <span className="px-2 py-0.5 bg-blue-600 text-white text-[8px] rounded font-black uppercase tracking-widest">Instructor</span>
+            )}
             {comment.rating && (
                <div className="flex items-center gap-0.5 ml-2">
                  {[...Array(5)].map((_, i) => (
-                   <Star key={i} size={10} className={i < comment.rating ? "text-[#EBBB54] fill-[#EBBB54]" : "text-gray-700"} />
+                   <Star key={i} size={10} className={cn(i < comment.rating ? "text-amber-400 fill-amber-400" : "text-gray-200")} />
                  ))}
                </div>
             )}
           </div>
-          <p className="text-[10px] text-gray-600 uppercase tracking-widest">{new Date(comment.createdAt).toLocaleDateString()}</p>
+          <p className="text-[9px] font-black text-gray-300 uppercase tracking-widest flex items-center gap-1">
+             <Clock size={12} /> {new Date(comment.createdAt).toLocaleDateString()}
+          </p>
         </div>
-        <p className="text-sm text-gray-400 leading-relaxed">{comment.content}</p>
-        <div className="flex items-center gap-4 pt-2">
+        <p className="text-sm text-gray-600 leading-relaxed font-medium">"{comment.content}"</p>
+        <div className="flex items-center gap-6 pt-2">
           {!isReply && (
             <button 
               onClick={() => { setReplyTo(comment._id); setContent(`@${comment.userId?.name} `); }}
-              className="text-[10px] text-gray-500 hover:text-[#EBBB54] uppercase font-bold tracking-widest flex items-center gap-1"
+              className="text-[9px] text-gray-400 hover:text-blue-600 uppercase font-black tracking-widest flex items-center gap-1.5 transition-colors"
             >
-              <CornerDownRight size={12} /> Reply
+              <CornerDownRight size={14} /> Reply_Thread
             </button>
           )}
-          <button className="text-[10px] text-gray-500 hover:text-white uppercase font-bold tracking-widest flex items-center gap-1">
-            <ThumbsUp size={12} /> {comment.likes || 0}
+          <button className="text-[9px] text-gray-400 hover:text-blue-600 uppercase font-black tracking-widest flex items-center gap-1.5 transition-colors">
+            <ThumbsUp size={14} /> {comment.likes || 0} Helpful
           </button>
         </div>
       </div>
@@ -138,35 +144,40 @@ export default function CommentSection({ courseId, lessonId }: CommentSectionPro
   );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10 font-sans">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold font-serif text-white flex items-center gap-3">
-          <MessageCircle className="text-[#EBBB54]" size={24} /> Discussion Thread
+        <h3 className="text-xl font-black text-gray-900 uppercase tracking-tighter flex items-center gap-3">
+          <MessageCircle className="text-blue-600" size={24} /> Discussion_Hub
         </h3>
-        <span className="text-xs text-gray-500 font-mono">{comments.length} Approved Comments</span>
+        <div className="px-3 py-1 bg-gray-50 border border-gray-100 rounded-full text-[9px] font-black uppercase tracking-widest text-gray-400">
+           {comments.length} Verified Segments
+        </div>
       </div>
 
       {/* Post Comment Form */}
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white/[0.02] border border-white/5 rounded-[2rem] p-6">
+      <form onSubmit={handleSubmit} className="card-premium p-8 space-y-6 bg-gray-50/50">
         {replyTo && (
-          <div className="flex items-center justify-between bg-[#EBBB54]/10 px-4 py-2 rounded-xl border border-[#EBBB54]/20">
-            <span className="text-[10px] font-black text-[#EBBB54] uppercase tracking-widest">Replying to thread...</span>
-            <button type="button" onClick={() => { setReplyTo(null); setContent(""); }} className="text-gray-500 hover:text-white text-xs">Cancel</button>
+          <div className="flex items-center justify-between bg-blue-50 px-5 py-3 rounded-2xl border border-blue-100">
+            <span className="text-[9px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2"><Sparkles size={14}/> Routing reply to thread...</span>
+            <button type="button" onClick={() => { setReplyTo(null); setContent(""); }} className="text-gray-400 hover:text-red-500 text-[10px] font-black uppercase">Cancel</button>
           </div>
         )}
         
         {!replyTo && (
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Rating:</span>
-            <div className="flex gap-1">
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Rate Unit:</span>
+            <div className="flex gap-1.5">
               {[1, 2, 3, 4, 5].map((s) => (
                 <button 
                   key={s} 
                   type="button" 
                   onClick={() => setRating(s)}
-                  className="transition-transform hover:scale-125"
+                  className="transition-all hover:scale-125"
                 >
-                  <Star size={18} className={s <= rating ? "text-[#EBBB54] fill-[#EBBB54]" : "text-gray-800"} />
+                  <Star size={20} className={cn(
+                    "transition-colors",
+                    s <= rating ? "text-amber-400 fill-amber-400" : "text-gray-200"
+                  )} />
                 </button>
               ))}
             </div>
@@ -177,15 +188,15 @@ export default function CommentSection({ courseId, lessonId }: CommentSectionPro
           required
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder={replyTo ? "Write your reply..." : "Ask a question or share your thoughts..."}
-          className="w-full bg-transparent border-none focus:ring-0 text-sm text-gray-300 resize-none min-h-[100px] placeholder:text-gray-700"
+          placeholder={replyTo ? "Compose reply protocol..." : "Submit inquiry or share academic insight..."}
+          className="w-full bg-transparent border-none focus:ring-0 text-sm font-medium text-gray-700 resize-none min-h-[120px] placeholder:text-gray-300"
         />
         
-        <div className="flex items-center justify-between pt-4 border-t border-white/5">
+        <div className="flex items-center justify-between pt-6 border-t border-gray-100">
            {statusMsg && (
              <div className={cn(
                "flex items-center gap-2 text-[10px] font-black uppercase tracking-widest",
-               statusMsg.type === "success" ? "text-green-500" : "text-red-500"
+               statusMsg.type === "success" ? "text-emerald-500" : "text-red-500"
              )}>
                 {statusMsg.type === "success" ? <CheckCircle size={14} /> : <AlertCircle size={14} />}
                 {statusMsg.text}
@@ -195,27 +206,27 @@ export default function CommentSection({ courseId, lessonId }: CommentSectionPro
            <button 
              disabled={submitting}
              type="submit" 
-             className="flex items-center gap-2 px-8 py-3 bg-[#EBBB54] text-black font-black rounded-xl hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:scale-100 shadow-lg shadow-[#EBBB54]/10"
+             className="flex items-center gap-3 px-10 py-4 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:scale-105 active:scale-95 transition-all disabled:opacity-50 shadow-xl shadow-blue-600/20"
            >
-             {submitting ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-             <span className="text-[10px] uppercase tracking-widest">Post_Message</span>
+             {submitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+             Dispatch_Message
            </button>
         </div>
       </form>
 
       {/* Comments List */}
-      <div className="space-y-6">
+      <div className="space-y-8">
         {loading ? (
-          <div className="flex items-center justify-center py-10">
-            <Loader2 className="animate-spin text-[#EBBB54]" size={32} />
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="animate-spin text-blue-600" size={32} />
           </div>
         ) : comments.length === 0 ? (
-          <div className="text-center py-10 text-gray-600 italic text-sm">
-            No approved comments yet. Be the first to start the discussion!
+          <div className="text-center py-20 border-2 border-dashed border-gray-50 rounded-[3rem] text-gray-300 italic text-[10px] font-black uppercase tracking-widest">
+            Discussion registry empty. Initialize first entry.
           </div>
         ) : (
           comments.map((comment) => (
-            <div key={comment._id} className="space-y-4">
+            <div key={comment._id} className="space-y-6">
               {renderComment(comment)}
               {comment.replies && comment.replies.map((reply: any) => renderComment(reply, true))}
             </div>

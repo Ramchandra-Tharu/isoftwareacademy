@@ -57,10 +57,10 @@ export default function TopNav() {
           </div>
           
           <div className="relative group/avatar">
-            {session?.user?.image ? (
-              <img src={session.user.image} alt="Avatar" className="w-11 h-11 rounded-2xl border border-gray-100 group-hover:border-blue-200 transition-all shadow-sm" />
+            {session?.user?.image || (session?.user as any)?.picture || (session?.user as any)?.imageUrl ? (
+              <img src={session?.user?.image || (session?.user as any)?.picture || (session?.user as any)?.imageUrl} alt="Avatar" className="w-11 h-11 rounded-2xl border border-gray-100 group-hover:border-blue-200 transition-all shadow-sm" />
             ) : (
-              <div className="w-11 h-11 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-black shadow-sm">
+              <div className="w-11 h-11 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-black shadow-sm group-hover:scale-105 transition-transform">
                 {session?.user?.name?.charAt(0) || "A"}
               </div>
             )}

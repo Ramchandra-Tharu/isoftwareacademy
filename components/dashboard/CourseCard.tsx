@@ -39,7 +39,7 @@ export default function CourseCard({
   rating = 4.8
 }: CourseCardProps) {
   return (
-    <div className="card-premium group flex flex-col h-full overflow-hidden bg-white hover:shadow-2xl hover:shadow-blue-600/5 transition-all duration-500">
+    <div className="card-premium group flex flex-col h-full overflow-hidden bg-white hover:shadow-2xl hover:shadow-blue-600/5 transition-all duration-500 border-transparent hover:border-blue-50">
       {/* Thumbnail */}
       <div className="relative aspect-video overflow-hidden">
         <img 
@@ -64,7 +64,7 @@ export default function CourseCard({
         <div className="flex items-center justify-between">
            <div className="flex items-center gap-1 text-amber-400">
               <Star size={12} fill="currentColor" />
-              <span className="text-[10px] font-black text-gray-400">{rating} (428 reviews)</span>
+              <span className="text-[10px] font-black text-gray-400">{rating} (Verified)</span>
            </div>
            <button className="text-gray-300 hover:text-gray-900 transition-colors"><MoreVertical size={16} /></button>
         </div>
@@ -73,17 +73,17 @@ export default function CourseCard({
            <h3 className="text-xl font-black text-gray-900 group-hover:text-blue-600 transition-colors leading-tight uppercase tracking-tighter">
              {title}
            </h3>
-           <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Lead Instructor: {instructor}</p>
+           <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Instructor: {instructor}</p>
         </div>
 
         <div className="pt-6 border-t border-gray-50 mt-auto space-y-6">
            {/* Progress Bar */}
            <div className="space-y-2">
               <div className="flex items-center justify-between">
-                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Deployment Progress</span>
+                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Progress</span>
                  <span className="text-[10px] font-black text-blue-600">{progress}%</span>
               </div>
-              <div className="h-2 w-full bg-gray-50 rounded-full overflow-hidden border border-gray-100">
+              <div className="h-1.5 w-full bg-gray-50 rounded-full overflow-hidden">
                  <div 
                    className="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" 
                    style={{ width: `${progress}%` }}
@@ -93,15 +93,15 @@ export default function CourseCard({
 
            {/* Footer */}
            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4 text-[10px] font-black text-gray-300 uppercase tracking-widest">
-                 <span className="flex items-center gap-1.5"><BookOpen size={14} /> {lessonsCount} Units</span>
+              <div className="flex items-center gap-3 text-[10px] font-black text-gray-300 uppercase tracking-widest">
+                 <span className="flex items-center gap-1.5"><BookOpen size={14} /> {lessonsCount}</span>
                  <span className="flex items-center gap-1.5"><Clock size={14} /> {duration}</span>
               </div>
               <Link 
                 href={`/dashboard/courses/${id}`}
-                className="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-widest group/btn"
+                className="px-6 py-2 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-600 hover:text-white transition-all"
               >
-                {progress > 0 ? "Resume" : "Initialize"} <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
+                {progress > 0 ? "Resume" : "Start"}
               </Link>
            </div>
         </div>

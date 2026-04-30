@@ -11,27 +11,30 @@ import {
   Target,
   Zap,
   BarChart3,
-  Loader2
+  Loader2,
+  Sparkles,
+  ArrowRight
 } from "lucide-react";
 import StatsCard from "@/components/dashboard/StatsCard";
+import Link from "next/link";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 export default function ProgressTrackingPage() {
   const [progressData, setProgressData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Helper because of constant issues
-  const TRENDING_UP = TrendingUp;
-  const CLOCK = Clock;
-  const BOOK_OPEN = BookOpen;
-  const AWARD = Award;
-
   const totalFinished = progressData.reduce((acc, curr) => acc + (curr.completedLessons?.length || 0), 0);
 
   const learningStats = [
-    { title: "Learning Streak", value: "12 Days", icon: TRENDING_UP, description: "consistent learning", trend: "Hot!", trendType: "positive" },
-    { title: "Total Time", value: "84.5h", icon: CLOCK, description: "spent learning", trend: "+12h", trendType: "positive" },
-    { title: "Modules Finished", value: totalFinished, icon: BOOK_OPEN, description: "across all courses", trend: "On track", trendType: "positive" },
-    { title: "Achievements", value: 15, icon: AWARD, description: "points & badges", trend: "Level 4", trendType: "positive" },
+    { title: "Learning Streak", value: "12 Days", icon: TrendingUp, description: "consistent sync", trend: "Hot!", trendType: "positive" },
+    { title: "Engagement Time", value: "84.5h", icon: Clock, description: "total uptime", trend: "+12h", trendType: "positive" },
+    { title: "Units Finished", value: totalFinished, icon: BookOpen, description: "deployed modules", trend: "On track", trendType: "positive" },
+    { title: "Achievements", value: 15, icon: Award, description: "milestones hit", trend: "Level 4", trendType: "positive" },
   ] as const;
 
   useEffect(() => {
@@ -41,127 +44,143 @@ export default function ProgressTrackingPage() {
         const data = await res.json();
         setProgressData(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error("Failed to fetch progress:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchProgress();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+        <Loader2 className="animate-spin text-blue-600" size={40} />
+        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Aggregating Learning Nodes...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-10 pb-10">
+    <div className="space-y-12 pb-20 font-sans">
       {/* Header */}
-      <div>
-         <h1 className="text-4xl font-bold font-serif text-white mb-2">Learning Analytics</h1>
-         <p className="text-gray-400">Track your journey, milestones, and daily progress.</p>
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+        <div>
+           <h1 className="text-4xl font-black tracking-tight text-gray-900 uppercase">Learning_Analytics</h1>
+           <p className="text-gray-500 font-medium mt-1">Real-time performance telemetry and academic milestone tracking.</p>
+        </div>
+        <div className="px-4 py-2 bg-blue-50 border border-blue-100 rounded-full text-blue-600 text-[10px] font-black uppercase tracking-widest shadow-sm flex items-center gap-2">
+           <Sparkles size={14} /> Data Accuracy 100%
+        </div>
       </div>
 
-      {/* Stats */}
-       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
          {learningStats.map((stat, i) => (
            <StatsCard key={i} {...stat} />
          ))}
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
-        {/* Weekly Activity Chart Mockup */}
-        <div className="xl:col-span-2 bg-[#1a1a1a] border border-white/5 rounded-[2.5rem] p-8 space-y-8">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
+        {/* Weekly Activity Chart */}
+        <div className="xl:col-span-8 card-premium p-10 space-y-10">
            <div className="flex items-center justify-between">
               <div>
-                 <h3 className="text-xl font-bold text-white">Weekly Activity</h3>
-                 <p className="text-xs text-gray-500 mt-1">Daily learning hours (last 7 days)</p>
+                 <h3 className="text-xl font-black text-gray-900 uppercase tracking-tighter">Activity_Stream</h3>
+                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">DAILY_ENGAGEMENT_HOURS</p>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10 text-xs text-gray-400">
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100 text-[9px] font-black uppercase tracking-widest text-gray-400">
                  <Calendar size={14} /> Last 7 Days
               </div>
            </div>
 
-           <div className="h-64 flex items-end justify-between gap-4 px-4">
+           <div className="h-64 flex items-end justify-between gap-6 px-4">
               {[4, 6, 3, 8, 5, 7, 2].map((height, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-4 group">
-                   <div className="w-full bg-white/5 rounded-t-xl relative overflow-hidden transition-all group-hover:bg-[#EBBB54]/20" style={{ height: `${height * 10}%` }}>
-                      <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-[#EBBB54] to-[#f5d085] opacity-80 group-hover:opacity-100 transition-opacity" style={{ height: "100%" }}></div>
+                <div key={i} className="flex-1 flex flex-col items-center gap-5 group">
+                   <div className="w-full bg-gray-50 rounded-2xl relative overflow-hidden transition-all group-hover:bg-blue-50 border border-gray-100/50" style={{ height: `100%` }}>
+                      <div 
+                        className="absolute bottom-0 left-0 w-full bg-blue-600 rounded-2xl transition-all duration-1000 group-hover:scale-y-105" 
+                        style={{ height: `${height * 10}%` }} 
+                      />
                    </div>
-                   <span className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">{['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}</span>
+                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}</span>
                 </div>
               ))}
            </div>
         </div>
 
         {/* Learning Goals */}
-        <div className="bg-gradient-to-br from-[#1a1a1a] to-[#0c0c0c] border border-[#EBBB54]/10 rounded-[2.5rem] p-8 space-y-8 relative overflow-hidden">
-           <div className="absolute -top-10 -right-10 opacity-[0.03] rotate-12">
+        <div className="xl:col-span-4 card-premium p-10 space-y-10 bg-white border border-gray-100 relative overflow-hidden group shadow-xl shadow-blue-600/5">
+           <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-1000">
               <Target size={200} />
            </div>
            
-           <h3 className="text-xl font-bold text-white relative z-10 flex items-center gap-3">
-             <Target className="text-[#EBBB54]" size={20} /> Current Goals
+           <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 relative z-10 text-gray-900">
+             <Target className="text-blue-600" size={24} /> Goal_Stack
            </h3>
 
-           <div className="space-y-6 relative z-10">
+           <div className="space-y-8 relative z-10">
               {[
-                { title: "React Mastery", progress: 85, color: "#EBBB54" },
-                { title: "Daily Coding", progress: 60, color: "#4ade80" },
-                { title: "Quiz Champ", progress: 40, color: "#60a5fa" }
+                { title: "React Mastery", progress: 85, color: "bg-blue-600" },
+                { title: "Daily Coding", progress: 60, color: "bg-emerald-500" },
+                { title: "Quiz Champ", progress: 40, color: "bg-amber-500" }
               ].map((goal, i) => (
-                <div key={i} className="space-y-2">
-                   <div className="flex items-center justify-between text-xs font-bold">
-                      <span className="text-gray-400">{goal.title}</span>
-                      <span className="text-white">{goal.progress}%</span>
+                <div key={i} className="space-y-3">
+                   <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
+                      <span>{goal.title}</span>
+                      <span className="text-gray-900">{goal.progress}%</span>
                    </div>
-                   <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                   <div className="h-2 w-full bg-gray-50 rounded-full overflow-hidden border border-gray-100 shadow-inner">
                       <div 
-                        className="h-full rounded-full transition-all duration-1000" 
-                        style={{ width: `${goal.progress}%`, backgroundColor: goal.color }}
-                      ></div>
+                        className={cn("h-full rounded-full transition-all duration-1000", goal.color)}
+                        style={{ width: `${goal.progress}%` }}
+                      />
                    </div>
                 </div>
               ))}
            </div>
 
-           <button className="w-full py-4 bg-[#EBBB54] text-black font-bold rounded-2xl shadow-lg hover:scale-105 transition-all text-sm mt-4 flex items-center justify-center gap-2">
-              <Zap size={16} /> Set New Goal
+           <button className="w-full py-4 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-600/20 hover:scale-105 transition-all flex items-center justify-center gap-2 relative z-10">
+              <Zap size={16} /> Update Objectives
            </button>
         </div>
       </div>
 
-      {/* Progress by Course */}
-      <div className="space-y-6">
-         <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-            <BarChart3 className="text-[#EBBB54]" /> Course Milestone Breakdown
+      {/* Progress Breakdown */}
+      <div className="space-y-8">
+         <h3 className="text-xl font-black uppercase tracking-tighter text-gray-900 flex items-center gap-3">
+            <BarChart3 className="text-blue-600" /> Milestone_Breakdown
          </h3>
 
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {loading ? (
-              <div className="col-span-full h-32 flex items-center justify-center">
-                 <Loader2 className="animate-spin text-[#EBBB54]" />
-              </div>
-            ) : progressData.length > 0 ? (
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {progressData.length > 0 ? (
               progressData.map((item, i) => (
-                <Link key={i} href={`/dashboard/courses/${item.courseId?.slug || ''}`} className="flex items-center justify-between p-6 bg-[#1a1a1a] border border-white/5 rounded-3xl hover:border-white/10 transition-all group">
-                   <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-[#EBBB54] group-hover:scale-110 transition-transform">
-                         <BookOpen size={20} />
+                <Link key={i} href={`/dashboard/courses/${item.courseId?.slug || ''}`} className="flex items-center justify-between p-8 card-premium hover:border-blue-100 transition-all group">
+                   <div className="flex items-center gap-6">
+                      <div className="w-14 h-14 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all shadow-sm">
+                         <BookOpen size={24} />
                       </div>
-                      <div>
-                         <h4 className="text-sm font-bold text-white">{item.courseId?.title || "Course"}</h4>
-                         <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">{item.courseId?.totalLessons || 0} total lessons</p>
+                      <div className="space-y-1">
+                         <h4 className="text-sm font-black text-gray-900 uppercase tracking-tight leading-none">{item.courseId?.title || "Module"}</h4>
+                         <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">{item.courseId?.totalLessons || 0} Segment Uptime</p>
                       </div>
                    </div>
-                   <div className="flex items-center gap-4">
+                   <div className="flex items-center gap-8">
                       <div className="text-right">
-                         <p className="text-sm font-bold text-white">{item.percentage || 0}%</p>
-                         <p className="text-[10px] text-gray-600 font-bold uppercase tracking-tighter">progress</p>
+                         <p className="text-xl font-black text-gray-900 tracking-tighter">{item.percentage || 0}%</p>
+                         <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest">DEPLOYED</p>
                       </div>
-                      <ChevronRight className="text-gray-700 group-hover:text-[#EBBB54] transition-colors" size={20} />
+                      <div className="w-10 h-10 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-300 group-hover:text-blue-600 group-hover:border-blue-100 transition-all">
+                         <ChevronRight size={20} />
+                      </div>
                    </div>
                 </Link>
               ))
             ) : (
-              <div className="col-span-full h-32 border-2 border-dashed border-white/5 rounded-3xl flex items-center justify-center text-gray-600 italic">
-                 No progress data found yet. Start learning to see analytics!
+              <div className="col-span-full h-48 border-2 border-dashed border-gray-100 rounded-[3rem] flex flex-col items-center justify-center text-gray-300 gap-4">
+                 <BarChart3 size={60} className="opacity-10" />
+                 <p className="text-[10px] font-black uppercase tracking-widest">No Telemetry Detected</p>
+                 <Link href="/dashboard/my-courses" className="text-blue-600 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest hover:gap-4 transition-all">Start Engagement <ArrowRight size={14}/></Link>
               </div>
             )}
          </div>

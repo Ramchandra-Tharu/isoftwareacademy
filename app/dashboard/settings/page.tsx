@@ -123,8 +123,8 @@ export default function SettingsPage() {
                  <h3 className="text-xl font-black text-gray-900 uppercase tracking-tighter">Identity_Settings</h3>
                  <div className="relative group cursor-pointer">
                     <div className="w-20 h-20 rounded-[2rem] bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden">
-                       {session?.user?.image ? (
-                         <img src={session.user.image} className="w-full h-full object-cover" />
+                       {session?.user?.image || (session?.user as any)?.picture || (session?.user as any)?.imageUrl ? (
+                         <img src={session?.user?.image || (session?.user as any)?.picture || (session?.user as any)?.imageUrl} className="w-full h-full object-cover" />
                        ) : (
                          <User size={32} className="text-gray-200" />
                        )}
