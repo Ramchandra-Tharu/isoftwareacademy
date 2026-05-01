@@ -172,24 +172,24 @@ export default function EditQuizPage() {
   if (fetching) {
     return (
       <div className="h-[60vh] flex items-center justify-center">
-        <Loader2 className="animate-spin text-[#EBBB54]" size={40} />
+        <Loader2 className="animate-spin text-blue-600" size={40} />
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 font-mono pb-20">
+    <div className="max-w-5xl mx-auto space-y-8 font-sans pb-20">
       <div className="flex items-center gap-4">
-        <Link href="/admin/quizzes" className="p-2 hover:bg-white/5 rounded-xl transition-colors text-gray-500 hover:text-white border border-white/5">
+        <Link href="/admin/quizzes" className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400 hover:text-gray-900 border border-gray-100">
           <ArrowLeft size={24} />
         </Link>
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tighter uppercase">UPDATE_<span className="text-[#EBBB54]">QUIZ</span></h1>
-          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em]">Modifying assessment unit in quiz_db</p>
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight uppercase">UPDATE_<span className="text-blue-600">QUIZ</span></h1>
+          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Modifying assessment unit in quiz_db</p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-black border border-white/10 rounded-[32px] p-10 space-y-12 shadow-2xl relative overflow-hidden">
+      <form onSubmit={handleSubmit} className="card-premium p-10 space-y-12 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-5">
            <Save size={120} />
         </div>
@@ -197,27 +197,27 @@ export default function EditQuizPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* Section 1: Core Identity */}
           <div className="space-y-8">
-            <h2 className="text-xs font-black text-[#EBBB54] uppercase tracking-[0.3em] border-l-2 border-[#EBBB54] pl-3">01. CORE_IDENTITY</h2>
+            <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.3em] border-l-2 border-blue-600 pl-3">01. CORE_IDENTITY</h2>
             
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
                 <Type size={12} /> Quiz_Title
               </label>
-              <input required type="text" value={formData.title} onChange={handleTitleChange} placeholder="E.G. REACT_FUNDAMENTALS" className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all" />
+              <input required type="text" value={formData.title} onChange={handleTitleChange} placeholder="E.G. REACT_FUNDAMENTALS" className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
             </div>
 
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
                 <LinkIcon size={12} /> Access_Slug
               </label>
-              <input required type="text" value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all font-mono text-[#EBBB54]/70" />
+              <input required type="text" value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all font-mono text-blue-600/70" />
             </div>
 
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
                  Linked_Course
               </label>
-              <select required value={formData.courseId} onChange={(e) => setFormData({ ...formData, courseId: e.target.value })} className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all appearance-none">
+              <select required value={formData.courseId} onChange={(e) => setFormData({ ...formData, courseId: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all appearance-none">
                 <option value="">SELECT_COURSE</option>
                 {courses.map(c => (
                   <option key={c._id} value={c._id}>{c.title}</option>
@@ -227,7 +227,7 @@ export default function EditQuizPage() {
             
             <div className="space-y-2">
               <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Description</label>
-              <textarea rows={2} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="BRIEF_OVERVIEW..." className="w-full bg-white/[0.02] border border-white/10 rounded-[24px] py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all resize-none" />
+              <textarea rows={2} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="BRIEF_OVERVIEW..." className="w-full bg-gray-50 border border-gray-100 rounded-[24px] py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all resize-none" />
             </div>
 
             <div className="space-y-2">
@@ -236,14 +236,14 @@ export default function EditQuizPage() {
               </label>
               <div className="flex items-center gap-4">
                 <div className="relative flex-1">
-                  <input type="text" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} placeholder="IMAGE_URL..." className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-5 pr-12 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all" />
+                  <input type="text" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} placeholder="IMAGE_URL..." className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 pr-12 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
                   {formData.image && (
                     <img src={formData.image} alt="Preview" className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 rounded object-cover border border-white/20" />
                   )}
                 </div>
                 <div className="relative">
                   <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                  <div className="flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl h-[54px] px-6 transition-all text-white font-bold text-xs uppercase tracking-widest gap-2">
+                  <div className="flex items-center justify-center bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-2xl h-[54px] px-6 transition-all text-gray-900 font-bold text-xs uppercase tracking-widest gap-2">
                     {uploadingImage ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
                     {uploadingImage ? "UPLOADING..." : "UPLOAD"}
                   </div>
@@ -254,20 +254,20 @@ export default function EditQuizPage() {
 
           {/* Section 2: Technical Metadata */}
           <div className="space-y-8">
-            <h2 className="text-xs font-black text-[#EBBB54] uppercase tracking-[0.3em] border-l-2 border-[#EBBB54] pl-3">02. TECHNICAL_META</h2>
+            <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.3em] border-l-2 border-blue-600 pl-3">02. TECHNICAL_META</h2>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
                   <Clock size={12} /> Duration
                 </label>
-                <input required type="text" value={formData.duration} onChange={(e) => setFormData({ ...formData, duration: e.target.value })} placeholder="E.G. 30m" className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all" />
+                <input required type="text" value={formData.duration} onChange={(e) => setFormData({ ...formData, duration: e.target.value })} placeholder="E.G. 30m" className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
               </div>
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
                   <Target size={12} /> Passing_Score_%
                 </label>
-                <input required type="number" min="1" max="100" value={formData.passingScore} onChange={(e) => setFormData({ ...formData, passingScore: Number(e.target.value) })} className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all" />
+                <input required type="number" min="1" max="100" value={formData.passingScore} onChange={(e) => setFormData({ ...formData, passingScore: Number(e.target.value) })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
               </div>
             </div>
 
@@ -275,7 +275,7 @@ export default function EditQuizPage() {
               <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
                  Difficulty
               </label>
-              <select value={formData.difficulty} onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })} className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all appearance-none">
+              <select value={formData.difficulty} onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all appearance-none">
                 <option value="Easy">EASY</option>
                 <option value="Medium">MEDIUM</option>
                 <option value="Hard">HARD</option>
@@ -285,17 +285,17 @@ export default function EditQuizPage() {
         </div>
 
         {/* Section 3: Question Builder */}
-        <div className="space-y-8 pt-8 border-t border-white/5">
+        <div className="space-y-8 pt-8 border-t border-gray-100">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-black text-[#EBBB54] uppercase tracking-[0.3em] border-l-2 border-[#EBBB54] pl-3">03. QUESTION_BANK</h2>
-            <button type="button" onClick={addQuestion} className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2">
+            <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.3em] border-l-2 border-blue-600 pl-3">03. QUESTION_BANK</h2>
+            <button type="button" onClick={addQuestion} className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-900 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2">
               <Plus size={14} /> ADD_QUESTION
             </button>
           </div>
 
           <div className="space-y-6">
             {formData.questions.map((q, qIndex) => (
-              <div key={qIndex} className="bg-white/[0.01] border border-white/10 rounded-2xl p-6 space-y-6 relative">
+              <div key={qIndex} className="bg-gray-50/50 border border-gray-100 rounded-2xl p-6 space-y-6 relative">
                 {formData.questions.length > 1 && (
                   <button type="button" onClick={() => removeQuestion(qIndex)} className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition-colors">
                     <Trash2 size={16} />
@@ -304,17 +304,17 @@ export default function EditQuizPage() {
                 
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Q_{qIndex + 1}_TEXT</label>
-                  <input required type="text" value={q.question} onChange={(e) => updateQuestion(qIndex, "question", e.target.value)} placeholder="WHAT IS NEXT.JS?" className="w-full bg-white/[0.02] border border-white/10 rounded-xl py-3 px-4 text-sm font-bold tracking-tight focus:outline-none focus:border-[#EBBB54]/50 focus:bg-white/5 transition-all" />
+                  <input required type="text" value={q.question} onChange={(e) => updateQuestion(qIndex, "question", e.target.value)} placeholder="WHAT IS NEXT.JS?" className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {q.options.map((opt, oIndex) => (
                     <div key={oIndex} className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <input type="radio" name={`correct-${qIndex}`} checked={q.correctAnswer === oIndex} onChange={() => updateQuestion(qIndex, "correctAnswer", oIndex)} className="accent-[#EBBB54] w-4 h-4" />
-                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">OPT_{oIndex + 1} {q.correctAnswer === oIndex && <span className="text-[#EBBB54] ml-1">(CORRECT)</span>}</label>
+                        <input type="radio" name={`correct-${qIndex}`} checked={q.correctAnswer === oIndex} onChange={() => updateQuestion(qIndex, "correctAnswer", oIndex)} className="accent-blue-600 w-4 h-4" />
+                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">OPT_{oIndex + 1} {q.correctAnswer === oIndex && <span className="text-blue-600 ml-1">(CORRECT)</span>}</label>
                       </div>
-                      <input required type="text" value={opt} onChange={(e) => updateOption(qIndex, oIndex, e.target.value)} placeholder={`OPTION ${oIndex + 1}`} className={`w-full bg-white/[0.02] border rounded-xl py-3 px-4 text-sm font-bold tracking-tight focus:outline-none transition-all ${q.correctAnswer === oIndex ? 'border-[#EBBB54]/50 text-[#EBBB54]' : 'border-white/10 focus:border-[#EBBB54]/50 focus:bg-white/5'}`} />
+                      <input required type="text" value={opt} onChange={(e) => updateOption(qIndex, oIndex, e.target.value)} placeholder={`OPTION ${oIndex + 1}`} className={`w-full bg-gray-50 border rounded-xl py-3 px-4 text-sm font-bold tracking-tight focus:outline-none transition-all ${q.correctAnswer === oIndex ? 'border-blue-600/50 text-blue-600 bg-white' : 'border-gray-100 focus:border-blue-600/50 focus:bg-white'}`} />
                     </div>
                   ))}
                 </div>
@@ -323,12 +323,12 @@ export default function EditQuizPage() {
           </div>
         </div>
 
-        <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="pt-10 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-6">
              <div className="flex items-center gap-3">
                 <div className="relative inline-block w-12 h-6">
                   <input type="checkbox" id="publish" checked={formData.isPublished} onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })} className="sr-only peer" />
-                  <label htmlFor="publish" className="absolute inset-0 cursor-pointer bg-white/10 rounded-full transition-colors peer-checked:bg-[#EBBB54]"></label>
+                  <label htmlFor="publish" className="absolute inset-0 cursor-pointer bg-gray-200 rounded-full transition-colors peer-checked:bg-blue-600"></label>
                   <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-6"></div>
                 </div>
                 <label htmlFor="publish" className="text-[10px] font-black uppercase tracking-widest text-gray-500 cursor-pointer">
@@ -336,7 +336,7 @@ export default function EditQuizPage() {
                 </label>
              </div>
 
-             <div className="h-6 w-px bg-white/5"></div>
+             <div className="h-6 w-px bg-gray-100"></div>
 
              <div className="flex items-center gap-4">
                {status === "success" && (
@@ -352,7 +352,7 @@ export default function EditQuizPage() {
              </div>
           </div>
           
-          <button disabled={loading} type="submit" className="w-full md:w-auto px-12 py-5 bg-[#EBBB54] text-black font-black rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-[#EBBB54]/20 flex items-center justify-center gap-3 uppercase text-xs tracking-widest">
+          <button disabled={loading} type="submit" className="w-full md:w-auto px-12 py-5 bg-blue-600 text-white font-black rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-blue-600/20 flex items-center justify-center gap-3 uppercase text-xs tracking-widest">
             {loading ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
             <span>EXECUTE_DEPLOYMENT</span>
           </button>
