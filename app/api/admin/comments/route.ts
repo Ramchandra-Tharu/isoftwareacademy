@@ -1,16 +1,10 @@
-import { NextResponse } from "next/server";
-import dbConnect from "@/utils/db";
-import Comment from "@/models/Comment";
-
-// Authorization check helper (based on the project's header-based middleware pattern)
-function isAdmin(req: Request) {
-  const userRole = req.headers.get("x-user-role");
-  return userRole === "admin";
-}
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 export async function GET(req: Request) {
   try {
-    if (!isAdmin(req)) {
+    const session = await getServerSession(authOptions);
+    if (session?.user?.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
@@ -48,7 +42,8 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    if (!isAdmin(req)) {
+    const session = await getServerSession(authOptions);
+    if (session?.user?.role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 

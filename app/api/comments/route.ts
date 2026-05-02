@@ -18,11 +18,13 @@ export async function GET(req: Request) {
     }
 
     // Only fetch approved comments for students
-    const comments = await Comment.find({ 
-      lessonId, 
+    const query: any = { 
+      lessonId: lessonId === "general" ? null : lessonId, 
       isDeleted: false,
       status: "approved" 
-    })
+    };
+
+    const comments = await Comment.find(query)
       .populate("userId", "name role image")
       .sort({ isPinned: -1, createdAt: -1 });
 
@@ -45,8 +47,8 @@ export async function POST(req: Request) {
 
     const comment = await Comment.create({
       userId,
-      courseId,
-      lessonId,
+      courseId: courseId === "general" ? null : courseId,
+      lessonId: lessonId === "general" ? null : lessonId,
       content,
       parentId: parentId || null,
       rating,
