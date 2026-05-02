@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import CourseCard from "@/components/dashboard/CourseCard";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -180,33 +181,12 @@ export default function StudentDashboardOverview() {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {recentCourses.map((course) => (
-                <div key={course._id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden group hover:shadow-lg transition-all">
-                  <div className="aspect-video bg-gray-100 relative">
-                    <img 
-                      src={course.thumbnail} 
-                      alt={course.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                       <PlayCircle className="text-white" size={32} />
-                    </div>
-                  </div>
-                  <div className="p-4 space-y-2">
-                    <span className="text-[8px] font-bold text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded-full">{course.category}</span>
-                    <h3 className="font-bold text-gray-900 line-clamp-1 leading-snug h-6 text-sm">{course.title}</h3>
-                    <div className="pt-2 border-t border-gray-50 flex items-center justify-between">
-                       <div className="flex items-center gap-2">
-                          <div className="w-12 h-1 bg-gray-100 rounded-full overflow-hidden">
-                             <div className="h-full bg-blue-600" style={{ width: `${course.progress || 0}%` }}></div>
-                          </div>
-                          <span className="text-[9px] font-bold text-gray-400">{course.progress || 0}%</span>
-                       </div>
-                       <Link href={`/dashboard/courses/${course.slug}`} className="text-gray-900 hover:text-blue-600">
-                          <ArrowRight size={14} />
-                       </Link>
-                    </div>
-                  </div>
-                </div>
+                <CourseCard 
+                  key={course._id} 
+                  {...course} 
+                  id={course.slug} 
+                  href={`/dashboard/courses/${course.slug}`} 
+                />
               ))}
             </div>
           </div>

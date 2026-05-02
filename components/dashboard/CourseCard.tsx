@@ -2,104 +2,106 @@ import React from "react";
 import Link from "next/link";
 import { 
   Clock, 
-  BookOpen, 
-  PlayCircle, 
-  MoreVertical,
-  Star,
+  Users,
+  BarChart,
+  BookOpen,
   ArrowRight
 } from "lucide-react";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 interface CourseCardProps {
   id: string;
   title: string;
-  instructor: string;
   thumbnail: string;
   progress?: number;
-  lessonsCount: number;
   duration: string;
-  category: string;
-  rating?: number;
+  lessonsCount?: number;
+  totalLessons?: number;
+  difficulty?: string;
+  enrolledCount?: number;
+  price?: number;
   href?: string;
 }
 
 export default function CourseCard({
   id,
   title,
-  instructor,
   thumbnail,
   progress,
-  lessonsCount,
   duration,
-  category,
-  rating = 4.8,
+  lessonsCount,
+  totalLessons,
+  difficulty = "Beginner",
+  enrolledCount = 0,
+  price = 0,
   href
 }: CourseCardProps) {
+  const isFree = price === 0;
+
   return (
-    <div className="border border-gray-200 group flex flex-col h-full overflow-hidden bg-white hover:border-black transition-all duration-300 rounded-md">
+    <div className="bg-white border border-blue-50 rounded-2xl overflow-hidden group hover:shadow-xl hover:shadow-blue-600/5 transition-all duration-300 flex flex-col h-full">
       {/* Thumbnail */}
-      <div className="relative aspect-video overflow-hidden">
+      <div className="relative aspect-[2/1] overflow-hidden">
         <img 
           src={thumbnail} 
           alt={title} 
-          className="w-full h-full object-cover transition-all duration-700"
+          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
         />
-        <div className="absolute top-4 left-4 px-3 py-1 bg-black text-white rounded-sm text-[8px] font-bold uppercase tracking-widest">
-          {category}
-        </div>
+        {isFree && (
+          <div className="absolute top-3 right-3 px-2 py-0.5 bg-white/90 backdrop-blur-sm rounded-md shadow-sm border border-gray-100">
+             <span className="text-[9px] font-black text-gray-900 uppercase tracking-widest">Free</span>
+          </div>
+        )}
       </div>
 
       {/* Content */}
-      <div className="p-6 flex-1 flex flex-col space-y-3">
-        <div className="flex items-center justify-between">
-           <div className="flex items-center gap-1 text-amber-400">
-              <Star size={12} fill="currentColor" />
-              <span className="text-[10px] font-black text-gray-400">{rating} (Verified)</span>
-           </div>
-           <button className="text-gray-300 hover:text-gray-900 transition-colors"><MoreVertical size={16} /></button>
-        </div>
-        
-        <div className="space-y-1">
-           <h3 className="text-lg font-light text-black group-hover:font-medium transition-all leading-tight tracking-tight">
-             {title}
-           </h3>
-           <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Instructor: {instructor}</p>
-        </div>
+      <div className="p-4 flex-1 flex flex-col space-y-2">
+        <h3 className="text-sm font-bold text-gray-900 leading-snug line-clamp-2">
+          {title}
+        </h3>
 
-        <div className="pt-4 border-t border-gray-50 mt-auto space-y-4">
+        <div className="space-y-2.5">
            {/* Progress Bar */}
-           {progress !== undefined && (
-             <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Progress</span>
-                   <span className="text-[10px] font-black text-black">{progress}%</span>
-                </div>
-                <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+           {progress !== undefined && progress > 0 && (
+             <div className="space-y-1">
+                <div className="h-1 w-full bg-blue-50 rounded-full overflow-hidden">
                    <div 
-                     className="h-full bg-black rounded-full transition-all duration-1000 ease-out" 
+                     className="h-full bg-blue-600 rounded-full transition-all duration-700" 
                      style={{ width: `${progress}%` }}
                    ></div>
                 </div>
+                <span className="text-[8px] font-black text-blue-600 uppercase">{progress}% Complete</span>
              </div>
            )}
 
-           {/* Footer */}
-           <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                 <span className="flex items-center gap-1"><BookOpen size={12} /> {lessonsCount}</span>
-                 <span className="flex items-center gap-1"><Clock size={12} /> {duration}</span>
+           {/* Stats Section */}
+           <div className="space-y-1.5">
+              <div className="flex items-center gap-3">
+                 <div className="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-tight">
+                    <Clock size={14} className="text-gray-400" /> {duration}
+                 </div>
+                 <div className="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-tight">
+                    <BookOpen size={14} className="text-gray-400" /> {totalLessons || lessonsCount || 0}
+                 </div>
               </div>
-              <Link 
-                href={href || `/dashboard/courses/${id}`}
-                className="px-4 py-2 bg-black text-white text-[9px] font-bold uppercase tracking-widest rounded-sm hover:bg-gray-800 transition-all"
-              >
-                {progress === undefined ? "Details" : (progress > 0 ? "Resume" : "Start")}
-              </Link>
+              <div className="flex items-center gap-3">
+                 <div className="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-tight">
+                    <Users size={14} className="text-gray-400" /> {enrolledCount}
+                 </div>
+                 <div className="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-tight">
+                    <BarChart size={14} className="text-gray-400" /> {difficulty}
+                 </div>
+              </div>
+           </div>
+
+           {/* Action */}
+           <div className="pt-1">
+             <Link 
+               href={href || `/dashboard/courses/${id}`}
+               className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 transition-all group/link"
+             >
+               <span>View Course</span>
+               <ArrowRight size={14} className="group-hover/link:translate-x-1 transition-transform" />
+             </Link>
            </div>
         </div>
       </div>

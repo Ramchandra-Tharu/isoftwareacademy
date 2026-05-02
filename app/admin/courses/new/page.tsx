@@ -122,10 +122,7 @@ export default function NewCoursePage() {
               <input required type="text" value={formData.title} onChange={handleTitleChange} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
             </div>
 
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><LinkIcon size={12} /> Access_Slug</label>
-              <input required type="text" value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all font-mono text-blue-600/70" />
-            </div>
+
 
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><User size={12} /> Lead_Instructor</label>
@@ -154,19 +151,13 @@ export default function NewCoursePage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><BarChart size={12} /> Difficulty</label>
-                <select value={formData.difficulty} onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all appearance-none">
-                  <option value="Beginner">BEGINNER</option>
-                  <option value="Intermediate">INTERMEDIATE</option>
-                  <option value="Advanced">ADVANCED</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><DollarSign size={12} /> Price (INR)</label>
-                <input required type="number" value={formData.price} onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
-              </div>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><BarChart size={12} /> Difficulty</label>
+              <select value={formData.difficulty} onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all appearance-none">
+                <option value="Beginner">BEGINNER</option>
+                <option value="Intermediate">INTERMEDIATE</option>
+                <option value="Advanced">ADVANCED</option>
+              </select>
             </div>
 
             <div className="space-y-2">

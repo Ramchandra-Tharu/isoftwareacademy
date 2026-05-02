@@ -29,6 +29,7 @@ import {
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import CourseCard from "@/components/dashboard/CourseCard";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -151,7 +152,7 @@ export default function Home() {
                     onClick={handleStartLearning}
                     className="btn-primary px-10 py-5 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-black/10 hover:scale-105 transition-all"
                   >
-                    {status === "authenticated" ? "Return to Dashboard" : "Start Learning Now"}
+                    {status === "authenticated" ? "Return to Dashboard" : "Try Now"}
                   </button>
                   <Link 
                     href="/certificates" 
@@ -366,32 +367,12 @@ export default function Home() {
               [1, 2, 3, 4].map(i => <div key={i} className="h-[350px] bg-gray-100 rounded-[2rem] animate-pulse" />)
             ) : (
               courses.slice(0, 8).map(course => (
-                <div key={course._id} className="card-premium overflow-hidden group flex flex-col">
-                   <div className="h-48 bg-gray-50 relative overflow-hidden">
-                      {course.thumbnail ? (
-                        <img src={course.thumbnail} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-200">
-                           <Code2 size={60} />
-                        </div>
-                      )}
-                      <div className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[8px] font-black uppercase tracking-widest shadow-sm">
-                         {course.category}
-                      </div>
-                   </div>
-                   <div className="p-6 flex-1 flex flex-col space-y-3">
-                      <h4 className="text-lg font-black tracking-tighter uppercase line-clamp-1">{course.title}</h4>
-                      <p className="text-gray-500 text-xs font-medium line-clamp-2">{course.description}</p>
-                      <div className="pt-4 mt-auto border-t border-gray-100 flex items-center justify-between">
-                         <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
-                            <Clock size={12} /> {course.duration || "Self-paced"}
-                         </div>
-                         <Link href={`/courses/${course.slug || course._id}`} className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform shadow-lg shadow-blue-600/20">
-                            <PlayCircle size={20} />
-                         </Link>
-                      </div>
-                   </div>
-                </div>
+                <CourseCard 
+                  key={course._id} 
+                  {...course} 
+                  id={course.slug || course._id} 
+                  href={`/courses/${course.slug || course._id}`} 
+                />
               ))
             )}
           </div>
@@ -513,7 +494,7 @@ export default function Home() {
                  <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter leading-none">Ready to start <br/> your <span className="text-blue-100">evolution?</span></h2>
                  <p className="text-blue-50 text-lg md:text-xl max-w-2xl mx-auto font-medium">Join 5,000+ engineers mastering the future of software development on iSoftware Lab Academy.</p>
                  <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                    <Link href="/get-started" className="bg-white text-blue-600 px-12 py-5 text-lg font-black rounded-2xl hover:scale-105 transition-all shadow-xl shadow-white/10 uppercase tracking-widest">Start Learning For Free</Link>
+                    <Link href="/get-started" className="bg-white text-blue-600 px-12 py-5 text-lg font-black rounded-2xl hover:scale-105 transition-all shadow-xl shadow-white/10 uppercase tracking-widest">Try Now</Link>
                     <Link href="#contact" className="px-12 py-5 bg-blue-700/50 border border-blue-400/30 text-white rounded-2xl text-lg font-bold hover:bg-blue-700 transition-all uppercase tracking-widest">Contact Sales</Link>
                  </div>
               </div>
