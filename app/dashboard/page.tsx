@@ -45,31 +45,30 @@ export default function StudentDashboardOverview() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // Fetch courses
+        // 1. Fetch Stats
+        const statsRes = await fetch("/api/dashboard/stats");
+        if (statsRes.ok) {
+           const stats = await statsRes.json();
+           setStatsData(stats);
+        }
+
+        // 2. Fetch Courses
         const courseRes = await fetch("/api/courses?featured=true");
         let courses = await courseRes.json();
         
-        // Fallback: If no featured courses, fetch all published courses
         if (courses.length === 0) {
            const allCourseRes = await fetch("/api/courses");
            courses = await allCourseRes.json();
         }
-
-        setRecentCourses(courses.slice(0, 3));
+        setRecentCourses(courses.slice(0, 4));
         
-        // Fetch real activities
+        // 3. Fetch Activities
         const activityRes = await fetch("/api/dashboard/activities");
         if (activityRes.ok) {
            const activityData = await activityRes.json();
            setActivities(activityData);
         }
 
-        setStatsData({
-           enrolled: courses.length,
-           completed: 48, 
-           avgScore: "92%", 
-           certs: 3 
-        });
       } catch (err) {
         console.error(err);
       } finally {
@@ -109,7 +108,7 @@ export default function StudentDashboardOverview() {
            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 leading-none uppercase">
              Good Day, <span className="text-blue-600">{session?.user?.name || "Learner"}</span>.
            </h1>
-           <p className="text-gray-500 font-medium">Continue your journey to mastery. You're <span className="text-gray-900 font-black">48% closer</span> to your next certificate.</p>
+           <p className="text-gray-500 font-medium">Continue your journey to mastery. You're <span className="text-gray-900 font-black">{statsData?.completed > 0 ? "making progress" : "ready to start"}</span> your next evolution.</p>
         </div>
         
         <div className="card-premium p-6 flex items-center gap-6 group cursor-pointer hover:border-blue-100">
@@ -125,22 +124,37 @@ export default function StudentDashboardOverview() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, i) => (
-          <div key={i} className="card-premium p-8 group">
-             <div className="flex items-center justify-between mb-6">
-                <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", stat.color)}>
-                   <stat.icon size={22} />
-                </div>
-                <div className="flex items-center gap-1 text-emerald-500 text-xs font-bold">
-                   <TrendingUp size={14} /> +8%
-                </div>
-             </div>
-             <h3 className="text-4xl font-black tracking-tighter text-gray-900">{stat.val}</h3>
-             <p className="text-xs font-black uppercase tracking-widest text-gray-500 mt-2">{stat.label}</p>
-          </div>
-        ))}
-      </div>
+      {statsData?.hasActivity ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stats.map((stat, i) => (
+            <div key={i} className="card-premium p-8 group">
+               <div className="flex items-center justify-between mb-6">
+                  <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", stat.color)}>
+                     <stat.icon size={22} />
+                  </div>
+                  <div className="flex items-center gap-1 text-emerald-500 text-xs font-bold">
+                     <TrendingUp size={14} /> +8%
+                  </div>
+               </div>
+               <h3 className="text-4xl font-black tracking-tighter text-gray-900">{stat.val}</h3>
+               <p className="text-xs font-black uppercase tracking-widest text-gray-500 mt-2">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="card-premium p-12 text-center space-y-6 bg-gray-50/50 border-dashed border-2">
+           <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto text-gray-200 shadow-sm">
+              <BarChart2 size={40} />
+           </div>
+           <div className="space-y-2">
+              <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight">No activity yet</h2>
+              <p className="text-sm text-gray-400 font-medium max-w-sm mx-auto">Start learning to see your analytics, streaks, and achievements mapped out here.</p>
+           </div>
+           <Link href="/dashboard/my-courses" className="btn-primary inline-flex px-10 py-4 text-xs">
+              Explore Catalog <ArrowRight size={16} className="ml-2" />
+           </Link>
+        </div>
+      )}
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">

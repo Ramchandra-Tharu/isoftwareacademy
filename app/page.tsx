@@ -324,7 +324,7 @@ export default function Home() {
             {coursesLoading ? (
               [1, 2, 3].map(i => <div key={i} className="h-[450px] bg-gray-100 rounded-[2.5rem] animate-pulse" />)
             ) : (
-              courses.slice(0, 3).map(course => (
+              courses.slice(0, 6).map(course => (
                 <div key={course._id} className="card-premium overflow-hidden group flex flex-col">
                    <div className="h-64 bg-gray-50 relative overflow-hidden">
                       {course.thumbnail ? (

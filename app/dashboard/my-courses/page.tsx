@@ -25,37 +25,68 @@ function cn(...inputs: ClassValue[]) {
 
 export default function MyCoursesPage() {
    const [courses, setCourses] = useState<any[]>([]);
+   const [allCatalogCourses, setAllCatalogCourses] = useState<any[]>([]);
    const [loading, setLoading] = useState(true);
    const [activeTab, setActiveTab] = useState("All Courses");
    const [searchQuery, setSearchQuery] = useState("");
    const [lastAccessed, setLastAccessed] = useState<any>(null);
 
    useEffect(() => {
-      const fetchCourses = async () => {
+      const fetchData = async () => {
          try {
-            const res = await fetch("/api/enrollments/my-courses");
-            const data = await res.json();
-            setCourses(data);
-            if (data.length > 0) {
-               // Sort by most recently updated/progressed if available, or just take first for now
-               setLastAccessed(data[0]);
+            // Fetch enrolled courses
+            const enrolledRes = await fetch("/api/enrollments/my-courses");
+            const enrolledData = await enrolledRes.json();
+            setCourses(enrolledData);
+            if (enrolledData.length > 0) {
+               setLastAccessed(enrolledData[0]);
             }
+
+            // Fetch all available courses for the catalog
+            const catalogRes = await fetch("/api/courses");
+            const catalogData = await catalogRes.json();
+            setAllCatalogCourses(catalogData);
          } catch (err) {
             console.error(err);
          } finally {
             setLoading(false);
          }
       };
-      fetchCourses();
+      fetchData();
    }, []);
 
-   const filteredCourses = courses.filter(course => {
-      const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase());
-      if (activeTab === "All Courses") return matchesSearch;
-      if (activeTab === "In Progress") return matchesSearch && course.progress > 0 && course.progress < 100;
-      if (activeTab === "Completed") return matchesSearch && course.progress === 100;
-      return matchesSearch;
-   });
+   const filteredCourses = (() => {
+      const query = searchQuery.toLowerCase();
+      
+      // Helper to merge enrollment progress into a catalog course
+      const mergeProgress = (catalogList: any[]) => catalogList.map(catCourse => {
+         const enrollment = courses.find(e => e.courseId?._id === catCourse._id || e._id === catCourse._id);
+         return enrollment ? { ...catCourse, progress: enrollment.progress } : catCourse;
+      });
+
+      if (activeTab === "Explore") {
+         return mergeProgress(allCatalogCourses).filter(c => 
+            c.title.toLowerCase().includes(query) || 
+            c.category.toLowerCase().includes(query)
+         );
+      }
+      if (activeTab === "All Courses") {
+         return mergeProgress(allCatalogCourses).filter(c => c.title.toLowerCase().includes(query));
+      }
+      if (activeTab === "In Progress") {
+         return courses.filter(c => c.title.toLowerCase().includes(query) && (c.progress || 0) > 0 && (c.progress || 0) < 100);
+      }
+      if (activeTab === "Completed") {
+         return courses.filter(c => c.title.toLowerCase().includes(query) && (c.progress || 0) === 100);
+      }
+      return [];
+   })();
+
+   // Recommendations logic for Explore tab
+   const recommendedCourses = allCatalogCourses
+      .filter(c => c.featured)
+      .sort((a, b) => (b.enrolledCount || 0) - (a.enrolledCount || 0))
+      .slice(0, 3);
 
    if (loading) {
       return (
@@ -138,7 +169,7 @@ export default function MyCoursesPage() {
          {/* 3. Filter Navigation */}
          <div className="flex items-center justify-between border-b border-gray-100 pb-1">
             <div className="flex items-center gap-8">
-               {["All Courses", "In Progress", "Completed"].map((tab) => (
+               {["All Courses", "In Progress", "Completed", "Explore"].map((tab) => (
                   <button
                      key={tab}
                      onClick={() => setActiveTab(tab)}
@@ -161,11 +192,47 @@ export default function MyCoursesPage() {
             </div>
          </div>
 
+         {/* 4. Explore Special View */}
+         {activeTab === "Explore" && (
+            <div className="space-y-12">
+               {/* Recommendations Section */}
+               {recommendedCourses.length > 0 && searchQuery === "" && (
+                  <div className="space-y-6">
+                     <div className="flex items-center gap-3">
+                        <Sparkles className="text-blue-600" size={18} />
+                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-gray-900">Recommended_For_You</h2>
+                     </div>
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {recommendedCourses.map(course => (
+                           <div key={course._id} className="card-premium p-6 bg-blue-50/30 border-blue-100 relative group overflow-hidden">
+                              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform"><Zap size={60} /></div>
+                              <div className="space-y-4 relative z-10">
+                                 <span className="text-[8px] font-black text-blue-600 uppercase tracking-widest px-2 py-1 bg-white rounded-full border border-blue-50">Trending Asset</span>
+                                 <h3 className="text-lg font-black text-gray-900 uppercase tracking-tight line-clamp-2">{course.title}</h3>
+                                 <Link href={`/courses/${course.slug}`} className="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:gap-4 transition-all">
+                                    Explore Module <ArrowRight size={14} />
+                                 </Link>
+                              </div>
+                           </div>
+                        ))}
+                     </div>
+                  </div>
+               )}
+            </div>
+         )}
+
          {/* 4. Course Grid */}
          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
             {filteredCourses.length > 0 ? (
                filteredCourses.map((course) => (
-                  <CourseCard key={course._id} {...course} id={course.slug} />
+                  <CourseCard 
+                     key={course._id} 
+                     {...course} 
+                     instructor={course.instructorName || course.instructor}
+                     lessonsCount={course.totalLessons || course.lessonsCount}
+                     id={course.slug} 
+                     href={course.progress === undefined ? `/courses/${course.slug}` : undefined}
+                  />
                ))
             ) : (
                <div className="col-span-full py-24 flex flex-col items-center justify-center text-center space-y-6">

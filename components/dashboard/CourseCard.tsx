@@ -20,11 +20,12 @@ interface CourseCardProps {
   title: string;
   instructor: string;
   thumbnail: string;
-  progress: number;
+  progress?: number;
   lessonsCount: number;
   duration: string;
   category: string;
   rating?: number;
+  href?: string;
 }
 
 export default function CourseCard({
@@ -36,7 +37,8 @@ export default function CourseCard({
   lessonsCount,
   duration,
   category,
-  rating = 4.8
+  rating = 4.8,
+  href
 }: CourseCardProps) {
   return (
     <div className="card-premium group flex flex-col h-full overflow-hidden bg-white hover:shadow-2xl hover:shadow-blue-600/5 transition-all duration-500 border-transparent hover:border-blue-50">
@@ -78,18 +80,20 @@ export default function CourseCard({
 
         <div className="pt-6 border-t border-gray-50 mt-auto space-y-6">
            {/* Progress Bar */}
-           <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Progress</span>
-                 <span className="text-[10px] font-black text-blue-600">{progress}%</span>
-              </div>
-              <div className="h-1.5 w-full bg-gray-50 rounded-full overflow-hidden">
-                 <div 
-                   className="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" 
-                   style={{ width: `${progress}%` }}
-                 ></div>
-              </div>
-           </div>
+           {progress !== undefined && (
+             <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Progress</span>
+                   <span className="text-[10px] font-black text-blue-600">{progress}%</span>
+                </div>
+                <div className="h-1.5 w-full bg-gray-50 rounded-full overflow-hidden">
+                   <div 
+                     className="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" 
+                     style={{ width: `${progress}%` }}
+                   ></div>
+                </div>
+             </div>
+           )}
 
            {/* Footer */}
            <div className="flex items-center justify-between">
@@ -98,10 +102,10 @@ export default function CourseCard({
                  <span className="flex items-center gap-1.5"><Clock size={14} /> {duration}</span>
               </div>
               <Link 
-                href={`/dashboard/courses/${id}`}
+                href={href || `/dashboard/courses/${id}`}
                 className="px-6 py-2 bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-600 hover:text-white transition-all"
               >
-                {progress > 0 ? "Resume" : "Start"}
+                {progress === undefined ? "View Details" : (progress > 0 ? "Resume" : "Start")}
               </Link>
            </div>
         </div>
