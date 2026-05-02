@@ -26,6 +26,8 @@ import {
   Cpu,
   Globe
 } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const fadeIn = {
@@ -34,11 +36,12 @@ const fadeIn = {
 };
 
 export default function Home() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [courses, setCourses] = useState<any[]>([]);
   const [coursesLoading, setCoursesLoading] = useState(true);
-  const [summarizerText, setSummarizerText] = useState("");
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -60,6 +63,14 @@ export default function Home() {
     fetchCourses();
   }, []);
 
+  const handleStartLearning = () => {
+    if (status === "authenticated") {
+      router.push("/dashboard");
+    } else {
+      router.push("/get-started");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-blue-100 selection:text-blue-900">
       {/* 1. Navigation Bar */}
@@ -70,10 +81,10 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-black rounded-sm flex items-center justify-center text-white group-hover:bg-gray-800 transition-colors">
-               <Cpu size={18} />
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white group-hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20">
+               <Cpu size={22} />
             </div>
-            <span className="text-lg font-bold tracking-tight">Oracle Cloud <span className="font-light">Infrastructure</span></span>
+            <span className="text-xl font-black tracking-tighter uppercase">iSoftware_<span className="text-blue-600">Academy</span></span>
           </Link>
           
           <div className="hidden md:flex items-center gap-10 text-sm font-bold uppercase tracking-widest text-gray-500">
@@ -109,62 +120,90 @@ export default function Home() {
 
       <main>
         {/* 2. Hero Section */}
-        <section className="relative pt-48 pb-32 px-6 overflow-hidden flex flex-col items-center">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[600px] bg-blue-50/50 blur-[140px] rounded-full pointer-events-none -z-10" />
+        {/* 2. Hero Section */}
+        <section className="relative pt-56 pb-32 px-6 overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[800px] bg-blue-50/30 blur-[160px] rounded-full pointer-events-none -z-10" />
           
-          <div className="max-w-5xl mx-auto text-left space-y-16">
-            <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-12">
-               <h1 className="text-7xl md:text-8xl font-light tracking-tight text-black leading-none">
-                  Oracle Cloud <br /> 
-                  Infrastructure
-               </h1>
-               <div className="space-y-8 max-w-3xl">
-                  <p className="text-2xl md:text-3xl text-gray-800 font-normal leading-tight">
-                    Oracle offers the highest-performing cloud services at the lowest cost. That's why so many of the world's biggest technology companies use OCI.
-                  </p>
-                  
-                  <div className="space-y-4">
-                    <h3 className="text-xl font-bold text-black">OCI Tech Customers</h3>
-                    <p className="text-lg text-gray-700 tracking-wide">
-                      AMD, ByteDance, Meta, NVIDIA, OpenAI, Temu, TikTok, Uber, xAI
-                    </p>
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
+            <motion.div 
+              initial="hidden" 
+              animate="visible" 
+              variants={fadeIn} 
+              className="space-y-10"
+            >
+               <div className="space-y-4">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full">
+                    <Sparkles className="text-blue-600" size={14} />
+                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Next Generation Learning</span>
                   </div>
-
-                  <p className="text-xl text-gray-700 leading-relaxed">
-                    The demand for cloud infrastructure for AI training and inferencing greatly exceeds supply. In response to this shortage, Oracle is building AI cloud capacity as quickly as we can.
+                  <h1 className="text-6xl md:text-8xl font-black tracking-tight text-black leading-[0.9] uppercase">
+                    Architect Your <br/> 
+                    <span className="text-blue-600">Engineering</span> <br/> 
+                    Career.
+                  </h1>
+                  <p className="text-xl md:text-2xl text-gray-500 font-medium leading-relaxed max-w-xl">
+                    Enterprise-scale skill development and blockchain-verified certifications for the next generation of software leaders.
                   </p>
+               </div>
+
+               <div className="flex flex-wrap gap-6">
+                  <button 
+                    onClick={handleStartLearning}
+                    className="btn-primary px-10 py-5 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-black/10 hover:scale-105 transition-all"
+                  >
+                    {status === "authenticated" ? "Return to Dashboard" : "Start Learning Now"}
+                  </button>
+                  <Link 
+                    href="/certificates" 
+                    className="px-10 py-5 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-gray-50 hover:border-gray-200 transition-all shadow-sm"
+                  >
+                    Explore Certifications
+                  </Link>
+               </div>
+
+               <div className="flex items-center gap-8 pt-4">
+                  <div className="flex -space-x-3">
+                     {[1, 2, 3, 4].map(i => (
+                        <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-gray-100 overflow-hidden">
+                           <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="User" className="w-full h-full object-cover" />
+                        </div>
+                     ))}
+                     <div className="w-10 h-10 rounded-full border-2 border-white bg-blue-600 flex items-center justify-center text-[10px] font-black text-white">
+                        +5k
+                     </div>
+                  </div>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Joined by 5,000+ Engineers</p>
                </div>
             </motion.div>
 
             <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              transition={{ delay: 0.3 }} 
-              className="flex gap-4"
+              initial={{ opacity: 0, scale: 0.8, x: 50 }} 
+              animate={{ opacity: 1, scale: 1, x: 0 }} 
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="relative hidden lg:block"
             >
-               <button className="btn-primary">
-                 Start Training Now
-               </button>
-               <button className="btn-secondary">
-                 View Cloud Portfolio
-               </button>
+               <div className="absolute inset-0 bg-blue-600/10 blur-[120px] rounded-full -z-10 animate-pulse" />
+               <div className="card-premium p-4 bg-white/40 backdrop-blur-3xl border-white/50 overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] rounded-[3rem]">
+                  <img 
+                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=2070" 
+                    alt="Enterprise UI Mockup" 
+                    className="w-full h-auto rounded-[2.5rem]"
+                  />
+               </div>
+               
+               {/* Floating Elements */}
+               <div className="absolute -top-10 -left-10 bg-white p-6 rounded-3xl shadow-2xl border border-gray-50 flex items-center gap-4 animate-bounce duration-[4000ms]">
+                  <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
+                     <CheckCircle2 size={24} />
+                  </div>
+                  <div>
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Certification</p>
+                     <p className="text-sm font-black text-gray-900 uppercase tracking-tight">Verified Master</p>
+                  </div>
+               </div>
             </motion.div>
           </div>
-
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              transition={{ delay: 0.6 }}
-              className="flex flex-wrap items-center justify-center gap-8 pt-8 opacity-40 grayscale"
-            >
-               <div className="text-[10px] font-black uppercase tracking-widest text-gray-400">Trusted By Leads At:</div>
-               <div className="flex gap-10">
-                  <span className="font-black tracking-tighter text-xl">META</span>
-                  <span className="font-black tracking-tighter text-xl">GOOGLE</span>
-                  <span className="font-black tracking-tighter text-xl">STRIPE</span>
-               </div>
-            </motion.div>
-         </section>
+        </section>
 
         {/* 2.5 Platform Overview Section */}
         <section className="py-24 bg-white px-6 overflow-hidden">

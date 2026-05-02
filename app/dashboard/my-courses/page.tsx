@@ -12,7 +12,9 @@ import {
    Layout,
    Loader2,
    ArrowRight,
-   Plus
+   Plus,
+   Sparkles,
+   Zap
 } from "lucide-react";
 import CourseCard from "@/components/dashboard/CourseCard";
 import Link from "next/link";
