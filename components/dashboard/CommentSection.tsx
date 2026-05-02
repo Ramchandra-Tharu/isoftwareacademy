@@ -88,10 +88,32 @@ export default function CommentSection({ courseId, lessonId }: CommentSectionPro
       });
 
       if (res.ok) {
+        const data = await res.json();
+        
+        // Add to local state temporarily to confirm submission
+        if (data.parentId) {
+          setComments(prev => prev.map(p => 
+            p._id === data.parentId ? { ...p, replies: [...(p.replies || []), data] } : p
+          ));
+        } else {
+          setComments(prev => [{ ...data, replies: [] }, ...prev]);
+        }
+
         setContent("");
         setRating(0);
         setReplyTo(null);
         setStatusMsg({ type: "success", text: "DISPATCH_SUCCESS: AWAITING_MODERATION" });
+
+        // Remove from local state after 2 seconds as requested
+        setTimeout(() => {
+          if (data.parentId) {
+            setComments(prev => prev.map(p => 
+              p._id === data.parentId ? { ...p, replies: p.replies.filter((r: any) => r._id !== data._id) } : p
+            ));
+          } else {
+            setComments(prev => prev.filter(c => c._id !== data._id));
+          }
+        }, 2000);
       }
     } finally {
       setSubmitting(false);

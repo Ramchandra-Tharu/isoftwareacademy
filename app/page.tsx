@@ -70,10 +70,10 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/20 group-hover:rotate-6 transition-transform">
-               <Cpu size={22} />
+            <div className="w-8 h-8 bg-black rounded-sm flex items-center justify-center text-white group-hover:bg-gray-800 transition-colors">
+               <Cpu size={18} />
             </div>
-            <span className="text-xl font-black tracking-tighter uppercase">iSoftware_<span className="text-blue-600">Academy</span></span>
+            <span className="text-lg font-bold tracking-tight">Oracle Cloud <span className="font-light">Infrastructure</span></span>
           </Link>
           
           <div className="hidden md:flex items-center gap-10 text-sm font-bold uppercase tracking-widest text-gray-500">
@@ -112,41 +112,44 @@ export default function Home() {
         <section className="relative pt-48 pb-32 px-6 overflow-hidden flex flex-col items-center">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[600px] bg-blue-50/50 blur-[140px] rounded-full pointer-events-none -z-10" />
           
-          <div className="max-w-4xl mx-auto text-center space-y-12">
-            <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-8">
-               <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-full text-blue-600 text-[10px] font-black uppercase tracking-widest shadow-sm">
-                  <Sparkles size={14} /> The_Future_Of_Education
-               </div>
-               <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] text-gray-900 uppercase">
-                  Level Up Your <br /> 
-                  <span className="text-blue-600">Dev Career.</span>
+          <div className="max-w-5xl mx-auto text-left space-y-16">
+            <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-12">
+               <h1 className="text-7xl md:text-8xl font-light tracking-tight text-black leading-none">
+                  Oracle Cloud <br /> 
+                  Infrastructure
                </h1>
-               <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto font-medium leading-relaxed">
-                  Join a global community of engineers mastering Full-Stack architectures. Structured learning paths designed for modern software deployment.
-               </p>
+               <div className="space-y-8 max-w-3xl">
+                  <p className="text-2xl md:text-3xl text-gray-800 font-normal leading-tight">
+                    Oracle offers the highest-performing cloud services at the lowest cost. That's why so many of the world's biggest technology companies use OCI.
+                  </p>
+                  
+                  <div className="space-y-4">
+                    <h3 className="text-xl font-bold text-black">OCI Tech Customers</h3>
+                    <p className="text-lg text-gray-700 tracking-wide">
+                      AMD, ByteDance, Meta, NVIDIA, OpenAI, Temu, TikTok, Uber, xAI
+                    </p>
+                  </div>
+
+                  <p className="text-xl text-gray-700 leading-relaxed">
+                    The demand for cloud infrastructure for AI training and inferencing greatly exceeds supply. In response to this shortage, Oracle is building AI cloud capacity as quickly as we can.
+                  </p>
+               </div>
             </motion.div>
 
-            {/* Centered Clean Input Box */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
               animate={{ opacity: 1, y: 0 }} 
               transition={{ delay: 0.3 }} 
-              className="max-w-2xl mx-auto w-full relative group"
+              className="flex gap-4"
             >
-               <div className="absolute inset-0 bg-blue-600/5 blur-3xl rounded-[3rem] -z-10 group-focus-within:bg-blue-600/10 transition-colors" />
-               <div className="bg-white border border-gray-100 rounded-[2.5rem] p-3 shadow-2xl shadow-blue-600/5 flex flex-col md:flex-row gap-3">
-                  <input 
-                    type="text" 
-                    value={summarizerText}
-                    onChange={(e) => setSummarizerText(e.target.value)}
-                    placeholder="Search for a career path or course..." 
-                    className="flex-1 bg-transparent px-8 py-5 text-sm font-bold focus:outline-none text-gray-900 placeholder:text-gray-300"
-                  />
-                  <button className="btn-primary px-10 py-5 flex items-center justify-center gap-3 whitespace-nowrap text-xs tracking-widest">
-                    Start Learning <ArrowRight size={18} />
-                  </button>
-               </div>
+               <button className="btn-primary">
+                 Start Training Now
+               </button>
+               <button className="btn-secondary">
+                 View Cloud Portfolio
+               </button>
             </motion.div>
+          </div>
 
             <motion.div 
               initial={{ opacity: 0 }} 
@@ -161,8 +164,7 @@ export default function Home() {
                   <span className="font-black tracking-tighter text-xl">STRIPE</span>
                </div>
             </motion.div>
-          </div>
-        </section>
+         </section>
 
         {/* 2.5 Platform Overview Section */}
         <section className="py-24 bg-white px-6 overflow-hidden">

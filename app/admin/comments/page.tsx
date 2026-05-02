@@ -161,7 +161,7 @@ export default function CommentsPage() {
          ) : comments.length === 0 ? (
             <div className="card-premium p-20 text-center space-y-4">
                <ShieldAlert className="mx-auto text-gray-100" size={60} />
-               <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest italic">No interactions found for this segment.</p>
+               <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest italic">No interactions found for this segment.</p>
             </div>
          ) : (
             comments.map((comment) => (
@@ -184,11 +184,11 @@ export default function CommentsPage() {
                             )}
                          </div>
                          <div className="flex items-center gap-3 mt-1">
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center gap-1">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1">
                                <Clock size={12} /> {new Date(comment.createdAt).toLocaleDateString()}
                             </span>
                             <div className="w-1 h-1 rounded-full bg-gray-200"></div>
-                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center gap-1 truncate max-w-[200px]">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1 truncate max-w-[200px]">
                                <MessageSquare size={12} /> {comment.lessonId?.title || "Module Level"}
                             </span>
                          </div>

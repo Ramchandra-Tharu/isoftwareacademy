@@ -45,14 +45,12 @@ export default function StudentDashboardOverview() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // 1. Fetch Stats
         const statsRes = await fetch("/api/dashboard/stats");
         if (statsRes.ok) {
            const stats = await statsRes.json();
            setStatsData(stats);
         }
 
-        // 2. Fetch Courses
         const courseRes = await fetch("/api/courses?featured=true");
         let courses = await courseRes.json();
         
@@ -60,9 +58,8 @@ export default function StudentDashboardOverview() {
            const allCourseRes = await fetch("/api/courses");
            courses = await allCourseRes.json();
         }
-        setRecentCourses(courses.slice(0, 4));
+        setRecentCourses(courses.slice(0, 3));
         
-        // 3. Fetch Activities
         const activityRes = await fetch("/api/dashboard/activities");
         if (activityRes.ok) {
            const activityData = await activityRes.json();
@@ -80,177 +77,191 @@ export default function StudentDashboardOverview() {
 
   if (loading) {
     return (
-      <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
-        <Loader2 className="animate-spin text-blue-600" size={40} />
-        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Loading Learning Path...</p>
+      <div className="h-[80vh] flex flex-col items-center justify-center gap-6">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+             <Zap className="text-blue-600 animate-pulse" size={24} />
+          </div>
+        </div>
+        <p className="text-sm font-medium text-gray-500 animate-pulse">Initializing your learning environment...</p>
       </div>
     );
   }
 
-  const stats = [
-    { label: "Active Courses", val: statsData?.enrolled || 0, icon: BookOpen, color: "bg-blue-50 text-blue-600" },
-    { label: "Lessons Done", val: statsData?.completed || 0, icon: CheckCircle, color: "bg-emerald-50 text-emerald-600" },
-    { label: "Average Score", val: statsData?.avgScore || "0%", icon: BarChart2, color: "bg-indigo-50 text-indigo-600" },
-    { label: "Certificates", val: statsData?.certs || 0, icon: Award, color: "bg-amber-50 text-amber-600" },
+  const summaryCards = [
+    { label: "Enrolled Courses", val: statsData?.enrolled || 0, icon: BookOpen, color: "from-blue-500 to-indigo-600" },
+    { label: "My Programs", val: statsData?.programs || 0, icon: Target, color: "from-purple-500 to-pink-600" },
+    { label: "Avg. Progress", val: statsData?.avgProgress || "0%", icon: BarChart2, color: "from-emerald-500 to-teal-600" },
+    { label: "Completed", val: statsData?.completedCourses || 0, icon: CheckCircle, color: "from-orange-500 to-red-600" },
+    { label: "Pending Tasks", val: statsData?.pendingTasks || 0, icon: Clock, color: "from-slate-700 to-slate-900" },
+  ];
+
+  const quickStats = [
+    { label: "Learning Streak", val: `${statsData?.streak || 0} Days`, icon: Zap, detail: "Keep it up!", color: "text-orange-500" },
+    { label: "Time Spent", val: statsData?.timeSpent || "0h", icon: Clock, detail: "This month", color: "text-blue-500" },
+    { label: "Achievements", val: statsData?.achievements || 0, icon: Award, detail: "Badges earned", color: "text-amber-500" },
+  ];
+
+  const shortcuts = [
+    { label: "My Courses", href: "/dashboard/my-courses", icon: BookOpen },
+    { label: "My Programs", href: "/dashboard/programs", icon: Target },
+    { label: "Certificates", href: "/dashboard/certificates", icon: Award },
+    { label: "Settings", href: "/dashboard/settings", icon: Sparkles },
   ];
 
   return (
-    <div className="space-y-12 pb-20 font-sans">
-      {/* Welcome Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-        <div className="space-y-2">
-           <div className="flex items-center gap-3">
-              <div className="px-3 py-1 bg-blue-600 text-white text-[10px] font-black rounded-full uppercase tracking-widest shadow-lg shadow-blue-600/20">
-                 Student Dashboard
-              </div>
-              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">v2.0.4 Premium</span>
-           </div>
-           <h1 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900 leading-none uppercase">
-             Good Day, <span className="text-blue-600">{session?.user?.name || "Learner"}</span>.
-           </h1>
-           <p className="text-gray-500 font-medium">Continue your journey to mastery. You're <span className="text-gray-900 font-black">{statsData?.completed > 0 ? "making progress" : "ready to start"}</span> your next evolution.</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10 animate-in fade-in duration-700">
+      
+      {/* Personalized Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -mr-32 -mt-32 opacity-50"></div>
+        <div className="relative z-10 space-y-2">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+            Welcome back, <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">{session?.user?.name?.split(' ')[0] || "Learner"}</span>! 👋
+          </h1>
+          <p className="text-gray-500 max-w-lg">
+            You've completed <span className="font-semibold text-gray-900">{statsData?.completedLessons || 0}</span> lessons so far. 
+            Ready to jump back into your journey?
+          </p>
         </div>
-        
-        <div className="card-premium p-6 flex items-center gap-6 group cursor-pointer hover:border-blue-100">
-           <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
-              <Target size={24} />
-           </div>
-           <div>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Next Milestone</p>
-              <p className="text-sm font-black text-gray-900 uppercase">React Design Patterns</p>
-           </div>
-           <ChevronRight size={18} className="text-gray-300 group-hover:text-blue-600 transition-colors" />
+        <div className="relative z-10">
+          <Link 
+            href={recentCourses.length > 0 ? `/dashboard/courses/${recentCourses[0].slug}` : "/dashboard/my-courses"}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-black transition-all hover:scale-105 active:scale-95 shadow-lg shadow-gray-200"
+          >
+            <PlayCircle size={20} />
+            Continue Learning
+          </Link>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      {statsData?.hasActivity ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, i) => (
-            <div key={i} className="card-premium p-8 group">
-               <div className="flex items-center justify-between mb-6">
-                  <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", stat.color)}>
-                     <stat.icon size={22} />
-                  </div>
-                  <div className="flex items-center gap-1 text-emerald-500 text-xs font-bold">
-                     <TrendingUp size={14} /> +8%
-                  </div>
-               </div>
-               <h3 className="text-4xl font-black tracking-tighter text-gray-900">{stat.val}</h3>
-               <p className="text-xs font-black uppercase tracking-widest text-gray-500 mt-2">{stat.label}</p>
+      {/* Summary Cards Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        {summaryCards.map((card, i) => (
+          <div key={i} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4 bg-gradient-to-br text-white shadow-lg", card.color)}>
+              <card.icon size={20} />
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="card-premium p-12 text-center space-y-6 bg-gray-50/50 border-dashed border-2">
-           <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto text-gray-200 shadow-sm">
-              <BarChart2 size={40} />
-           </div>
-           <div className="space-y-2">
-              <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight">No activity yet</h2>
-              <p className="text-sm text-gray-400 font-medium max-w-sm mx-auto">Start learning to see your analytics, streaks, and achievements mapped out here.</p>
-           </div>
-           <Link href="/dashboard/my-courses" className="btn-primary inline-flex px-10 py-4 text-xs">
-              Explore Catalog <ArrowRight size={16} className="ml-2" />
-           </Link>
-        </div>
-      )}
+            <p className="text-2xl font-bold text-gray-900">{card.val}</p>
+            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mt-1">{card.label}</p>
+          </div>
+        ))}
+      </div>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-        {/* Recently Accessed Courses */}
-        <div className="xl:col-span-8 space-y-8">
-           <div className="flex items-center justify-between">
-              <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
-                <PlayCircle className="text-blue-600" /> Continue_Learning
-              </h2>
-              <Link href="/dashboard/my-courses" className="text-[10px] font-black uppercase tracking-widest text-blue-600 flex items-center gap-1 hover:gap-3 transition-all">
-                View Catalog <ArrowRight size={14} />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        {/* Left Column: Quick Stats & Recent Courses */}
+        <div className="lg:col-span-8 space-y-8">
+          
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {quickStats.map((stat, i) => (
+              <div key={i} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                <div className={cn("w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center", stat.color)}>
+                  <stat.icon size={24} />
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-gray-900">{stat.val}</p>
+                  <p className="text-xs text-gray-400">{stat.label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Continue Learning / Recent Courses */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900">Recent Courses</h2>
+              <Link href="/dashboard/my-courses" className="text-sm font-semibold text-blue-600 hover:underline flex items-center gap-1">
+                View all <ChevronRight size={16} />
               </Link>
-           </div>
-           
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {recentCourses.length > 0 ? recentCourses.map((course) => (
-                <div key={course._id} className="card-premium group p-8 flex flex-col h-full relative overflow-hidden">
-                   <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:opacity-10 transition-opacity">
-                      <BookOpen size={120} />
-                   </div>
-                   <div className="relative z-10 flex-1 flex flex-col space-y-6">
-                      <div className="flex items-center justify-between">
-                         <span className="px-3 py-1 bg-gray-50 border border-gray-100 rounded-full text-[10px] font-black text-gray-400 uppercase tracking-widest">{course.category}</span>
-                         <span className="text-[10px] font-black text-blue-600 flex items-center gap-1 uppercase tracking-widest"><Clock size={12} /> {course.duration}</span>
-                      </div>
-                      <h3 className="text-2xl font-black text-gray-900 group-hover:text-blue-600 transition-colors tracking-tighter uppercase leading-tight">{course.title}</h3>
-                      <div className="mt-auto pt-8 border-t border-gray-50 flex items-center justify-between">
-                         <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
-                               <TrendingUp size={16} />
-                            </div>
-                            <div>
-                               <p className="text-[10px] font-black text-gray-900 uppercase">{course.progress || 0}% Done</p>
-                               <div className="w-24 h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
-                                  <div className="h-full bg-blue-600 rounded-full" style={{ width: `${course.progress || 0}%` }} />
-                               </div>
-                            </div>
-                         </div>
-                         <Link href={`/dashboard/courses/${course.slug}`} className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-xl shadow-blue-600/20">
-                            <ArrowRight size={20} />
-                         </Link>
-                      </div>
-                   </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {recentCourses.map((course) => (
+                <div key={course._id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden group hover:shadow-lg transition-all">
+                  <div className="aspect-video bg-gray-100 relative">
+                    <img 
+                      src={course.thumbnail} 
+                      alt={course.title} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                       <PlayCircle className="text-white" size={48} />
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded-full">{course.category}</span>
+                    <h3 className="font-bold text-gray-900 line-clamp-2 leading-snug h-10">{course.title}</h3>
+                    <div className="pt-2 border-t border-gray-50 flex items-center justify-between">
+                       <div className="flex items-center gap-2">
+                          <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                             <div className="h-full bg-blue-600" style={{ width: `${course.progress || 0}%` }}></div>
+                          </div>
+                          <span className="text-[10px] font-bold text-gray-400">{course.progress || 0}%</span>
+                       </div>
+                       <Link href={`/dashboard/courses/${course.slug}`} className="text-gray-900 hover:text-blue-600">
+                          <ArrowRight size={18} />
+                       </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Activity & Shortcuts */}
+        <div className="lg:col-span-4 space-y-8">
+          
+          {/* Shortcuts */}
+          <div className="bg-gray-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10"><Sparkles size={100} /></div>
+            <h3 className="text-lg font-bold mb-6 relative z-10">Quick Links</h3>
+            <div className="grid grid-cols-2 gap-4 relative z-10">
+              {shortcuts.map((link, i) => (
+                <Link 
+                  key={i} 
+                  href={link.href}
+                  className="flex flex-col items-center justify-center p-4 bg-white/10 rounded-2xl hover:bg-white/20 transition-all border border-white/5 group"
+                >
+                  <link.icon size={24} className="mb-2 text-blue-400 group-hover:scale-110 transition-transform" />
+                  <span className="text-xs font-medium">{link.label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Activity Feed */}
+          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+            <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <MessageSquare size={20} className="text-blue-600" /> Community Activity
+            </h3>
+            <div className="space-y-6">
+              {activities.length > 0 ? activities.map((activity, i) => (
+                <div key={i} className="flex gap-4">
+                  <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">
+                    {activity.image ? <img src={activity.image} className="w-full h-full rounded-full object-cover" /> : activity.user.charAt(0)}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-gray-900 truncate">{activity.user}</p>
+                    <p className="text-xs text-gray-500 line-clamp-1">{activity.action}</p>
+                    <p className="text-[10px] text-gray-300 font-medium mt-1 uppercase tracking-wider">{activity.time}</p>
+                  </div>
                 </div>
               )) : (
-                <div className="col-span-full h-64 card-premium border-dashed flex flex-col items-center justify-center text-gray-400 gap-4">
-                   <Ghost size={48} className="opacity-10" />
-                   <p className="text-[10px] font-black uppercase tracking-widest">No active deployments found.</p>
-                   <Link href="/courses" className="btn-primary text-xs">Start Your First Course</Link>
+                <div className="text-center py-8 text-gray-400">
+                  <Ghost size={32} className="mx-auto mb-2 opacity-20" />
+                  <p className="text-xs">No recent activity</p>
                 </div>
               )}
-           </div>
-        </div>
+            </div>
+            <Link href="/dashboard/comments" className="mt-8 w-full py-3 bg-gray-50 text-gray-900 text-xs font-bold uppercase tracking-widest rounded-xl flex items-center justify-center gap-2 hover:bg-gray-100 transition-all">
+               Discussion Hub
+            </Link>
+          </div>
 
-        {/* Community / Social Side Bar */}
-        <div className="xl:col-span-4 space-y-8">
-           <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
-             <MessageSquare className="text-blue-600" /> Community_Sync
-           </h2>
-
-           <div className="card-premium p-10 space-y-10 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-[0.02] pointer-events-none"><MessageSquare size={120} /></div>
-              
-              <div className="space-y-8 relative z-10">
-                 {activities.length > 0 ? activities.map((activity, i) => (
-                   <div key={activity.id || i} className="flex items-center gap-5 group cursor-pointer">
-                      <div className="w-12 h-12 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden font-black text-lg group-hover:border-blue-100 transition-all shadow-sm shrink-0">
-                         {activity.image ? (
-                            <img src={activity.image} alt={activity.user} className="w-full h-full object-cover" />
-                         ) : (
-                            <span className="text-gray-400 group-hover:text-blue-600 uppercase">{activity.user.charAt(0)}</span>
-                         )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                         <p className="text-sm font-black text-gray-900 uppercase tracking-tight leading-tight truncate">{activity.user}</p>
-                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5 truncate">{activity.action}</p>
-                      </div>
-                      <div className="text-right shrink-0">
-                         <div className="flex items-center justify-end gap-1 text-[10px] text-blue-600 font-black uppercase tracking-widest">
-                            {activity.type === "Comment" ? <MessageSquare size={14}/> : <Sparkles size={14}/>} {activity.points}
-                         </div>
-                         <p className="text-[8px] text-gray-300 font-black uppercase tracking-widest mt-1">{activity.time}</p>
-                      </div>
-                   </div>
-                 )) : (
-                    <div className="py-10 text-center space-y-4">
-                       <Ghost size={40} className="mx-auto text-gray-100" />
-                       <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Awaiting_Activity</p>
-                    </div>
-                 )}
-              </div>
-
-              <Link href="/dashboard/comments" className="w-full py-4 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 hover:scale-105 transition-all shadow-xl shadow-blue-600/20">
-                 Explore Discussion Hub
-              </Link>
-           </div>
         </div>
       </div>
     </div>

@@ -35,12 +35,14 @@ const CommentSchema = new Schema<IComment>(
     courseId: {
       type: Schema.Types.ObjectId,
       ref: "Course",
-      required: [true, "Please provide a course ID"],
+      required: false,
+      default: null
     },
     lessonId: {
       type: Schema.Types.ObjectId,
       ref: "Lesson",
-      required: [true, "Please provide a lesson ID"],
+      required: false,
+      default: null
     },
     content: {
       type: String,

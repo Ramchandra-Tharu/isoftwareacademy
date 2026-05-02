@@ -52,12 +52,12 @@ export default function Sidebar() {
         isCollapsed ? "justify-center" : "justify-between"
       )}>
         {!isCollapsed && (
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-600/20 group-hover:rotate-6 transition-transform">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-8 h-8 bg-black rounded-sm flex items-center justify-center text-white group-hover:bg-gray-800 transition-colors">
                <Cpu size={18} />
             </div>
-            <span className="text-[11px] font-black tracking-tighter uppercase text-gray-900">
-               ACADEMY_<span className="text-blue-600">STUDENT</span>
+            <span className="text-xs font-bold tracking-tight text-gray-900">
+               ORACLE_<span className="font-light">CLOUD</span>
             </span>
           </Link>
         )}
@@ -75,16 +75,29 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 px-4 py-8 space-y-1.5 overflow-y-auto custom-scrollbar">
         {session?.user?.role === "admin" && (
-          <Link
-            href="/admin"
-            className={cn(
-              "flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all group mb-6",
-              isCollapsed && "justify-center"
-            )}
-          >
-            <ShieldCheck size={20} className="group-hover:scale-110 transition-transform shrink-0" />
-            {!isCollapsed && <span className="text-xs font-black uppercase tracking-widest">Admin Control</span>}
-          </Link>
+          <>
+            <Link
+              href="/admin"
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all group mb-2",
+                isCollapsed && "justify-center"
+              )}
+            >
+              <ShieldCheck size={20} className="group-hover:scale-110 transition-transform shrink-0" />
+              {!isCollapsed && <span className="text-xs font-black uppercase tracking-widest">Admin Control</span>}
+            </Link>
+            <Link
+              href="/admin/comments"
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50 text-gray-600 border border-gray-100 hover:bg-gray-100 transition-all group mb-6",
+                isCollapsed && "justify-center",
+                pathname === "/admin/comments" && "bg-black text-white border-black"
+              )}
+            >
+              <MessageSquare size={20} className={cn("shrink-0", pathname === "/admin/comments" ? "text-white" : "group-hover:scale-110")} />
+              {!isCollapsed && <span className="text-xs font-black uppercase tracking-widest">Moderation Hub</span>}
+            </Link>
+          </>
         )}
 
         {menuItems.map((item) => {
@@ -94,15 +107,15 @@ export default function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group",
+                "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group",
                 isActive 
-                  ? "bg-blue-50 text-blue-600 font-bold shadow-sm shadow-blue-600/5" 
-                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                  ? "bg-black text-white font-medium" 
+                  : "text-gray-600 hover:bg-gray-100 hover:text-black"
               )}
             >
-              <item.icon size={20} className={cn(
+              <item.icon size={18} className={cn(
                 "transition-colors shrink-0",
-                isActive ? "text-blue-600" : "text-gray-400 group-hover:text-blue-500"
+                isActive ? "text-white" : "text-gray-400 group-hover:text-black"
               )} />
               {!isCollapsed && <span className="text-sm tracking-tight">{item.label}</span>}
             </Link>
