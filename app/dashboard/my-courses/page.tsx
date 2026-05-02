@@ -136,20 +136,20 @@ export default function MyCoursesPage() {
          {lastAccessed && searchQuery === "" && activeTab === "All Courses" && (
             <div className="relative group">
                <div className="absolute inset-0 bg-black/5 blur-3xl rounded-[3rem] -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-               <Link href={`/dashboard/courses/${lastAccessed.slug}`} className="border border-gray-200 p-8 md:p-12 flex flex-col lg:flex-row items-center gap-10 bg-white rounded-lg hover:border-black transition-all">
-                  <div className="w-full lg:w-72 aspect-video rounded-md overflow-hidden transition-all duration-700">
+               <Link href={`/dashboard/courses/${lastAccessed.slug}`} className="border border-gray-200 p-6 md:p-8 flex flex-col lg:flex-row items-center gap-10 bg-white rounded-lg hover:border-black transition-all">
+                  <div className="w-full lg:w-64 aspect-video rounded-md overflow-hidden transition-all duration-700">
                      <img src={lastAccessed.thumbnail} alt={lastAccessed.title} className="w-full h-full object-cover" />
                   </div>
-                  <div className="flex-1 space-y-6">
+                  <div className="flex-1 space-y-4">
                      <div className="space-y-2">
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Resume_Operation</p>
-                        <h2 className="text-4xl font-light text-black tracking-tight leading-none">{lastAccessed.title}</h2>
-                        <p className="text-sm text-gray-500 font-normal">Continue from where you left off. 8 units remaining in this module.</p>
+                        <h2 className="text-3xl font-light text-black tracking-tight leading-none">{lastAccessed.title}</h2>
+                        <p className="text-xs text-gray-500 font-normal">Continue from where you left off. 8 units remaining in this module.</p>
                      </div>
 
                      <div className="flex flex-wrap items-center gap-8">
                         <div className="space-y-2">
-                           <div className="flex items-center justify-between min-w-[200px]">
+                           <div className="flex items-center justify-between min-w-[180px]">
                               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Progress</span>
                               <span className="text-[10px] font-bold text-black">{lastAccessed.progress}%</span>
                            </div>
@@ -157,8 +157,8 @@ export default function MyCoursesPage() {
                               <div className="h-full bg-black rounded-full" style={{ width: `${lastAccessed.progress}%` }} />
                            </div>
                         </div>
-                        <div className="px-8 py-3 bg-black text-white text-xs font-bold uppercase tracking-widest rounded-lg">
-                           Access Module <ArrowRight size={16} className="ml-2 inline" />
+                        <div className="px-6 py-2.5 bg-black text-white text-[10px] font-bold uppercase tracking-widest rounded-lg">
+                           Access Module <ArrowRight size={14} className="ml-2 inline" />
                         </div>
                      </div>
                   </div>
@@ -219,7 +219,7 @@ export default function MyCoursesPage() {
          )}
 
          {/* 4. Course Grid */}
-         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredCourses.length > 0 ? (
                filteredCourses.map((course) => (
                   <CourseCard 

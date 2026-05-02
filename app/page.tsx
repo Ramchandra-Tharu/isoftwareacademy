@@ -322,33 +322,33 @@ export default function Home() {
              <Link href="/courses" className="text-sm font-black uppercase tracking-widest text-blue-600 hover:gap-4 transition-all flex items-center gap-2">View Full Catalog <ArrowRight size={16}/></Link>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {coursesLoading ? (
-              [1, 2, 3].map(i => <div key={i} className="h-[450px] bg-gray-100 rounded-[2.5rem] animate-pulse" />)
+              [1, 2, 3, 4].map(i => <div key={i} className="h-[350px] bg-gray-100 rounded-[2rem] animate-pulse" />)
             ) : (
-              courses.slice(0, 6).map(course => (
+              courses.slice(0, 8).map(course => (
                 <div key={course._id} className="card-premium overflow-hidden group flex flex-col">
-                   <div className="h-64 bg-gray-50 relative overflow-hidden">
+                   <div className="h-48 bg-gray-50 relative overflow-hidden">
                       {course.thumbnail ? (
                         <img src={course.thumbnail} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-200">
-                           <Code2 size={80} />
+                           <Code2 size={60} />
                         </div>
                       )}
-                      <div className="absolute top-6 left-6 px-4 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
+                      <div className="absolute top-4 left-4 px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[8px] font-black uppercase tracking-widest shadow-sm">
                          {course.category}
                       </div>
                    </div>
-                   <div className="p-10 flex-1 flex flex-col space-y-4">
-                      <h4 className="text-2xl font-black tracking-tighter uppercase">{course.title}</h4>
-                      <p className="text-gray-500 text-sm font-medium line-clamp-2">{course.description}</p>
-                      <div className="pt-6 mt-auto border-t border-gray-100 flex items-center justify-between">
-                         <div className="flex items-center gap-2 text-xs font-bold text-gray-400">
-                            <Clock size={14} /> {course.duration || "Self-paced"}
+                   <div className="p-6 flex-1 flex flex-col space-y-3">
+                      <h4 className="text-lg font-black tracking-tighter uppercase line-clamp-1">{course.title}</h4>
+                      <p className="text-gray-500 text-xs font-medium line-clamp-2">{course.description}</p>
+                      <div className="pt-4 mt-auto border-t border-gray-100 flex items-center justify-between">
+                         <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
+                            <Clock size={12} /> {course.duration || "Self-paced"}
                          </div>
-                         <Link href={`/courses/${course.slug || course._id}`} className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform">
-                            <PlayCircle size={24} />
+                         <Link href={`/courses/${course.slug || course._id}`} className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white hover:scale-110 transition-transform shadow-lg shadow-blue-600/20">
+                            <PlayCircle size={20} />
                          </Link>
                       </div>
                    </div>

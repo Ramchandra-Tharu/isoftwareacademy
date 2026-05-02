@@ -55,7 +55,7 @@ export default function CourseCard({
       </div>
 
       {/* Content */}
-      <div className="p-8 flex-1 flex flex-col space-y-4">
+      <div className="p-6 flex-1 flex flex-col space-y-3">
         <div className="flex items-center justify-between">
            <div className="flex items-center gap-1 text-amber-400">
               <Star size={12} fill="currentColor" />
@@ -65,16 +65,16 @@ export default function CourseCard({
         </div>
         
         <div className="space-y-1">
-           <h3 className="text-xl font-light text-black group-hover:font-medium transition-all leading-tight tracking-tight">
+           <h3 className="text-lg font-light text-black group-hover:font-medium transition-all leading-tight tracking-tight">
              {title}
            </h3>
            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Instructor: {instructor}</p>
         </div>
 
-        <div className="pt-6 border-t border-gray-50 mt-auto space-y-6">
+        <div className="pt-4 border-t border-gray-50 mt-auto space-y-4">
            {/* Progress Bar */}
            {progress !== undefined && (
-             <div className="space-y-2">
+             <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Progress</span>
                    <span className="text-[10px] font-black text-black">{progress}%</span>
@@ -90,13 +90,13 @@ export default function CourseCard({
 
            {/* Footer */}
            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                 <span className="flex items-center gap-1.5"><BookOpen size={14} /> {lessonsCount}</span>
-                 <span className="flex items-center gap-1.5"><Clock size={14} /> {duration}</span>
+              <div className="flex items-center gap-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                 <span className="flex items-center gap-1"><BookOpen size={12} /> {lessonsCount}</span>
+                 <span className="flex items-center gap-1"><Clock size={12} /> {duration}</span>
               </div>
               <Link 
                 href={href || `/dashboard/courses/${id}`}
-                className="px-6 py-2 bg-black text-white text-[10px] font-bold uppercase tracking-widest rounded-sm hover:bg-gray-800 transition-all"
+                className="px-4 py-2 bg-black text-white text-[9px] font-bold uppercase tracking-widest rounded-sm hover:bg-gray-800 transition-all"
               >
                 {progress === undefined ? "Details" : (progress > 0 ? "Resume" : "Start")}
               </Link>
