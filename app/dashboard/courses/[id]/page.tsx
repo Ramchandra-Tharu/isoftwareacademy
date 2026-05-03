@@ -26,11 +26,13 @@ function cn(...inputs: ClassValue[]) {
 
 export default function CourseViewerPage() {
   const params = useParams();
+  const topRef = React.useRef<HTMLDivElement>(null);
   const [course, setCourse] = useState<any>(null);
   const [activeLesson, setActiveLesson] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState<any>({ completedLessons: [], percentage: 0 });
   const [activeTab, setActiveTab] = useState<"chapters" | "leaderboard" | "about">("chapters");
+  const [selectedChapter, setSelectedChapter] = useState<string | null>(null);
 
   const fetchProgress = async (courseId: string) => {
     try {
@@ -52,6 +54,11 @@ export default function CourseViewerPage() {
           if (lessonsRes.ok) {
             const lessons = await lessonsRes.json();
             foundCourse.lessons = lessons;
+            // Select first chapter by default if none selected
+            if (lessons.length > 0) {
+              const firstChapter = lessons[0].moduleName || "General";
+              setSelectedChapter(firstChapter);
+            }
           }
           await fetchProgress(foundCourse._id);
         }
@@ -63,6 +70,40 @@ export default function CourseViewerPage() {
     };
     if (params.id) fetchCourseData();
   }, [params.id]);
+
+  useEffect(() => {
+    if (activeLesson) {
+      topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [activeLesson]);
+
+  // Group lessons by moduleName
+  const groupedLessons = course?.lessons?.reduce((acc: any, lesson: any) => {
+    const chapter = lesson.moduleName || "General";
+    if (!acc[chapter]) acc[chapter] = [];
+    acc[chapter].push(lesson);
+    return acc;
+  }, {});
+
+  // Calculate total duration for a chapter
+  const getChapterDuration = (lessons: any[]) => {
+    let totalSeconds = 0;
+    lessons.forEach(l => {
+      const parts = (l.duration || "0:0").split(':');
+      if (parts.length === 3) {
+        totalSeconds += parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseInt(parts[2]);
+      } else if (parts.length === 2) {
+        totalSeconds += parseInt(parts[0]) * 60 + parseInt(parts[1]);
+      }
+    });
+    
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    
+    if (h > 0) return `${h}h ${m}m`;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
 
   const handleToggleComplete = async (lessonId: string) => {
     if (!course?._id) return;
@@ -81,6 +122,22 @@ export default function CourseViewerPage() {
     }
   };
 
+  const handleNext = () => {
+    if (!activeLesson || !course?.lessons) return;
+    const currentIndex = course.lessons.findIndex((l: any) => l._id === activeLesson._id);
+    if (currentIndex < course.lessons.length - 1) {
+      setActiveLesson(course.lessons[currentIndex + 1]);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (!activeLesson || !course?.lessons) return;
+    const currentIndex = course.lessons.findIndex((l: any) => l._id === activeLesson._id);
+    if (currentIndex > 0) {
+      setActiveLesson(course.lessons[currentIndex - 1]);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-white">
@@ -91,8 +148,11 @@ export default function CourseViewerPage() {
 
   if (!course) return <div className="flex h-screen items-center justify-center uppercase font-black tracking-widest text-xs text-gray-300">Registry_Entry_Missing</div>;
 
+  const currentIdx = activeLesson ? course.lessons.findIndex((l: any) => l._id === activeLesson._id) : -1;
+
   return (
     <div className="min-h-screen bg-white font-sans p-6 lg:p-12">
+      <div ref={topRef} className="absolute top-0 left-0 h-0 w-0" />
       <div className="max-w-6xl mx-auto space-y-16">
         {activeLesson ? (
           /* Active Lesson Viewer */
@@ -107,6 +167,10 @@ export default function CourseViewerPage() {
                 duration={activeLesson.duration}
                 isCompleted={progress.completedLessons.includes(activeLesson._id)}
                 onToggleComplete={() => handleToggleComplete(activeLesson._id)}
+                onNext={currentIdx < course.lessons.length - 1 ? handleNext : undefined}
+                onPrevious={currentIdx > 0 ? handlePrevious : undefined}
+                nextUnitName={currentIdx < course.lessons.length - 1 ? course.lessons[currentIdx + 1].title : undefined}
+                prevUnitName={currentIdx > 0 ? course.lessons[currentIdx - 1].title : undefined}
               />
             </div>
           </div>
@@ -131,7 +195,7 @@ export default function CourseViewerPage() {
 
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   {[
-                    { icon: BookOpen, label: `${course.totalLessons || course.lessons?.length || 0} Chapters` },
+                    { icon: BookOpen, label: `${Object.keys(groupedLessons || {}).length} Chapters` },
                     { icon: Clock, label: course.duration || "Self-Paced" },
                     { icon: BarChart, label: course.difficulty || "Intermediate" },
                     { icon: Users, label: `${course.enrolledCount || 0} Enrolled` }
@@ -174,23 +238,87 @@ export default function CourseViewerPage() {
 
               <div className="animate-in fade-in duration-500">
                 {activeTab === "chapters" && (
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 pb-20">
-                    {course.lessons?.map((lesson: any, i: number) => (
-                      <div
-                        key={i}
-                        onClick={() => setActiveLesson(lesson)}
-                        className="p-6 bg-white border border-gray-100 rounded-3xl flex items-center justify-between hover:border-blue-200 transition-all group cursor-pointer shadow-sm hover:shadow-xl hover:shadow-blue-600/5"
-                      >
-                        <div className="flex items-center gap-4">
-                          <span className="text-2xl font-black text-gray-100 group-hover:text-blue-600/20 transition-colors tracking-tighter">0{i + 1}</span>
-                          <div>
-                            <h4 className="text-sm font-bold text-gray-900 tracking-tight uppercase">{lesson.title}</h4>
-                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-0.5">{lesson.duration || "15m"}</p>
+                  <div className="flex flex-col lg:flex-row gap-12 pb-24 items-start">
+                    {/* Left: Chapters List */}
+                    <div className="w-full lg:w-[35%] space-y-2 shrink-0">
+                      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 mb-8 px-2">Navigation_Index</p>
+                      {Object.keys(groupedLessons || {}).map((chapterTitle, idx) => (
+                        <div 
+                          key={idx} 
+                          onClick={() => setSelectedChapter(chapterTitle)}
+                          className={cn(
+                            "flex items-center justify-between py-3.5 px-5 rounded-xl transition-all group cursor-pointer border border-transparent",
+                            selectedChapter === chapterTitle 
+                              ? "bg-gray-900 border-gray-900 shadow-xl shadow-gray-900/10" 
+                              : "bg-transparent hover:bg-white hover:border-pink-200 hover:shadow-lg hover:shadow-pink-500/5"
+                          )}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={cn(
+                              "w-1 h-1 rounded-full transition-colors",
+                              selectedChapter === chapterTitle ? "bg-blue-500" : "bg-gray-300 group-hover:bg-gray-600"
+                            )} />
+                            <h3 className={cn(
+                              "text-[11px] font-bold uppercase tracking-wide transition-colors",
+                              selectedChapter === chapterTitle ? "text-blue-600" : "text-gray-500 group-hover:text-gray-900"
+                            )}>{chapterTitle}</h3>
+                          </div>
+                          <div className="flex items-center gap-3">
+                             <span className={cn(
+                               "text-[9px] font-black uppercase tracking-widest",
+                               selectedChapter === chapterTitle ? "text-blue-400" : "text-gray-300"
+                             )}>
+                               {getChapterDuration(groupedLessons[chapterTitle])}
+                             </span>
                           </div>
                         </div>
-                        <PlayCircle size={20} className="text-gray-200 group-hover:text-blue-600 transition-colors shrink-0" />
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+
+                    {/* Right: Topics for Selected Chapter */}
+                    <div className="flex-1 w-full p-2 lg:p-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                      {selectedChapter ? (
+                        <div className="space-y-10">
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="w-8 h-[1px] bg-blue-600/30"></span>
+                              <p className="text-[9px] font-black uppercase tracking-[0.5em] text-blue-600/60">Module_Selection</p>
+                            </div>
+                            <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight leading-none">{selectedChapter}</h2>
+                          </div>
+                          
+                          <div className="grid gap-1">
+                            {groupedLessons[selectedChapter].map((lesson: any, i: number) => (
+                              <div 
+                                key={i}
+                                onClick={() => setActiveLesson(lesson)}
+                                className="group flex items-center justify-between p-4 bg-transparent border border-transparent rounded-xl hover:bg-white hover:border-pink-200 hover:shadow-xl hover:shadow-pink-500/5 transition-all cursor-pointer"
+                              >
+                                <div className="flex items-center gap-4">
+                                  <span className="text-xs font-black text-gray-200 group-hover:text-blue-600/30 transition-colors">0{i+1}</span>
+                                  <h4 className="text-[12px] font-bold text-gray-600 uppercase tracking-tight group-hover:text-gray-900 transition-colors">{lesson.title}</h4>
+                                </div>
+                                 <div className="flex items-center gap-4">
+                                   <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest group-hover:text-gray-400 transition-colors">{lesson.duration || "10:00"}</span>
+                                   <div className={cn(
+                                     "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
+                                     progress.completedLessons.includes(lesson._id) 
+                                       ? "bg-emerald-50 text-emerald-500 shadow-sm" 
+                                       : "bg-transparent text-gray-200 group-hover:bg-blue-50 group-hover:text-blue-600"
+                                   )}>
+                                      {progress.completedLessons.includes(lesson._id) ? <CheckCircle size={16} /> : <PlayCircle size={16} />}
+                                   </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="h-64 flex items-center justify-center text-gray-200 font-black uppercase tracking-[0.5em] text-[9px] italic">
+                          Awaiting_Module_Selection...
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
                 {activeTab === "about" && (

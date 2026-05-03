@@ -208,7 +208,7 @@ export default function MyCoursesPage() {
                               <div className="space-y-4 relative z-10">
                                  <span className="text-[8px] font-black text-blue-600 uppercase tracking-widest px-2 py-1 bg-white rounded-full border border-blue-50">Trending Asset</span>
                                  <h3 className="text-lg font-black text-gray-900 uppercase tracking-tight line-clamp-2">{course.title}</h3>
-                                 <Link href={`/courses/${course.slug}`} className="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:gap-4 transition-all">
+                                 <Link href={`/dashboard/courses/${course.slug}`} className="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:gap-4 transition-all">
                                     Explore Module <ArrowRight size={14} />
                                  </Link>
                               </div>
@@ -230,7 +230,7 @@ export default function MyCoursesPage() {
                      instructor={course.instructorName || course.instructor}
                      lessonsCount={course.totalLessons || course.lessonsCount}
                      id={course.slug}
-                     href={course.progress === undefined ? `/courses/${course.slug}` : undefined}
+                     href={course.progress === undefined ? `/dashboard/courses/${course.slug}` : undefined}
                   />
                ))
             ) : (

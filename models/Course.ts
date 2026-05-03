@@ -9,6 +9,8 @@ export interface ICourse extends Document {
   category: string;
   thumbnail: string;
   totalLessons: number;
+  totalChapters: number;
+  totalTopics: number;
   duration: string;
   difficulty: "Beginner" | "Intermediate" | "Advanced";
   rating: number;
@@ -16,6 +18,7 @@ export interface ICourse extends Document {
   featured: boolean;
   isPublished: boolean;
   price: number;
+  lastUpdated?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -61,9 +64,21 @@ const CourseSchema = new Schema<ICourse>(
       required: [true, "Please provide total lessons count"],
       default: 0,
     },
+    totalChapters: {
+      type: Number,
+      default: 0,
+    },
+    totalTopics: {
+      type: Number,
+      default: 0,
+    },
     duration: {
       type: String,
       required: [true, "Please provide total duration"],
+    },
+    lastUpdated: {
+      type: Date,
+      default: Date.now,
     },
     difficulty: {
       type: String,
