@@ -59,7 +59,7 @@ export default function MyCoursesPage() {
 
    const filteredCourses = (() => {
       const query = searchQuery.toLowerCase();
-      
+
       // Helper to merge enrollment progress into a catalog course
       const mergeProgress = (catalogList: any[]) => catalogList.map(catCourse => {
          const enrollment = courses.find(e => e.courseId?._id === catCourse._id || e._id === catCourse._id);
@@ -67,8 +67,8 @@ export default function MyCoursesPage() {
       });
 
       if (activeTab === "Explore") {
-         return mergeProgress(allCatalogCourses).filter(c => 
-            c.title.toLowerCase().includes(query) || 
+         return mergeProgress(allCatalogCourses).filter(c =>
+            c.title.toLowerCase().includes(query) ||
             c.category.toLowerCase().includes(query)
          );
       }
@@ -224,12 +224,12 @@ export default function MyCoursesPage() {
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredCourses.length > 0 ? (
                filteredCourses.map((course) => (
-                  <CourseCard 
-                     key={course._id} 
-                     {...course} 
+                  <CourseCard
+                     key={course._id}
+                     {...course}
                      instructor={course.instructorName || course.instructor}
                      lessonsCount={course.totalLessons || course.lessonsCount}
-                     id={course.slug} 
+                     id={course.slug}
                      href={course.progress === undefined ? `/courses/${course.slug}` : undefined}
                   />
                ))

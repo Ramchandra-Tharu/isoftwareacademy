@@ -7,6 +7,12 @@ import {
   BookOpen,
   ArrowRight
 } from "lucide-react";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 interface CourseCardProps {
   id: string;
@@ -59,22 +65,9 @@ export default function CourseCard({
           {title}
         </h3>
 
-        <div className="space-y-2.5">
-           {/* Progress Bar */}
-           {progress !== undefined && progress > 0 && (
-             <div className="space-y-1">
-                <div className="h-1 w-full bg-blue-50 rounded-full overflow-hidden">
-                   <div 
-                     className="h-full bg-blue-600 rounded-full transition-all duration-700" 
-                     style={{ width: `${progress}%` }}
-                   ></div>
-                </div>
-                <span className="text-[8px] font-black text-blue-600 uppercase">{progress}% Complete</span>
-             </div>
-           )}
-
-           {/* Stats Section */}
-           <div className="space-y-1.5">
+        <div className="relative h-16">
+           {/* Stats Section - Visible by default, hidden on hover */}
+           <div className="absolute inset-0 space-y-1.5 transition-all duration-300 group-hover:opacity-0 group-hover:-translate-y-2">
               <div className="flex items-center gap-3">
                  <div className="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-tight">
                     <Clock size={14} className="text-gray-400" /> {duration}
@@ -93,17 +86,33 @@ export default function CourseCard({
               </div>
            </div>
 
-           {/* Action */}
-           <div className="pt-1">
+           {/* View Course Action - Visible as link by default, transforms to button on hover */}
+           <div className="absolute inset-x-0 bottom-0 transition-all duration-300 translate-y-0 group-hover:translate-y-[-4px]">
              <Link 
                href={href || `/dashboard/courses/${id}`}
-               className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 transition-all group/link"
+               className={cn(
+                 "inline-flex items-center gap-1 text-xs font-bold text-blue-600 transition-all duration-300 w-full justify-start",
+                 "group-hover:bg-blue-600 group-hover:text-white group-hover:px-6 group-hover:py-2.5 group-hover:rounded-xl group-hover:shadow-lg group-hover:shadow-blue-600/20 group-hover:justify-center"
+               )}
              >
                <span>View Course</span>
-               <ArrowRight size={14} className="group-hover/link:translate-x-1 transition-transform" />
+               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
              </Link>
            </div>
         </div>
+
+        {/* Progress Bar (Always visible if exists) */}
+        {progress !== undefined && progress > 0 && (
+           <div className="pt-2 space-y-1">
+              <div className="h-1 w-full bg-blue-50 rounded-full overflow-hidden">
+                 <div 
+                   className="h-full bg-blue-600 rounded-full transition-all duration-700" 
+                   style={{ width: `${progress}%` }}
+                 ></div>
+              </div>
+              <span className="text-[8px] font-black text-blue-600 uppercase">{progress}% Complete</span>
+           </div>
+        )}
       </div>
     </div>
   );

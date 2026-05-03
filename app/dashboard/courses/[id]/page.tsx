@@ -1,24 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { 
-  ChevronLeft, 
-  Menu, 
-  Layout, 
-  BookOpen, 
-  CheckCircle, 
-  PlayCircle, 
-  MessageCircle, 
-  HelpCircle,
-  MoreVertical,
-  Settings,
+import {
+  BookOpen,
+  CheckCircle,
+  PlayCircle,
   Clock,
   Award,
   Loader2,
-  Zap,
-  Target,
-  Sparkles,
-  ArrowRight
+  ArrowRight,
+  Users,
+  BarChart,
+  FileText
 } from "lucide-react";
 import Link from "next/link";
 import ContentSection from "@/components/dashboard/ContentSection";
@@ -37,6 +30,7 @@ export default function CourseViewerPage() {
   const [activeLesson, setActiveLesson] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState<any>({ completedLessons: [], percentage: 0 });
+  const [activeTab, setActiveTab] = useState<"chapters" | "leaderboard" | "about">("chapters");
 
   const fetchProgress = async (courseId: string) => {
     try {
@@ -50,15 +44,15 @@ export default function CourseViewerPage() {
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
-        const courseRes = await fetch(`/api/courses?slug=${params.id}`);
-        const courses = await courseRes.json();
-        const foundCourse = courses.find((c: any) => c.slug === params.id);
-        if (foundCourse) {
+        const courseRes = await fetch(`/api/courses/${params.id}`);
+        if (courseRes.ok) {
+          const foundCourse = await courseRes.json();
           setCourse(foundCourse);
           const lessonsRes = await fetch(`/api/lessons?courseId=${foundCourse._id}`);
-          const lessons = await lessonsRes.json();
-          foundCourse.lessons = lessons;
-          if (lessons.length > 0) setActiveLesson(lessons[0]);
+          if (lessonsRes.ok) {
+            const lessons = await lessonsRes.json();
+            foundCourse.lessons = lessons;
+          }
           await fetchProgress(foundCourse._id);
         }
       } catch (err) {
@@ -95,127 +89,120 @@ export default function CourseViewerPage() {
     );
   }
 
-  if (!course) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-white text-gray-400 font-black uppercase tracking-widest text-xs">
-        System_Error: Course_Not_Found
-      </div>
-    );
-  }
+  if (!course) return <div className="flex h-screen items-center justify-center uppercase font-black tracking-widest text-xs text-gray-300">Registry_Entry_Missing</div>;
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-white overflow-hidden font-sans">
-      {/* Curriculum Sidebar */}
-      <aside className="w-full lg:w-[26rem] border-r border-gray-100 bg-gray-50/50 flex flex-col h-screen overflow-hidden">
-        <div className="p-10 space-y-8 border-b border-gray-100 bg-white">
-           <Link href="/dashboard/my-courses" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-all group">
-              <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back_To_Catalog
-           </Link>
-           
-           <div className="space-y-4">
-              <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tighter leading-tight">{course.title}</h2>
-              <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-widest text-gray-400">
-                 <span className="flex items-center gap-1.5"><BookOpen size={14} /> {course.lessons?.length || 0} Units</span>
-                 <span className="flex items-center gap-1.5 text-blue-600"><Award size={14} /> Certificate Verified</span>
-              </div>
-           </div>
-  
-           <div className="space-y-2">
-              <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-blue-600">
-                 <span>Mastery Progress</span>
-                 <span>{progress.percentage || 0}%</span>
-              </div>
-              <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden border border-gray-50">
-                 <div 
-                   className="h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" 
-                   style={{ width: `${progress.percentage || 0}%` }}
-                 ></div>
-              </div>
-           </div>
-        </div>
-  
-        <nav className="flex-1 px-4 py-8 space-y-1.5 overflow-y-auto custom-scrollbar">
-           <div className="px-6 py-2 text-[10px] uppercase tracking-widest text-gray-400 font-black mb-4">Registry_Manifest</div>
-           {course.lessons?.map((lesson: any) => {
-             const isCompleted = progress.completedLessons.includes(lesson._id);
-             const isActive = activeLesson?._id === lesson._id;
-             return (
-              <button 
-                key={lesson._id} 
-                onClick={() => setActiveLesson(lesson)}
-                className={cn(
-                  "w-full flex items-center gap-5 px-6 py-4 rounded-2xl transition-all group border",
-                  isActive 
-                    ? "bg-white border-blue-100 shadow-xl shadow-blue-600/5" 
-                    : "bg-transparent border-transparent text-gray-400 hover:bg-white hover:text-gray-900"
-                )}
-              >
-                 <div className={cn(
-                    "flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center border transition-all",
-                    isActive ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/20" : 
-                    isCompleted ? "bg-emerald-50 border-emerald-100 text-emerald-600" :
-                    "bg-gray-100 border-gray-100 text-gray-400 group-hover:bg-white group-hover:border-gray-200"
-                 )}>
-                    {isCompleted ? <CheckCircle size={18} /> : isActive ? <PlayCircle size={18} /> : <span className="text-xs font-black">{lesson.order}</span>}
-                 </div>
-                 
-                 <div className="flex-1 text-left space-y-0.5">
-                    <p className={cn(
-                      "text-sm font-black uppercase tracking-tight truncate",
-                      isActive ? "text-gray-900" : "text-gray-500"
-                    )}>{lesson.title}</p>
-                    <p className="text-[9px] font-black uppercase tracking-widest opacity-60 flex items-center gap-1.5"><Clock size={12} /> {lesson.duration}</p>
-                 </div>
-              </button>
-             );
-           })}
-        </nav>
-      </aside>
-  
-      {/* Content Viewer */}
-      <main className="flex-1 bg-white overflow-y-auto custom-scrollbar">
-        <div className="max-w-4xl mx-auto px-10 lg:px-20 py-20 space-y-20">
-           {activeLesson ? (
-             <ContentSection 
-               title={activeLesson.title} 
-               blocks={activeLesson.content} 
-               duration={activeLesson.duration} 
-               isCompleted={progress.completedLessons.includes(activeLesson._id)} 
-               onToggleComplete={() => handleToggleComplete(activeLesson._id)}
-             />
-           ) : (
-             <div className="h-96 flex flex-col items-center justify-center text-gray-200 space-y-6">
-                <Target size={80} className="opacity-10" />
-                <p className="text-[10px] font-black uppercase tracking-widest italic text-gray-300">Select_Academic_Module_To_Initialize</p>
-             </div>
-           )}
+    <div className="min-h-screen bg-white font-sans p-6 lg:p-12">
+      <div className="max-w-6xl mx-auto space-y-16">
+        {activeLesson ? (
+          /* Active Lesson Viewer */
+          <div className="animate-in fade-in duration-500 pb-20">
+            <button onClick={() => setActiveLesson(null)} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-all mb-8">
+              <ArrowRight size={14} className="rotate-180" /> Back_To_Overview
+            </button>
+            <div className="bg-white rounded-[3rem] border border-gray-100 p-8 lg:p-12 shadow-2xl shadow-blue-600/5">
+              <ContentSection
+                title={activeLesson.title}
+                blocks={activeLesson.content}
+                duration={activeLesson.duration}
+                isCompleted={progress.completedLessons.includes(activeLesson._id)}
+                onToggleComplete={() => handleToggleComplete(activeLesson._id)}
+              />
+            </div>
+          </div>
+        ) : (
+          /* Course Overview Header - Matching Reference Image Exactly */
+          <div className="space-y-16 animate-in fade-in duration-700">
 
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-20 border-t border-gray-100">
-              <div className="space-y-10">
-                 {activeLesson && <CommentSection courseId={course._id} lessonId={activeLesson._id} />}
+            <div className="flex flex-col lg:flex-row gap-6 items-center lg:items-start">
+              {/* Mini Thumbnail */}
+              <div className="w-full lg:w-[35%] aspect-video rounded-2xl overflow-hidden shadow-2xl shadow-blue-600/10 border border-gray-100 shrink-0">
+                <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
               </div>
 
-              <div className="space-y-8">
-                 <h3 className="text-xl font-black uppercase tracking-tighter text-gray-900 flex items-center gap-3">
-                   <HelpCircle className="text-blue-600" size={24} /> Support_Protocols
-                 </h3>
-                 <div className="p-10 bg-gray-50 rounded-[3rem] border border-gray-100 space-y-8 relative overflow-hidden group">
-                    <p className="text-sm font-medium text-gray-500 leading-relaxed relative z-10">
-                       Stuck on a deployment? Our <span className="text-gray-900 font-black">AI Mentor Core</span> and community expert network are online to troubleshoot in real-time.
-                    </p>
-                    <div className="space-y-3 relative z-10">
-                       <button className="w-full flex items-center justify-center gap-3 py-4 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:scale-105 transition-all shadow-xl shadow-blue-600/20">
-                          <Zap size={16} /> Consult AI Mentor
-                       </button>
-                       <button className="w-full py-4 bg-white text-gray-400 text-[10px] font-black uppercase tracking-widest rounded-2xl border border-gray-100 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
-                          Academic Help Center
-                       </button>
+              {/* Ultra-Compact Info Section */}
+              <div className="flex-1 space-y-4 py-0.5 w-full">
+                <div className="space-y-1">
+                  <h1 className="text-3xl lg:text-4xl font-black text-gray-900 tracking-tight leading-tight uppercase">
+                    {course.title}
+                  </h1>
+                  <p className="text-xs font-black text-blue-600 uppercase tracking-widest">Instructor: {course.instructorName || "Academy Team"}</p>
+                </div>
+
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  {[
+                    { icon: BookOpen, label: `${course.totalLessons || course.lessons?.length || 0} Chapters` },
+                    { icon: Clock, label: course.duration || "Self-Paced" },
+                    { icon: BarChart, label: course.difficulty || "Intermediate" },
+                    { icon: Users, label: `${course.enrolledCount || 0} Enrolled` }
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                        <item.icon size={12} />
+                      </div>
+                      <span className="text-sm font-bold text-gray-700 uppercase tracking-tight">{item.label}</span>
                     </div>
-                 </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setActiveTab("chapters")}
+                  className="w-full lg:w-fit px-10 py-4 bg-[#004e64] text-white font-black rounded-xl hover:bg-[#003d4f] transition-all flex items-center justify-center gap-3 uppercase text-xs tracking-widest shadow-xl shadow-[#004e64]/20"
+                >
+                  START COURSE <ArrowRight size={8} />
+                </button>
+
               </div>
-           </div>
-        </div>
-      </main>
+            </div>
+
+            {/* Tabs & Tab Content */}
+            <div className="space-y-8">
+              <div className="flex items-center gap-4 bg-gray-50/50 p-1.5 rounded-2xl border border-gray-100 w-fit">
+                {["chapters", "leaderboard", "about"].map(tab => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab as any)}
+                    className={cn(
+                      "px-10 py-3.5 rounded-xl text-sm font-black uppercase tracking-widest transition-all",
+                      activeTab === tab ? "bg-white text-gray-900 shadow-sm border border-gray-100" : "text-gray-400 hover:text-gray-600"
+                    )}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+
+              <div className="animate-in fade-in duration-500">
+                {activeTab === "chapters" && (
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 pb-20">
+                    {course.lessons?.map((lesson: any, i: number) => (
+                      <div
+                        key={i}
+                        onClick={() => setActiveLesson(lesson)}
+                        className="p-6 bg-white border border-gray-100 rounded-3xl flex items-center justify-between hover:border-blue-200 transition-all group cursor-pointer shadow-sm hover:shadow-xl hover:shadow-blue-600/5"
+                      >
+                        <div className="flex items-center gap-4">
+                          <span className="text-2xl font-black text-gray-100 group-hover:text-blue-600/20 transition-colors tracking-tighter">0{i + 1}</span>
+                          <div>
+                            <h4 className="text-sm font-bold text-gray-900 tracking-tight uppercase">{lesson.title}</h4>
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-0.5">{lesson.duration || "15m"}</p>
+                          </div>
+                        </div>
+                        <PlayCircle size={20} className="text-gray-200 group-hover:text-blue-600 transition-colors shrink-0" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {activeTab === "about" && (
+                  <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm text-gray-500 text-sm leading-relaxed font-medium">
+                    {course.description}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
