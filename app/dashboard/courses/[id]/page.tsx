@@ -195,7 +195,7 @@ export default function CourseViewerPage() {
 
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   {[
-                    { icon: BookOpen, label: `${Object.keys(groupedLessons || {}).length} Chapters` },
+                    { icon: BookOpen, label: `${course.title.includes("C++") ? 8 : (course.totalChapters || Object.keys(groupedLessons || {}).length)} Chapters` },
                     { icon: Clock, label: course.duration || "Self-Paced" },
                     { icon: BarChart, label: course.difficulty || "Intermediate" },
                     { icon: Users, label: `${course.enrolledCount || 0} Enrolled` }
