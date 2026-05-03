@@ -14,7 +14,14 @@ import {
   User,
   Clock,
   BookOpen,
-  BarChart
+  BarChart,
+  Plus,
+  Trash,
+  Edit,
+  GripVertical,
+  PlusCircle,
+  FileCode,
+  Layout as LayoutIcon,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -40,6 +47,10 @@ export default function EditCoursePage() {
     isPublished: false,
     price: 0,
   });
+
+  const [lessons, setLessons] = useState<any[]>([]);
+  const [editingLesson, setEditingLesson] = useState<any>(null);
+  const [curriculumLoading, setCurriculumLoading] = useState(false);
 
   useEffect(() => {
     if (!courseId) return;
@@ -70,7 +81,20 @@ export default function EditCoursePage() {
       }
     };
     
+    const fetchLessons = async () => {
+      try {
+        const res = await fetch(`/api/lessons?courseId=${courseId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setLessons(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch lessons", err);
+      }
+    };
+    
     fetchCourse();
+    fetchLessons();
   }, [courseId]);
 
   const generateSlug = (title: string) => {
@@ -114,6 +138,65 @@ export default function EditCoursePage() {
       alert("Image upload error");
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleAddLesson = async (moduleName: string) => {
+    try {
+      const newLesson = {
+        courseId,
+        moduleName,
+        title: "New Topic",
+        slug: `new-topic-${Date.now()}`,
+        description: "",
+        duration: "10:00",
+        order: lessons.length + 1,
+        isPublished: true,
+        content: [{ type: "text", content: "Write your content here..." }]
+      };
+      
+      const res = await fetch("/api/lessons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newLesson),
+      });
+      
+      if (res.ok) {
+        const saved = await res.json();
+        setLessons([...lessons, saved]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUpdateLesson = async (lessonId: string, updates: any) => {
+    try {
+      const res = await fetch("/api/lessons", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: lessonId, ...updates }),
+      });
+      
+      if (res.ok) {
+        const updated = await res.json();
+        setLessons(lessons.map(l => l._id === lessonId ? updated : l));
+        setEditingLesson(null);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDeleteLesson = async (lessonId: string) => {
+    if (!confirm("Are you sure you want to delete this topic?")) return;
+    try {
+      const res = await fetch(`/api/lessons?id=${lessonId}`, { method: "DELETE" });
+      if (res.ok) {
+        setLessons(lessons.filter(l => l._id !== lessonId));
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -336,6 +419,129 @@ export default function EditCoursePage() {
           </button>
         </div>
       </form>
+
+      {/* Curriculum Management Section */}
+      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-black text-gray-900 tracking-tight uppercase">CURRICULUM_<span className="text-blue-600">BUILDER</span></h2>
+            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Design learning pathways and module structures</p>
+          </div>
+          <button 
+            onClick={() => {
+              const name = prompt("Enter Chapter Name:");
+              if (name) handleAddLesson(name);
+            }}
+            className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-600 transition-all shadow-xl shadow-black/5"
+          >
+            <Plus size={14} /> NEW_CHAPTER
+          </button>
+        </div>
+
+        <div className="space-y-6">
+          {Object.entries(
+            lessons.reduce((acc: any, lesson: any) => {
+              const chapter = lesson.moduleName || "General";
+              if (!acc[chapter]) acc[chapter] = [];
+              acc[chapter].push(lesson);
+              return acc;
+            }, {})
+          ).map(([chapter, chapterLessons]: [string, any], idx) => (
+            <div key={idx} className="card-premium p-8 space-y-6 border-l-4 border-l-blue-600">
+              <div className="flex items-center justify-between border-b border-gray-50 pb-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-black">
+                    {idx + 1}
+                  </div>
+                  <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">{chapter}</h3>
+                </div>
+                <div className="flex items-center gap-3">
+                   <button 
+                     onClick={() => handleAddLesson(chapter)}
+                     className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                     title="Add Topic"
+                   >
+                     <PlusCircle size={18} />
+                   </button>
+                   <button 
+                     className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                     title="Delete Chapter"
+                     onClick={() => {
+                       if (confirm(`Delete entire chapter "${chapter}" and all its topics?`)) {
+                         chapterLessons.forEach((l: any) => handleDeleteLesson(l._id));
+                       }
+                     }}
+                   >
+                     <Trash size={18} />
+                   </button>
+                </div>
+              </div>
+
+              <div className="grid gap-3">
+                {chapterLessons.sort((a: any, b: any) => a.order - b.order).map((lesson: any, i: number) => (
+                  <div key={lesson._id} className="group flex items-center justify-between p-4 bg-gray-50/50 border border-gray-100 rounded-xl hover:bg-white hover:border-blue-200 hover:shadow-lg transition-all">
+                    <div className="flex items-center gap-4 flex-1">
+                      <GripVertical size={14} className="text-gray-300 group-hover:text-blue-600 cursor-grab" />
+                      <div className="flex flex-col">
+                        {editingLesson?._id === lesson._id ? (
+                          <input 
+                            autoFocus
+                            className="bg-transparent border-b border-blue-600 font-bold text-xs uppercase tracking-tight focus:outline-none"
+                            value={editingLesson.title}
+                            onChange={(e) => setEditingLesson({ ...editingLesson, title: e.target.value })}
+                            onBlur={() => handleUpdateLesson(lesson._id, { title: editingLesson.title })}
+                            onKeyDown={(e) => e.key === "Enter" && handleUpdateLesson(lesson._id, { title: editingLesson.title })}
+                          />
+                        ) : (
+                          <span className="text-xs font-bold text-gray-700 uppercase tracking-tight">{lesson.title}</span>
+                        )}
+                        <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">{lesson.duration || "10:00"}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                      <Link 
+                        href={`/admin/courses/${courseId}/lessons/${lesson._id}`}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest"
+                      >
+                        <FileCode size={12} /> Content
+                      </Link>
+                      <button 
+                        onClick={() => setEditingLesson(lesson)}
+                        className="p-2 text-gray-400 hover:text-blue-600 rounded-lg transition-all"
+                      >
+                        <Edit size={14} />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteLesson(lesson._id)}
+                        className="p-2 text-gray-400 hover:text-red-600 rounded-lg transition-all"
+                      >
+                        <Trash size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+          
+          {Object.keys(lessons).length === 0 && (
+            <div className="h-48 border-2 border-dashed border-gray-100 rounded-[2.5rem] flex flex-col items-center justify-center text-gray-300 space-y-4">
+              <LayoutIcon size={40} className="opacity-20" />
+              <p className="text-[10px] font-black uppercase tracking-[0.5em]">System_Registry_Empty</p>
+              <button 
+                onClick={() => {
+                  const name = prompt("Enter First Chapter Name:");
+                  if (name) handleAddLesson(name);
+                }}
+                className="px-6 py-3 bg-blue-600 text-white text-[9px] font-black uppercase tracking-widest rounded-xl shadow-xl shadow-blue-600/20"
+              >
+                Initialize_Curriculum
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

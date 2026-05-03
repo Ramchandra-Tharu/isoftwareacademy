@@ -182,7 +182,7 @@ export default function CourseManagement() {
                 </button>
 
                 <div className="w-px h-8 bg-gray-100 mx-2"></div>
-                <Link href={`/courses/${course.slug || course._id}`} className="p-2.5 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
+                <Link href={`/dashboard/courses/${course.slug || course._id}`} className="p-2.5 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
                   <Eye size={18} />
                 </Link>
                 <Link href={`/admin/courses/${course._id}/edit`} className="p-2.5 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">

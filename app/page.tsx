@@ -371,7 +371,7 @@ export default function Home() {
                   key={course._id} 
                   {...course} 
                   id={course.slug || course._id} 
-                  href={`/courses/${course.slug || course._id}`} 
+                  href={`/dashboard/courses/${course.slug || course._id}`} 
                 />
               ))
             )}
