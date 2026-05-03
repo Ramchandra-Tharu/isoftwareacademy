@@ -16,6 +16,11 @@ export interface ILesson extends Document {
   duration: string;
   order: number;
   isPublished: boolean;
+  quiz?: {
+    question: string;
+    options: string[];
+    correctAnswer: number;
+  }[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -76,6 +81,13 @@ const LessonSchema = new Schema<ILesson>(
       type: Boolean,
       default: false,
     },
+    quiz: [
+      {
+        question: { type: String, required: true },
+        options: [{ type: String, required: true }],
+        correctAnswer: { type: Number, required: true },
+      },
+    ],
   },
   {
     timestamps: true,

@@ -223,6 +223,7 @@ export default function MyCoursesPage() {
          {/* 4. Course Grid */}
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredCourses.length > 0 ? (
+               filteredCourses.map((course) => (
                   <CourseCard
                      key={course._id}
                      {...course}
@@ -232,6 +233,7 @@ export default function MyCoursesPage() {
                      id={course.slug}
                      href={course.progress === undefined ? `/dashboard/courses/${course.slug}` : undefined}
                   />
+               ))
             ) : (
                <div className="col-span-full py-24 flex flex-col items-center justify-center text-center space-y-6">
                   <div className="w-20 h-20 bg-gray-50 rounded-[2rem] flex items-center justify-center text-gray-200">

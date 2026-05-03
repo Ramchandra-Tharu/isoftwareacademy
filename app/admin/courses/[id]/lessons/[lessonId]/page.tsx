@@ -35,6 +35,7 @@ export default function LessonContentEditor() {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const [lesson, setLesson] = useState<any>(null);
   const [blocks, setBlocks] = useState<any[]>([]);
+  const [quiz, setQuiz] = useState<any[]>([]);
   const [uploadingBlockIndex, setUploadingBlockIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -48,6 +49,7 @@ export default function LessonContentEditor() {
           if (found) {
             setLesson(found);
             setBlocks(found.content || []);
+            setQuiz(found.quiz || []);
           }
         }
       } catch (err) {
@@ -106,22 +108,53 @@ export default function LessonContentEditor() {
     setBlocks(newBlocks);
   };
 
+  const addQuizQuestion = () => {
+    setQuiz([...quiz, { 
+      question: "New Question?", 
+      options: ["Option A", "Option B", "Option C", "Option D"], 
+      correctAnswer: 0 
+    }]);
+  };
+
+  const removeQuizQuestion = (idx: number) => {
+    setQuiz(quiz.filter((_, i) => i !== idx));
+  };
+
+  const updateQuizQuestion = (idx: number, field: string, value: any) => {
+    const newQuiz = [...quiz];
+    newQuiz[idx] = { ...newQuiz[idx], [field]: value };
+    setQuiz(newQuiz);
+  };
+
   const handleSave = async () => {
     setLoading(true);
     setStatus("idle");
     try {
+      const payload = { 
+        id: lessonId, 
+        content: blocks,
+        quiz: quiz 
+      };
+      console.log("Saving lesson with payload:", payload);
+      
       const res = await fetch("/api/lessons", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: lessonId, content: blocks }),
+        body: JSON.stringify(payload),
       });
+      
       if (res.ok) {
+        const updated = await res.json();
+        console.log("Save successful. Updated lesson:", updated);
         setStatus("success");
         setTimeout(() => setStatus("idle"), 3000);
       } else {
+        const errorText = await res.text();
+        console.error("Save failed with status:", res.status, errorText);
         setStatus("error");
       }
     } catch (err) {
+      console.error("Save error:", err);
       setStatus("error");
     } finally {
       setLoading(false);
@@ -282,6 +315,109 @@ export default function LessonContentEditor() {
              <p className="text-[10px] font-black uppercase tracking-[0.5em]">Block_Registry_Empty</p>
           </div>
         )}
+      </div>
+
+      {/* Quiz Management Section */}
+      <div className="pt-20 border-t border-gray-100 space-y-10">
+        <div className="flex items-center justify-between">
+           <div className="space-y-1">
+              <h2 className="text-xl font-black text-gray-900 uppercase tracking-tight">Topic_Quiz_Engine</h2>
+              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Verify student understanding with mini-quizzes.</p>
+           </div>
+           <button 
+             onClick={addQuizQuestion}
+             className="px-6 py-3 bg-white border border-gray-100 text-[10px] font-black text-blue-600 uppercase tracking-widest rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+           >
+             ADD_QUESTION +
+           </button>
+        </div>
+
+        <div className="space-y-6">
+           {quiz.map((q, qIdx) => (
+             <div key={qIdx} className="bg-gray-50/50 border border-gray-100 rounded-[2.5rem] p-8 space-y-6 relative group">
+                <button 
+                  onClick={() => removeQuizQuestion(qIdx)}
+                  className="absolute top-8 right-8 p-2 text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                >
+                  <Trash size={16} />
+                </button>
+
+                <div className="space-y-4">
+                   <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Question 0{qIdx + 1}</p>
+                   <input 
+                     type="text"
+                     className="w-full bg-white border border-gray-100 rounded-xl px-6 py-4 text-sm font-bold focus:border-blue-600 outline-none transition-all shadow-sm"
+                     placeholder="Enter question text..."
+                     value={q.question}
+                     onChange={(e) => updateQuizQuestion(qIdx, 'question', e.target.value)}
+                   />
+                </div>
+
+                <div className="space-y-4">
+                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Options & Logic</p>
+                   <div className="grid gap-3">
+                      {q.options.map((opt: string, oIdx: number) => (
+                        <div key={oIdx} className="flex items-center gap-3">
+                           <button 
+                             onClick={() => updateQuizQuestion(qIdx, 'correctAnswer', oIdx)}
+                             className={cn(
+                               "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
+                               q.correctAnswer === oIdx ? "border-emerald-500 bg-emerald-500 text-white" : "border-gray-200 text-transparent"
+                             )}
+                           >
+                             <CheckCircle size={12} />
+                           </button>
+                           <input 
+                             type="text"
+                             className="flex-1 bg-white border border-gray-100 rounded-xl px-5 py-3 text-xs font-medium focus:border-blue-200 outline-none"
+                             value={opt}
+                             onChange={(e) => {
+                               const newOptions = [...q.options];
+                               newOptions[oIdx] = e.target.value;
+                               updateQuizQuestion(qIdx, 'options', newOptions);
+                             }}
+                           />
+                           <button 
+                             onClick={() => {
+                               if (q.options.length <= 2) return;
+                               const newOptions = q.options.filter((_: any, i: number) => i !== oIdx);
+                               updateQuizQuestion(qIdx, 'options', newOptions);
+                             }}
+                             className="p-2 text-gray-200 hover:text-red-400 transition-colors"
+                           >
+                             <Trash size={14} />
+                           </button>
+                        </div>
+                      ))}
+                      <button 
+                        onClick={() => updateQuizQuestion(qIdx, 'options', [...q.options, `New Option`])}
+                        className="text-[9px] font-black text-blue-600 uppercase tracking-widest w-fit hover:underline ml-9 pt-2"
+                      >
+                        + Add_Option
+                      </button>
+                   </div>
+                </div>
+             </div>
+           ))}
+
+           {quiz.length === 0 && (
+             <div className="py-12 flex flex-col items-center justify-center text-gray-300 space-y-4 border-2 border-dashed border-gray-50 rounded-[2.5rem]">
+                <p className="text-[9px] font-black uppercase tracking-[0.4em]">No Quiz Questions Configured</p>
+             </div>
+           )}
+        </div>
+      </div>
+
+      {/* Bottom Save Action */}
+      <div className="pt-12 flex justify-center border-t border-gray-100">
+         <button 
+           onClick={handleSave}
+           disabled={loading}
+           className="flex items-center gap-3 px-12 py-5 bg-gray-900 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-blue-600 transition-all shadow-2xl shadow-blue-600/10 active:scale-95"
+         >
+           {loading ? <Loader2 className="animate-spin" size={16} /> : status === "success" ? <CheckCircle size={16} className="text-emerald-400" /> : <Save size={16} />}
+           {status === "success" ? "SYNC_COMPLETE" : "SAVE_ALL_CHANGES"}
+         </button>
       </div>
 
       {/* Feedback Status */}

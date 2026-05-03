@@ -171,6 +171,7 @@ export default function CourseViewerPage() {
                 onPrevious={currentIdx > 0 ? handlePrevious : undefined}
                 nextUnitName={currentIdx < course.lessons.length - 1 ? course.lessons[currentIdx + 1].title : undefined}
                 prevUnitName={currentIdx > 0 ? course.lessons[currentIdx - 1].title : undefined}
+                quiz={activeLesson.quiz}
               />
             </div>
           </div>
@@ -299,6 +300,11 @@ export default function CourseViewerPage() {
                                   <h4 className="text-[12px] font-bold text-gray-600 uppercase tracking-tight group-hover:text-gray-900 transition-colors">{lesson.title}</h4>
                                 </div>
                                  <div className="flex items-center gap-4">
+                                   {lesson.quiz && lesson.quiz.length > 0 && (
+                                     <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-[8px] font-black uppercase tracking-widest rounded-md border border-blue-100 flex items-center gap-1 shadow-sm">
+                                        Quiz_Active
+                                     </span>
+                                   )}
                                    <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest group-hover:text-gray-400 transition-colors">{lesson.duration || "10:00"}</span>
                                    <div className={cn(
                                      "w-8 h-8 rounded-lg flex items-center justify-center transition-all",

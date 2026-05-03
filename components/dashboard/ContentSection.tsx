@@ -37,6 +37,11 @@ interface ContentSectionProps {
   onPrevious?: () => void;
   nextUnitName?: string;
   prevUnitName?: string;
+  quiz?: {
+    question: string;
+    options: string[];
+    correctAnswer: number;
+  }[];
 }
 
 export default function ContentSection({ 
@@ -48,9 +53,12 @@ export default function ContentSection({
   onNext,
   onPrevious,
   nextUnitName,
-  prevUnitName
+  prevUnitName,
+  quiz
 }: ContentSectionProps) {
   const [loading, setLoading] = React.useState(false);
+  const [selectedAnswers, setSelectedAnswers] = React.useState<Record<number, number>>({});
+  const [showResults, setShowResults] = React.useState(false);
 
   const handleComplete = async () => {
     if (!onToggleComplete || loading) return;
@@ -67,6 +75,11 @@ export default function ContentSection({
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  const handleOptionSelect = (qIdx: number, oIdx: number) => {
+    if (showResults) return;
+    setSelectedAnswers(prev => ({ ...prev, [qIdx]: oIdx }));
   };
 
   return (
@@ -187,6 +200,83 @@ export default function ContentSection({
           }
         })}
       </div>
+
+      {/* Interactive Unit Quiz */}
+      {quiz && quiz.length > 0 && (
+        <div className="pt-16 pb-8 border-t border-gray-100 space-y-10">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+               <span className="w-8 h-[1px] bg-blue-600/30"></span>
+               <p className="text-[9px] font-black uppercase tracking-[0.5em] text-blue-600/60">Knowledge_Verification</p>
+            </div>
+            <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Concept Check</h2>
+          </div>
+
+          <div className="space-y-12">
+            {quiz.map((q, qIdx) => (
+              <div key={qIdx} className="space-y-6">
+                <div className="flex gap-4">
+                  <span className="text-xs font-black text-blue-600/20 pt-1">0{qIdx + 1}</span>
+                  <p className="text-lg font-bold text-gray-800 leading-tight">{q.question}</p>
+                </div>
+                
+                <div className="grid gap-3 pl-8">
+                  {q.options.map((opt, oIdx) => {
+                    const isSelected = selectedAnswers[qIdx] === oIdx;
+                    const isCorrect = q.correctAnswer === oIdx;
+                    const showFeedback = showResults;
+                    
+                    return (
+                      <button
+                        key={oIdx}
+                        onClick={() => handleOptionSelect(qIdx, oIdx)}
+                        className={cn(
+                          "w-full text-left px-6 py-4 rounded-2xl border transition-all duration-300 font-bold text-[13px] tracking-tight flex items-center justify-between group",
+                          !showFeedback && isSelected ? "bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-600/20" : "bg-white border-gray-100 text-gray-600 hover:border-blue-200 hover:bg-blue-50/30",
+                          showFeedback && isCorrect ? "bg-emerald-500 border-emerald-500 text-white shadow-xl shadow-emerald-500/20" : "",
+                          showFeedback && isSelected && !isCorrect ? "bg-rose-500 border-rose-500 text-white shadow-xl shadow-rose-500/20" : "",
+                          showFeedback && !isCorrect && !isSelected ? "opacity-30" : ""
+                        )}
+                      >
+                        {opt}
+                        {showFeedback && isCorrect && <CheckCircle2 size={16} />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {!showResults ? (
+            <button
+              onClick={() => setShowResults(true)}
+              disabled={Object.keys(selectedAnswers).length < quiz.length}
+              className="w-full py-5 bg-gray-900 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl hover:bg-black transition-all shadow-xl shadow-gray-900/10 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              Verify_Answers
+            </button>
+          ) : (
+            <div className="p-8 bg-blue-50/50 rounded-3xl border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-6 animate-in zoom-in-95 duration-500">
+               <div className="space-y-1 text-center md:text-left">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-blue-600/60">Module_Result</p>
+                  <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight">
+                    SCORE: {Object.entries(selectedAnswers).filter(([qIdx, oIdx]) => quiz[parseInt(qIdx)].correctAnswer === oIdx).length} / {quiz.length}
+                  </h3>
+               </div>
+               <button 
+                 onClick={() => {
+                   setShowResults(false);
+                   setSelectedAnswers({});
+                 }}
+                 className="px-8 py-3 bg-white border border-blue-100 text-blue-600 font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+               >
+                 Retake_Quiz
+               </button>
+            </div>
+          )}
+        </div>
+      )}
 
 
       {/* Navigation */}
