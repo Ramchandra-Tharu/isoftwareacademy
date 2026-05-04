@@ -149,11 +149,11 @@ export default function NewCoursePage() {
                 </div>
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><BookOpen size={12} /> Lessons</label>
-                  <input required type="number" value={formData.totalLessons} onChange={(e) => setFormData({ ...formData, totalLessons: Number(e.target.value) })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
+                  <input required type="text" value={formData.totalLessons} onChange={(e) => setFormData({ ...formData, totalLessons: Number(e.target.value.replace(/\D/g, '')) || 0 })} placeholder="0" className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
                 </div>
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><FileText size={12} /> Chapters</label>
-                  <input required type="number" value={formData.totalChapters} onChange={(e) => setFormData({ ...formData, totalChapters: Number(e.target.value) })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
+                  <input required type="text" value={formData.totalChapters} onChange={(e) => setFormData({ ...formData, totalChapters: Number(e.target.value.replace(/\D/g, '')) || 0 })} placeholder="0" className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
                 </div>
               </div>
 

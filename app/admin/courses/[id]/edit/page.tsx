@@ -61,6 +61,8 @@ export default function EditCoursePage() {
   const [expandedQuizId, setExpandedQuizId] = useState<string | null>(null);
   const [showChapterModal, setShowChapterModal] = useState(false);
   const [newChapterName, setNewChapterName] = useState("");
+  const [editingChapter, setEditingChapter] = useState<string | null>(null);
+  const [editingChapterName, setEditingChapterName] = useState("");
 
   useEffect(() => {
     if (!courseId) return;
@@ -265,6 +267,28 @@ export default function EditCoursePage() {
     }
   };
 
+  const handleUpdateChapterName = async (oldName: string) => {
+    if (!editingChapterName.trim() || oldName === editingChapterName.trim()) {
+      setEditingChapter(null);
+      return;
+    }
+
+    const newName = editingChapterName.trim();
+    const chapterLessons = lessons.filter(l => (l.moduleName || "General") === oldName);
+
+    try {
+      setCurriculumLoading(true);
+      await Promise.all(chapterLessons.map(l => 
+        handleUpdateLesson(l._id, { moduleName: newName })
+      ));
+      setEditingChapter(null);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCurriculumLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -375,9 +399,10 @@ export default function EditCoursePage() {
                 </label>
                 <input 
                   required
-                  type="number" 
+                  type="text" 
                   value={formData.totalLessons}
-                  onChange={(e) => setFormData({ ...formData, totalLessons: Number(e.target.value) })}
+                  onChange={(e) => setFormData({ ...formData, totalLessons: Number(e.target.value.replace(/\D/g, '')) || 0 })}
+                  placeholder="0"
                   className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all"
                 />
               </div>
@@ -387,9 +412,10 @@ export default function EditCoursePage() {
                 </label>
                 <input 
                   required
-                  type="number" 
+                  type="text" 
                   value={formData.totalChapters}
-                  onChange={(e) => setFormData({ ...formData, totalChapters: Number(e.target.value) })}
+                  onChange={(e) => setFormData({ ...formData, totalChapters: Number(e.target.value.replace(/\D/g, '')) || 0 })}
+                  placeholder="0"
                   className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all"
                 />
               </div>
@@ -527,9 +553,30 @@ export default function EditCoursePage() {
                   <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-black">
                     {idx + 1}
                   </div>
-                  <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">{chapter}</h3>
+                  {editingChapter === chapter ? (
+                    <input 
+                      autoFocus
+                      className="bg-transparent border-b-2 border-blue-600 font-black text-sm uppercase tracking-widest focus:outline-none"
+                      value={editingChapterName}
+                      onChange={(e) => setEditingChapterName(e.target.value)}
+                      onBlur={() => handleUpdateChapterName(chapter)}
+                      onKeyDown={(e) => e.key === "Enter" && handleUpdateChapterName(chapter)}
+                    />
+                  ) : (
+                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">{chapter}</h3>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
+                   <button 
+                     onClick={() => {
+                       setEditingChapter(chapter);
+                       setEditingChapterName(chapter);
+                     }}
+                     className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                     title="Edit Chapter Name"
+                   >
+                     <Edit size={16} />
+                   </button>
                    <button 
                      onClick={() => handleAddLesson(chapter)}
                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
