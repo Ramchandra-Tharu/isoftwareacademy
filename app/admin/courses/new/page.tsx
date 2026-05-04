@@ -15,7 +15,8 @@ import {
   Clock,
   BookOpen,
   BarChart,
-  DollarSign
+  DollarSign,
+  FileText
 } from "lucide-react";
 import Link from "next/link";
 
@@ -32,6 +33,7 @@ export default function NewCoursePage() {
     category: "",
     thumbnail: "",
     totalLessons: 0,
+    totalChapters: 0,
     duration: "",
     difficulty: "Beginner",
     isPublished: false,
@@ -140,16 +142,20 @@ export default function NewCoursePage() {
           <div className="space-y-8">
             <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.3em] border-l-2 border-blue-600 pl-3">02. TECHNICAL_META</h2>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><Clock size={12} /> Duration</label>
-                <input required type="text" value={formData.duration} onChange={(e) => setFormData({ ...formData, duration: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><Clock size={12} /> Duration</label>
+                  <input required type="text" value={formData.duration} onChange={(e) => setFormData({ ...formData, duration: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
+                </div>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><BookOpen size={12} /> Lessons</label>
+                  <input required type="number" value={formData.totalLessons} onChange={(e) => setFormData({ ...formData, totalLessons: Number(e.target.value) })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
+                </div>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><FileText size={12} /> Chapters</label>
+                  <input required type="number" value={formData.totalChapters} onChange={(e) => setFormData({ ...formData, totalChapters: Number(e.target.value) })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
+                </div>
               </div>
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><BookOpen size={12} /> Lesson_Count</label>
-                <input required type="number" value={formData.totalLessons} onChange={(e) => setFormData({ ...formData, totalLessons: Number(e.target.value) })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
-              </div>
-            </div>
 
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><BarChart size={12} /> Difficulty</label>

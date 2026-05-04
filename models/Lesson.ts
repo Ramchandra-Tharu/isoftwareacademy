@@ -94,6 +94,11 @@ const LessonSchema = new Schema<ILesson>(
   }
 );
 
-const Lesson: Model<ILesson> = mongoose.models.Lesson || mongoose.model<ILesson>("Lesson", LessonSchema);
+// Force clear the model from cache to ensure schema updates (like 'quiz') are reflected
+if (mongoose.models.Lesson) {
+  delete mongoose.models.Lesson;
+}
+
+const Lesson: Model<ILesson> = mongoose.model<ILesson>("Lesson", LessonSchema);
 
 export default Lesson;

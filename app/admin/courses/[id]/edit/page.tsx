@@ -22,6 +22,12 @@ import {
   PlusCircle,
   FileCode,
   Layout as LayoutIcon,
+  HelpCircle,
+  ChevronDown,
+  ChevronUp,
+  Check,
+  Trash2,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -42,6 +48,7 @@ export default function EditCoursePage() {
     category: "",
     thumbnail: "",
     totalLessons: 0,
+    totalChapters: 0,
     duration: "",
     difficulty: "Beginner",
     isPublished: false,
@@ -51,6 +58,9 @@ export default function EditCoursePage() {
   const [lessons, setLessons] = useState<any[]>([]);
   const [editingLesson, setEditingLesson] = useState<any>(null);
   const [curriculumLoading, setCurriculumLoading] = useState(false);
+  const [expandedQuizId, setExpandedQuizId] = useState<string | null>(null);
+  const [showChapterModal, setShowChapterModal] = useState(false);
+  const [newChapterName, setNewChapterName] = useState("");
 
   useEffect(() => {
     if (!courseId) return;
@@ -68,6 +78,7 @@ export default function EditCoursePage() {
             category: data.category || "",
             thumbnail: data.thumbnail || "",
             totalLessons: data.totalLessons || 0,
+            totalChapters: data.totalChapters || 0,
             duration: data.duration || "",
             difficulty: data.difficulty || "Beginner",
             isPublished: data.isPublished || false,
@@ -96,6 +107,17 @@ export default function EditCoursePage() {
     fetchCourse();
     fetchLessons();
   }, [courseId]);
+
+  useEffect(() => {
+    if (lessons.length > 0) {
+      const uniqueChapters = new Set(lessons.map(l => l.moduleName || "General")).size;
+      setFormData(prev => ({
+        ...prev,
+        totalLessons: lessons.length,
+        totalChapters: uniqueChapters
+      }));
+    }
+  }, [lessons]);
 
   const generateSlug = (title: string) => {
     return title
@@ -200,6 +222,49 @@ export default function EditCoursePage() {
     }
   };
 
+  const handleAddQuestion = (lessonId: string) => {
+    const lesson = lessons.find(l => l._id === lessonId);
+    if (!lesson) return;
+    const newQuiz = [...(lesson.quiz || []), {
+      question: "New Question?",
+      options: ["Option 1", "Option 2", "Option 3", "Option 4"],
+      correctAnswer: 0
+    }];
+    handleUpdateLesson(lessonId, { quiz: newQuiz });
+  };
+
+  const handleDeleteQuestion = (lessonId: string, qIdx: number) => {
+    const lesson = lessons.find(l => l._id === lessonId);
+    if (!lesson) return;
+    const newQuiz = lesson.quiz.filter((_: any, i: number) => i !== qIdx);
+    handleUpdateLesson(lessonId, { quiz: newQuiz });
+  };
+
+  const handleUpdateQuestion = (lessonId: string, qIdx: number, field: string, value: any) => {
+    const lesson = lessons.find(l => l._id === lessonId);
+    if (!lesson) return;
+    const newQuiz = [...lesson.quiz];
+    newQuiz[qIdx] = { ...newQuiz[qIdx], [field]: value };
+    
+    // For text inputs, we might want to update local state first and then save on blur
+    // But for simplicity and consistency with other fields here, we update all
+    setLessons(lessons.map(l => l._id === lessonId ? { ...l, quiz: newQuiz } : l));
+  };
+
+  const handleSaveQuestion = (lessonId: string) => {
+    const lesson = lessons.find(l => l._id === lessonId);
+    if (!lesson) return;
+    handleUpdateLesson(lessonId, { quiz: lesson.quiz });
+  };
+
+  const handleCreateChapter = () => {
+    if (newChapterName.trim()) {
+      handleAddLesson(newChapterName.trim());
+      setNewChapterName("");
+      setShowChapterModal(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -290,7 +355,7 @@ export default function EditCoursePage() {
           <div className="space-y-8">
             <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.3em] border-l-2 border-blue-600 pl-3">02. TECHNICAL_META</h2>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
                   <Clock size={12} /> Duration
@@ -306,13 +371,25 @@ export default function EditCoursePage() {
               </div>
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                  <BookOpen size={12} /> Lesson_Count
+                  <BookOpen size={12} /> Lessons
                 </label>
                 <input 
                   required
                   type="number" 
                   value={formData.totalLessons}
                   onChange={(e) => setFormData({ ...formData, totalLessons: Number(e.target.value) })}
+                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                  <FileText size={12} /> Chapters
+                </label>
+                <input 
+                  required
+                  type="number" 
+                  value={formData.totalChapters}
+                  onChange={(e) => setFormData({ ...formData, totalChapters: Number(e.target.value) })}
                   className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all"
                 />
               </div>
@@ -428,10 +505,7 @@ export default function EditCoursePage() {
             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Design learning pathways and module structures</p>
           </div>
           <button 
-            onClick={() => {
-              const name = prompt("Enter Chapter Name:");
-              if (name) handleAddLesson(name);
-            }}
+            onClick={() => setShowChapterModal(true)}
             className="flex items-center gap-2 px-6 py-3 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-600 transition-all shadow-xl shadow-black/5"
           >
             <Plus size={14} /> NEW_CHAPTER
@@ -479,46 +553,131 @@ export default function EditCoursePage() {
 
               <div className="grid gap-3">
                 {chapterLessons.sort((a: any, b: any) => a.order - b.order).map((lesson: any, i: number) => (
-                  <div key={lesson._id} className="group flex items-center justify-between p-4 bg-gray-50/50 border border-gray-100 rounded-xl hover:bg-white hover:border-blue-200 hover:shadow-lg transition-all">
-                    <div className="flex items-center gap-4 flex-1">
-                      <GripVertical size={14} className="text-gray-300 group-hover:text-blue-600 cursor-grab" />
-                      <div className="flex flex-col">
-                        {editingLesson?._id === lesson._id ? (
-                          <input 
-                            autoFocus
-                            className="bg-transparent border-b border-blue-600 font-bold text-xs uppercase tracking-tight focus:outline-none"
-                            value={editingLesson.title}
-                            onChange={(e) => setEditingLesson({ ...editingLesson, title: e.target.value })}
-                            onBlur={() => handleUpdateLesson(lesson._id, { title: editingLesson.title })}
-                            onKeyDown={(e) => e.key === "Enter" && handleUpdateLesson(lesson._id, { title: editingLesson.title })}
-                          />
-                        ) : (
-                          <span className="text-xs font-bold text-gray-700 uppercase tracking-tight">{lesson.title}</span>
-                        )}
-                        <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">{lesson.duration || "10:00"}</span>
+                  <div key={lesson._id} className="space-y-3">
+                    <div className="group flex items-center justify-between p-4 bg-gray-50/50 border border-gray-100 rounded-xl hover:bg-white hover:border-blue-200 hover:shadow-lg transition-all">
+                      <div className="flex items-center gap-4 flex-1">
+                        <GripVertical size={14} className="text-gray-300 group-hover:text-blue-600 cursor-grab" />
+                        <div className="flex flex-col">
+                          {editingLesson?._id === lesson._id ? (
+                            <input 
+                              autoFocus
+                              className="bg-transparent border-b border-blue-600 font-bold text-xs uppercase tracking-tight focus:outline-none"
+                              value={editingLesson.title}
+                              onChange={(e) => setEditingLesson({ ...editingLesson, title: e.target.value })}
+                              onBlur={() => handleUpdateLesson(lesson._id, { title: editingLesson.title })}
+                              onKeyDown={(e) => e.key === "Enter" && handleUpdateLesson(lesson._id, { title: editingLesson.title })}
+                            />
+                          ) : (
+                            <span className="text-xs font-bold text-gray-700 uppercase tracking-tight">{lesson.title}</span>
+                          )}
+                          <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">{lesson.duration || "10:00"}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                        <button 
+                          onClick={() => setExpandedQuizId(expandedQuizId === lesson._id ? null : lesson._id)}
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all text-[9px] font-black uppercase tracking-widest ${expandedQuizId === lesson._id ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+                        >
+                          <HelpCircle size={12} /> QUIZ {lesson.quiz?.length > 0 && `(${lesson.quiz.length})`}
+                        </button>
+                        <Link 
+                          href={`/admin/courses/${courseId}/lessons/${lesson._id}`}
+                          className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest"
+                        >
+                          <FileCode size={12} /> CONTENT
+                        </Link>
+                        <button 
+                          onClick={() => setEditingLesson(lesson)}
+                          className="p-2 text-gray-400 hover:text-blue-600 rounded-lg transition-all"
+                        >
+                          <Edit size={14} />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteLesson(lesson._id)}
+                          className="p-2 text-gray-400 hover:text-red-600 rounded-lg transition-all"
+                        >
+                          <Trash size={14} />
+                        </button>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                      <Link 
-                        href={`/admin/courses/${courseId}/lessons/${lesson._id}`}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest"
-                      >
-                        <FileCode size={12} /> Content
-                      </Link>
-                      <button 
-                        onClick={() => setEditingLesson(lesson)}
-                        className="p-2 text-gray-400 hover:text-blue-600 rounded-lg transition-all"
-                      >
-                        <Edit size={14} />
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteLesson(lesson._id)}
-                        className="p-2 text-gray-400 hover:text-red-600 rounded-lg transition-all"
-                      >
-                        <Trash size={14} />
-                      </button>
-                    </div>
+
+                    {/* Expanded Quiz Editor */}
+                    {expandedQuizId === lesson._id && (
+                      <div className="ml-8 p-6 bg-white border border-blue-100 rounded-2xl shadow-sm space-y-6 animate-in slide-in-from-top-2 duration-300">
+                        <div className="flex items-center justify-between border-b border-gray-50 pb-4">
+                          <div className="flex items-center gap-2">
+                            <HelpCircle size={16} className="text-blue-600" />
+                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-900">QUIZ_MANAGEMENT</h4>
+                          </div>
+                          <button 
+                            onClick={() => handleAddQuestion(lesson._id)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest"
+                          >
+                            <Plus size={12} /> ADD_QUESTION
+                          </button>
+                        </div>
+
+                        <div className="space-y-6">
+                          {(lesson.quiz || []).map((q: any, qIdx: number) => (
+                            <div key={qIdx} className="p-5 bg-gray-50/50 rounded-xl border border-gray-100 space-y-4 relative group/q">
+                              <button 
+                                onClick={() => handleDeleteQuestion(lesson._id, qIdx)}
+                                className="absolute top-4 right-4 p-1.5 text-gray-300 hover:text-red-500 hover:bg-white rounded-lg transition-all shadow-sm opacity-0 group-hover/q:opacity-100"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+
+                              <div className="space-y-2">
+                                <label className="text-[8px] font-black text-gray-400 uppercase tracking-widest">QUESTION_0{qIdx + 1}</label>
+                                <input 
+                                  type="text"
+                                  value={q.question}
+                                  onChange={(e) => handleUpdateQuestion(lesson._id, qIdx, 'question', e.target.value)}
+                                  onBlur={() => handleSaveQuestion(lesson._id)}
+                                  placeholder="Enter quiz question..."
+                                  className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none focus:border-blue-400 transition-all shadow-sm"
+                                />
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {q.options.map((opt: string, oIdx: number) => (
+                                  <div key={oIdx} className="flex items-center gap-3">
+                                    <button 
+                                      onClick={() => {
+                                        handleUpdateQuestion(lesson._id, qIdx, 'correctAnswer', oIdx);
+                                        handleSaveQuestion(lesson._id);
+                                      }}
+                                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${q.correctAnswer === oIdx ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-gray-200'}`}
+                                    >
+                                      {q.correctAnswer === oIdx && <Check size={10} />}
+                                    </button>
+                                    <input 
+                                      type="text"
+                                      value={opt}
+                                      onChange={(e) => {
+                                        const newOpts = [...q.options];
+                                        newOpts[oIdx] = e.target.value;
+                                        handleUpdateQuestion(lesson._id, qIdx, 'options', newOpts);
+                                      }}
+                                      onBlur={() => handleSaveQuestion(lesson._id)}
+                                      className="flex-1 bg-white border border-gray-100 rounded-xl px-3 py-2 text-[10px] font-medium outline-none focus:border-blue-300 transition-all"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+
+                          {(lesson.quiz || []).length === 0 && (
+                            <div className="flex flex-col items-center justify-center py-10 space-y-3 opacity-30">
+                              <HelpCircle size={32} className="text-gray-400" />
+                              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-gray-400">NO_QUESTIONS_FOUND</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -530,10 +689,7 @@ export default function EditCoursePage() {
               <LayoutIcon size={40} className="opacity-20" />
               <p className="text-[10px] font-black uppercase tracking-[0.5em]">System_Registry_Empty</p>
               <button 
-                onClick={() => {
-                  const name = prompt("Enter First Chapter Name:");
-                  if (name) handleAddLesson(name);
-                }}
+                onClick={() => setShowChapterModal(true)}
                 className="px-6 py-3 bg-blue-600 text-white text-[9px] font-black uppercase tracking-widest rounded-xl shadow-xl shadow-blue-600/20"
               >
                 Initialize_Curriculum
@@ -542,6 +698,52 @@ export default function EditCoursePage() {
           )}
         </div>
       </div>
+
+      {/* Chapter Creation Modal */}
+      {showChapterModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 space-y-8 animate-in zoom-in-95 duration-300 border border-gray-100">
+            <div className="space-y-2">
+              <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tight">NEW_<span className="text-blue-600">CHAPTER</span></h3>
+              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Define a new module in the curriculum</p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Chapter_Title</label>
+              <input 
+                autoFocus
+                type="text" 
+                value={newChapterName}
+                onChange={(e) => setNewChapterName(e.target.value)}
+                placeholder="E.G. INTRO_TO_SYSTEMS"
+                className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleCreateChapter();
+                  if (e.key === "Escape") setShowChapterModal(false);
+                }}
+              />
+            </div>
+
+            <div className="flex gap-4 pt-4">
+              <button 
+                onClick={() => {
+                  setShowChapterModal(false);
+                  setNewChapterName("");
+                }}
+                className="flex-1 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-all"
+              >
+                CANCEL_ACTION
+              </button>
+              <button 
+                onClick={handleCreateChapter}
+                className="flex-1 py-4 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-blue-600/20"
+              >
+                INITIALIZE_MODULE
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
