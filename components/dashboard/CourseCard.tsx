@@ -75,7 +75,7 @@ export default function CourseCard({
                     <Clock size={14} className="text-gray-400" /> {duration}
                  </div>
                  <div className="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-tight">
-                    <BookOpen size={14} className="text-gray-400" /> {title.includes("C++") ? 8 : (totalChapters || 0)}
+                    <BookOpen size={14} className="text-gray-400" /> {totalChapters || 0}
                  </div>
               </div>
               <div className="flex items-center gap-3">

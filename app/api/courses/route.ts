@@ -3,6 +3,8 @@ import dbConnect from "@/utils/db";
 import Course from "@/models/Course";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
+import User from "@/models/User";
+import Enrollment from "@/models/Enrollment";
 
 export async function GET(req: Request) {
   try {
@@ -37,7 +39,30 @@ export async function GET(req: Request) {
     const courses = await Course.find(query).sort({ createdAt: -1 });
     console.log(`api/courses: Found ${courses.length} courses`);
     
-    return NextResponse.json(courses);
+    // Get total students count as requested by the user
+    const totalStudents = await User.countDocuments({ role: "student" });
+    
+    // Get actual enrollment counts per course from the Enrollment model
+    const courseIds = courses.map(c => c._id);
+    const actualEnrollments = await Enrollment.aggregate([
+      { $match: { courseId: { $in: courseIds }, status: "active" } },
+      { $group: { _id: "$courseId", count: { $sum: 1 } } }
+    ]);
+    
+    const enrollmentMap = Object.fromEntries(actualEnrollments.map(e => [e._id.toString(), e.count]));
+
+    // Return courses with dynamic student counts
+    const coursesWithStats = courses.map(course => {
+      const courseObj = course.toObject();
+      // Use total student count if no specific enrollments, or combine them
+      // User specifically asked for "number of people who login as student"
+      return {
+        ...courseObj,
+        enrolledCount: Math.max(totalStudents, enrollmentMap[course._id.toString()] || 0)
+      };
+    });
+    
+    return NextResponse.json(coursesWithStats);
   } catch (error: any) {
     console.error("Fetch courses error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

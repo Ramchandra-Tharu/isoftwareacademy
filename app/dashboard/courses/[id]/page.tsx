@@ -72,10 +72,17 @@ export default function CourseViewerPage() {
   }, [params.id]);
 
   useEffect(() => {
-    if (activeLesson) {
+    if (activeLesson && course?._id) {
       topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      // Auto-initialize progress for this course when a lesson is viewed
+      fetch("/api/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId: course._id, action: "view" }),
+      }).catch(err => console.error("Auto-progress init failed", err));
     }
-  }, [activeLesson]);
+  }, [activeLesson, course?._id]);
 
   // Group lessons by moduleName
   const groupedLessons = course?.lessons?.reduce((acc: any, lesson: any) => {

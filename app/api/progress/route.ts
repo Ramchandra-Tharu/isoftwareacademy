@@ -57,10 +57,10 @@ export async function POST(req: Request) {
     }
 
     await dbConnect();
-    const { courseId, lessonId, action } = await req.json(); // action: "toggleComplete"
+    const { courseId, lessonId, action = "toggleComplete" } = await req.json();
 
-    if (!courseId || !lessonId) {
-      return NextResponse.json({ error: "courseId and lessonId required" }, { status: 400 });
+    if (!courseId) {
+      return NextResponse.json({ error: "courseId required" }, { status: 400 });
     }
 
     const userId = session.user.id;
@@ -77,27 +77,24 @@ export async function POST(req: Request) {
       });
     }
 
-    // 2. Toggle completion
-    const lessonIndex = progress.completedLessons.indexOf(lessonId);
-    if (lessonIndex > -1) {
-      // It's already completed, so unmark it
-      progress.completedLessons.splice(lessonIndex, 1);
-    } else {
-      // Mark it completed
-      progress.completedLessons.push(lessonId);
+    if (action === "toggleComplete" && lessonId) {
+        // 2. Toggle completion
+        const lessonIndex = progress.completedLessons.indexOf(lessonId);
+        if (lessonIndex > -1) {
+          progress.completedLessons.splice(lessonIndex, 1);
+        } else {
+          progress.completedLessons.push(lessonId);
+        }
     }
 
     progress.lastAccessed = new Date();
 
-    // 3. Recalculate percentage
+    // 3. Recalculate percentage if lessons exist
     const totalLessons = await Lesson.countDocuments({ courseId });
-    // If the course has quizzes, we should count them too, but for now we calculate based on lessons
     const completedCount = progress.completedLessons.length;
     
-    // Safety check to prevent divide by zero
     if (totalLessons > 0) {
-      const newPercentage = Math.min(100, Math.round((completedCount / totalLessons) * 100));
-      progress.percentage = newPercentage;
+      progress.percentage = Math.min(100, Math.round((completedCount / totalLessons) * 100));
     } else {
       progress.percentage = completedCount > 0 ? 100 : 0;
     }
