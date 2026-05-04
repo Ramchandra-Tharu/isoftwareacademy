@@ -63,6 +63,9 @@ export default function EditCoursePage() {
   const [newChapterName, setNewChapterName] = useState("");
   const [editingChapter, setEditingChapter] = useState<string | null>(null);
   const [editingChapterName, setEditingChapterName] = useState("");
+  const [showTopicModal, setShowTopicModal] = useState(false);
+  const [newTopicName, setNewTopicName] = useState("");
+  const [targetChapterName, setTargetChapterName] = useState("");
 
   useEffect(() => {
     if (!courseId) return;
@@ -111,7 +114,10 @@ export default function EditCoursePage() {
   }, [courseId]);
 
   useEffect(() => {
-    if (lessons.length > 0) {
+    // Only auto-update if the user is not actively editing these fields
+    const isEditingMeta = document.activeElement?.id === "lessons-input" || document.activeElement?.id === "chapters-input";
+    
+    if (lessons.length > 0 && !isEditingMeta) {
       const uniqueChapters = new Set(lessons.map(l => l.moduleName || "General")).size;
       setFormData(prev => ({
         ...prev,
@@ -165,14 +171,14 @@ export default function EditCoursePage() {
     }
   };
 
-  const handleAddLesson = async (moduleName: string) => {
+  const handleAddLesson = async (moduleName: string, title: string = "New Topic") => {
     try {
+      setCurriculumLoading(true);
       const newLesson = {
         courseId,
         moduleName,
-        title: "New Topic",
-        slug: `new-topic-${Date.now()}`,
-        description: "",
+        title,
+        slug: `${moduleName.toLowerCase().replace(/ /g, '-')}-${Date.now()}`,
         duration: "10:00",
         order: lessons.length + 1,
         isPublished: true,
@@ -381,42 +387,68 @@ export default function EditCoursePage() {
             
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                <label htmlFor="duration-input" className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest cursor-pointer hover:text-blue-600 transition-colors">
                   <Clock size={12} /> Duration
                 </label>
                 <input 
+                  id="duration-input"
                   required
                   type="text" 
                   value={formData.duration}
+                  onFocus={(e) => e.target.select()}
                   onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                   placeholder="E.G. 12_HOURS"
-                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all"
+                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all cursor-text"
                 />
               </div>
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                <label htmlFor="lessons-input" className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest cursor-pointer hover:text-blue-600 transition-colors">
                   <BookOpen size={12} /> Lessons
                 </label>
                 <input 
+                  id="lessons-input"
                   required
                   type="text" 
                   value={formData.totalLessons}
-                  onChange={(e) => setFormData({ ...formData, totalLessons: Number(e.target.value.replace(/\D/g, '')) || 0 })}
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => setFormData({ ...formData, totalLessons: e.target.value.replace(/\D/g, '') })}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowUp") {
+                      e.preventDefault();
+                      setFormData(prev => ({ ...prev, totalLessons: Number(prev.totalLessons || 0) + 1 }));
+                    }
+                    if (e.key === "ArrowDown") {
+                      e.preventDefault();
+                      setFormData(prev => ({ ...prev, totalLessons: Math.max(0, Number(prev.totalLessons || 0) - 1) }));
+                    }
+                  }}
                   placeholder="0"
-                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all"
+                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all cursor-text"
                 />
               </div>
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                <label htmlFor="chapters-input" className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest cursor-pointer hover:text-blue-600 transition-colors">
                   <FileText size={12} /> Chapters
                 </label>
                 <input 
+                  id="chapters-input"
                   required
                   type="text" 
                   value={formData.totalChapters}
-                  onChange={(e) => setFormData({ ...formData, totalChapters: Number(e.target.value.replace(/\D/g, '')) || 0 })}
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => setFormData({ ...formData, totalChapters: e.target.value.replace(/\D/g, '') })}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowUp") {
+                      e.preventDefault();
+                      setFormData(prev => ({ ...prev, totalChapters: Number(prev.totalChapters || 0) + 1 }));
+                    }
+                    if (e.key === "ArrowDown") {
+                      e.preventDefault();
+                      setFormData(prev => ({ ...prev, totalChapters: Math.max(0, Number(prev.totalChapters || 0) - 1) }));
+                    }
+                  }}
                   placeholder="0"
-                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all"
+                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all cursor-text"
                 />
               </div>
             </div>
@@ -549,21 +581,29 @@ export default function EditCoursePage() {
           ).map(([chapter, chapterLessons]: [string, any], idx) => (
             <div key={idx} className="card-premium p-8 space-y-6 border-l-4 border-l-blue-600">
               <div className="flex items-center justify-between border-b border-gray-50 pb-4">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 flex-1">
                   <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-black">
                     {idx + 1}
                   </div>
                   {editingChapter === chapter ? (
                     <input 
                       autoFocus
-                      className="bg-transparent border-b-2 border-blue-600 font-black text-sm uppercase tracking-widest focus:outline-none"
+                      className="bg-transparent border-b-2 border-blue-600 font-black text-sm uppercase tracking-widest focus:outline-none flex-1"
                       value={editingChapterName}
                       onChange={(e) => setEditingChapterName(e.target.value)}
                       onBlur={() => handleUpdateChapterName(chapter)}
                       onKeyDown={(e) => e.key === "Enter" && handleUpdateChapterName(chapter)}
                     />
                   ) : (
-                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">{chapter}</h3>
+                    <h3 
+                      onClick={() => {
+                        setEditingChapter(chapter);
+                        setEditingChapterName(chapter);
+                      }}
+                      className="text-sm font-black text-gray-900 uppercase tracking-widest cursor-pointer hover:text-blue-600 transition-colors flex-1"
+                    >
+                      {chapter}
+                    </h3>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
@@ -578,7 +618,10 @@ export default function EditCoursePage() {
                      <Edit size={16} />
                    </button>
                    <button 
-                     onClick={() => handleAddLesson(chapter)}
+                     onClick={() => {
+                       setTargetChapterName(chapter);
+                       setShowTopicModal(true);
+                     }}
                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                      title="Add Topic"
                    >
@@ -615,9 +658,19 @@ export default function EditCoursePage() {
                               onKeyDown={(e) => e.key === "Enter" && handleUpdateLesson(lesson._id, { title: editingLesson.title })}
                             />
                           ) : (
-                            <span className="text-xs font-bold text-gray-700 uppercase tracking-tight">{lesson.title}</span>
+                            <span 
+                              onClick={() => setEditingLesson(lesson)}
+                              className="text-xs font-bold text-gray-700 uppercase tracking-tight cursor-pointer hover:text-blue-600 transition-colors"
+                            >
+                              {lesson.title}
+                            </span>
                           )}
-                          <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">{lesson.duration || "10:00"}</span>
+                          <span 
+                            onClick={() => setEditingLesson(lesson)}
+                            className="text-[9px] font-black text-gray-300 uppercase tracking-widest cursor-pointer hover:text-blue-600 transition-colors"
+                          >
+                            {lesson.duration || "10:00"}
+                          </span>
                         </div>
                       </div>
                       
@@ -786,6 +839,52 @@ export default function EditCoursePage() {
                 className="flex-1 py-4 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-blue-600/20"
               >
                 INITIALIZE_MODULE
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Topic Creation Modal */}
+      {showTopicModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 space-y-8 animate-in zoom-in-95 duration-300 border border-gray-100">
+            <div className="space-y-2">
+              <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tight">NEW_<span className="text-blue-600">TOPIC</span></h3>
+              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Add a new lesson to <span className="text-gray-900">{targetChapterName}</span></p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Topic_Title</label>
+              <input 
+                autoFocus
+                type="text" 
+                value={newTopicName}
+                onChange={(e) => setNewTopicName(e.target.value)}
+                placeholder="E.G. VARIABLE_DECLARATION"
+                className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleCreateTopic();
+                  if (e.key === "Escape") setShowTopicModal(false);
+                }}
+              />
+            </div>
+
+            <div className="flex gap-4 pt-4">
+              <button 
+                onClick={() => {
+                  setShowTopicModal(false);
+                  setNewTopicName("");
+                }}
+                className="flex-1 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-all"
+              >
+                CANCEL_ACTION
+              </button>
+              <button 
+                onClick={handleCreateTopic}
+                className="flex-1 py-4 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-blue-600/20"
+              >
+                INITIALIZE_TOPIC
               </button>
             </div>
           </div>

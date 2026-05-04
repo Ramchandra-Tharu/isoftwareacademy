@@ -149,11 +149,49 @@ export default function NewCoursePage() {
                 </div>
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><BookOpen size={12} /> Lessons</label>
-                  <input required type="text" value={formData.totalLessons} onChange={(e) => setFormData({ ...formData, totalLessons: Number(e.target.value.replace(/\D/g, '')) || 0 })} placeholder="0" className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
+                  <input 
+                    id="lessons-input"
+                    required 
+                    type="text" 
+                    value={formData.totalLessons} 
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => setFormData({ ...formData, totalLessons: e.target.value.replace(/\D/g, '') })} 
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        setFormData(prev => ({ ...prev, totalLessons: Number(prev.totalLessons || 0) + 1 }));
+                      }
+                      if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        setFormData(prev => ({ ...prev, totalLessons: Math.max(0, Number(prev.totalLessons || 0) - 1) }));
+                      }
+                    }}
+                    placeholder="0" 
+                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all cursor-text" 
+                  />
                 </div>
                 <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest"><FileText size={12} /> Chapters</label>
-                  <input required type="text" value={formData.totalChapters} onChange={(e) => setFormData({ ...formData, totalChapters: Number(e.target.value.replace(/\D/g, '')) || 0 })} placeholder="0" className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
+                  <label htmlFor="chapters-input" className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest cursor-pointer hover:text-blue-600 transition-colors"><FileText size={12} /> Chapters</label>
+                  <input 
+                    id="chapters-input"
+                    required 
+                    type="text" 
+                    value={formData.totalChapters} 
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => setFormData({ ...formData, totalChapters: e.target.value.replace(/\D/g, '') })} 
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        setFormData(prev => ({ ...prev, totalChapters: Number(prev.totalChapters || 0) + 1 }));
+                      }
+                      if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        setFormData(prev => ({ ...prev, totalChapters: Math.max(0, Number(prev.totalChapters || 0) - 1) }));
+                      }
+                    }}
+                    placeholder="0" 
+                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all cursor-text" 
+                  />
                 </div>
               </div>
 
