@@ -5,31 +5,21 @@ import { motion } from "framer-motion";
 import {
   Menu,
   X,
-  PlayCircle,
-  Clock,
+  ChevronRight,
+  Play,
+  CheckCircle2,
+  Users,
+  Star,
+  ArrowRight,
   BookOpen,
   Code2,
-  Layout,
-  CheckCircle2,
-  FileText,
-  Award,
-  Video,
   Terminal,
-  Bot,
-  Database,
-  Lock,
   MessageSquare,
-  Sparkles,
-  ArrowRight,
-  ShieldCheck,
-  Zap,
-  Cpu,
-  Globe
+  ChevronDown
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import CourseCard from "@/components/dashboard/CourseCard";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -39,29 +29,13 @@ const fadeIn = {
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [courses, setCourses] = useState<any[]>([]);
-  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const res = await fetch("/api/courses");
-        if (res.ok) setCourses(await res.json());
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setCoursesLoading(false);
-      }
-    };
-    fetchCourses();
   }, []);
 
   const handleStartLearning = () => {
@@ -72,435 +46,206 @@ export default function Home() {
     }
   };
 
+  const tracks = [
+    {
+      title: "Core DSA & CP",
+      desc: "Master Algorithms, Data Structures and Competitive Programming from Scratch.",
+      features: ["300+ Problems", "Live Mentorship", "Interview Ready"],
+      gradient: "from-blue-600 to-indigo-700",
+    },
+    {
+      title: "Full Stack Web Dev",
+      desc: "Build professional grade projects with React, Next.js, Node.js and more.",
+      features: ["8+ Projects", "Frontend + Backend", "Deployment"],
+      gradient: "from-indigo-600 to-purple-700",
+    },
+    {
+      title: "Interview Bootcamp",
+      desc: "Intensive 4-week program covering frequently asked interview patterns.",
+      features: ["Mock Interviews", "System Design", "OS & DBMS"],
+      gradient: "from-purple-600 to-pink-700",
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-blue-100 selection:text-blue-900">
-      {/* 1. Navigation Bar */}
-      <nav
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-          isScrolled ? "bg-white/80 backdrop-blur-md border-b border-gray-100 py-3" : "bg-transparent py-6"
-        }`}
-      >
+    <div className="min-h-screen bg-white text-[#0F172A] font-sans selection:bg-blue-100">
+      {/* Navigation */}
+      <nav className={`sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled ? "bg-white/95 backdrop-blur-md shadow-sm py-4" : "bg-white py-6"
+      }`}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 flex items-center justify-center transition-transform group-hover:scale-110">
-               <svg viewBox="0 0 100 100" className="w-full h-full">
-                  <path d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z" fill="#2563eb" />
-                  <path d="M50 15 L80 32 L80 68 L50 85 L20 68 L20 32 Z" fill="none" stroke="white" strokeWidth="2" opacity="0.2" />
-                  <path d="M30 35 L50 25 L70 35 L70 65 L50 75 L30 65 Z" fill="white" />
-                  <path d="M50 25 V75 M30 35 L70 65 M70 35 L30 65" stroke="#2563eb" strokeWidth="1" />
-               </svg>
-            </div>
-            <span className="text-xl font-black tracking-tighter uppercase text-gray-900">iSoftware <span className="text-blue-600">Lab</span></span>
+          <Link href="/" className="flex items-center gap-2">
+            <img src="/uploads/logo.png" alt="iSoftware Lab Logo" className="w-10 h-10 object-contain" />
+            <span className="text-xl font-bold tracking-tight text-[#1A4B6B]">iSoftware Lab</span>
           </Link>
-          
-          <div className="hidden md:flex items-center gap-10 text-sm font-bold uppercase tracking-widest text-gray-500">
-            <a href="#features" className="hover:text-blue-600 transition-colors">Features</a>
-            <a href="#courses" className="hover:text-blue-600 transition-colors">Courses</a>
-            <a href="#demo" className="hover:text-blue-600 transition-colors">Demo</a>
-            <a href="#about" className="hover:text-blue-600 transition-colors">About</a>
+
+          <div className="hidden md:flex items-center gap-8">
+            <Link href="/" className="nav-link">Home</Link>
+            <Link href="/courses" className="nav-link">Premium</Link>
+            <Link href="#" className="nav-link">Mocks</Link>
+            <Link href="#" className="nav-link">Results</Link>
           </div>
 
-          <div className="hidden md:block">
-            <Link replace href="/get-started" className="btn-primary flex items-center gap-2">
-              Try Now <ArrowRight size={18} />
-            </Link>
-          </div>
+          <div className="flex items-center gap-4">
 
-          <button className="md:hidden text-gray-900" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            {mobileMenuOpen ? <X /> : <Menu />}
-          </button>
+            <button 
+              onClick={handleStartLearning}
+              className="bg-[#1A4B6B] text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-[#153a54] transition-all"
+            >
+              Start Learning
+            </button>
+            <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X /> : <Menu />}
+            </button>
+          </div>
         </div>
       </nav>
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-white pt-24 px-6 md:hidden animate-in fade-in slide-in-from-top-4">
-          <div className="flex flex-col gap-8 text-sm font-black uppercase tracking-widest text-gray-500">
-            <a href="#features" onClick={() => setMobileMenuOpen(false)}>Features</a>
-            <a href="#courses" onClick={() => setMobileMenuOpen(false)}>Courses</a>
-            <a href="#demo" onClick={() => setMobileMenuOpen(false)}>Demo</a>
-            <Link replace href="/get-started" className="btn-primary w-full text-center">Login</Link>
+        <div className="fixed inset-0 z-40 bg-white pt-24 px-6 md:hidden">
+          <div className="flex flex-col gap-6">
+            <Link href="/" className="text-lg font-bold" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+            <Link href="/courses" className="text-lg font-bold" onClick={() => setMobileMenuOpen(false)}>Premium</Link>
+            <Link href="#" className="text-lg font-bold">Mocks</Link>
+            <Link href="#" className="text-lg font-bold">Results</Link>
+
           </div>
         </div>
       )}
 
       <main>
-        {/* 2. Hero Section */}
-        {/* 2. Hero Section */}
-        <section className="relative pt-56 pb-32 px-6 overflow-hidden">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[800px] bg-blue-50/30 blur-[160px] rounded-full pointer-events-none -z-10" />
-          
-          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-            <motion.div 
-              initial="hidden" 
-              animate="visible" 
-              variants={fadeIn} 
-              className="space-y-10"
-            >
-               <div className="space-y-4">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full">
-                    <Sparkles className="text-blue-600" size={14} />
-                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Next Generation Learning</span>
-                  </div>
-                  <h1 className="text-6xl md:text-8xl font-black tracking-tight text-black leading-[0.9] uppercase">
-                    Architect Your <br/> 
-                    <span className="text-blue-600">Engineering</span> <br/> 
-                    Career.
-                  </h1>
-                  <p className="text-xl md:text-2xl text-gray-500 font-medium leading-relaxed max-w-xl">
-                    Enterprise-scale skill development and blockchain-verified certifications for the next generation of software leaders.
-                  </p>
-               </div>
-
-               <div className="flex flex-wrap gap-6">
-                  <button 
-                    onClick={handleStartLearning}
-                    className="btn-primary px-10 py-5 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-black/10 hover:scale-105 transition-all"
-                  >
-                    {status === "authenticated" ? "Return to Dashboard" : "Try Now"}
-                  </button>
-                  <Link 
-                    href="/certificates" 
-                    className="px-10 py-5 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-gray-50 hover:border-gray-200 transition-all shadow-sm"
-                  >
-                    Explore Certifications
-                  </Link>
-               </div>
-
-               <div className="flex items-center gap-8 pt-4">
-                  <div className="flex -space-x-3">
-                     {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-gray-100 overflow-hidden">
-                           <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="User" className="w-full h-full object-cover" />
-                        </div>
-                     ))}
-                     <div className="w-10 h-10 rounded-full border-2 border-white bg-blue-600 flex items-center justify-center text-[10px] font-black text-white">
-                        +5k
-                     </div>
-                  </div>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Joined by 5,000+ Engineers</p>
-               </div>
+        {/* Hero Section */}
+        <section className="pt-20 pb-32 px-6">
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+            <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-8">
+              <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] tracking-tight">
+                Cracking Top <br />
+                <span className="text-[#4270BD]">Software Jobs</span> <br />
+                made Simple!
+              </h1>
+              <p className="text-xl text-slate-500 leading-relaxed max-w-xl">
+                iSoftware Lab offers a world-class curriculum, live mentorship, and a gamified platform to help you master DSA, Development, and beyond.
+              </p>
+              <div className="flex flex-wrap gap-4 pt-4">
+                <button 
+                  onClick={handleStartLearning}
+                  className="bg-[#1A4B6B] text-white px-10 py-4 rounded-xl text-lg font-bold flex items-center gap-2 hover:scale-105 transition-all shadow-xl shadow-blue-900/20"
+                >
+                  Start Learning <ChevronRight size={20} />
+                </button>
+                <button className="bg-white border-2 border-slate-200 text-slate-700 px-10 py-4 rounded-xl text-lg font-bold hover:bg-slate-50 transition-all">
+                  Join Now
+                </button>
+              </div>
+              
+              <div className="flex items-center gap-4 pt-6">
+                <div className="flex -space-x-3">
+                  {[1,2,3,4].map(i => (
+                    <img key={i} src={`https://i.pravatar.cc/100?img=${i+20}`} className="w-10 h-10 rounded-full border-2 border-white shadow-sm" alt="Student" />
+                  ))}
+                </div>
+                <p className="text-sm font-semibold text-slate-500">Joined by 20,000+ ambitious developers</p>
+              </div>
             </motion.div>
 
             <motion.div 
-              initial={{ opacity: 0, scale: 0.8, x: 50 }} 
-              animate={{ opacity: 1, scale: 1, x: 0 }} 
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="relative hidden lg:block"
+              initial={{ opacity: 0, scale: 0.9 }} 
+              animate={{ opacity: 1, scale: 1 }} 
+              transition={{ duration: 0.8 }}
+              className="relative"
             >
-               <div className="absolute inset-0 bg-blue-600/10 blur-[120px] rounded-full -z-10 animate-pulse" />
-               <div className="card-premium p-4 bg-white/40 backdrop-blur-3xl border-white/50 overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] rounded-[3rem]">
-                  <img 
-                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=2070" 
-                    alt="Enterprise UI Mockup" 
-                    className="w-full h-auto rounded-[2.5rem]"
-                  />
-               </div>
-               
-               {/* Floating Elements */}
-               <div className="absolute -top-10 -left-10 bg-white p-6 rounded-3xl shadow-2xl border border-gray-50 flex items-center gap-4 animate-bounce duration-[4000ms]">
-                  <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
-                     <CheckCircle2 size={24} />
-                  </div>
-                  <div>
-                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Certification</p>
-                     <p className="text-sm font-black text-gray-900 uppercase tracking-tight">Verified Master</p>
-                  </div>
-               </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* 2.5 Platform Overview Section */}
-        <section className="py-24 bg-white px-6 overflow-hidden">
-          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-             <motion.div 
-               initial={{ opacity: 0, x: -30 }} 
-               whileInView={{ opacity: 1, x: 0 }} 
-               viewport={{ once: true }}
-               className="space-y-10"
-             >
-                <div className="space-y-6">
-                   <h2 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.4em]">Section_01. PLATFORM_OVERVIEW</h2>
-                   <h3 className="text-5xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none uppercase">
-                      Architecture Your <br/> <span className="text-blue-600">Future Success.</span>
-                   </h3>
-                   <p className="text-lg text-gray-500 font-medium leading-relaxed max-w-xl">
-                      iSoftware Lab is more than just a course platform. It is a comprehensive ecosystem designed to bridge the gap between theoretical mastery and enterprise-scale software engineering.
-                   </p>
-                </div>
-
-                <div className="grid sm:grid-cols-2 gap-8">
-                   {[
-                      { title: "Specialized Programs", desc: "Cohesive learning paths designed for career transitions.", icon: Layout },
-                      { title: "Expert Courses", desc: "Meticulously crafted modules by industry veterans.", icon: BookOpen },
-                      { title: "Verified Credentials", desc: "Blockchain-backed certifications for your resume.", icon: Award },
-                      { title: "Structured Learning", desc: "Zero-fluff curriculum focused on practical output.", icon: ShieldCheck }
-                   ].map((item, i) => (
-                      <div key={i} className="space-y-3">
-                         <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-                            <item.icon size={20} />
-                         </div>
-                         <h4 className="text-xs font-black uppercase tracking-widest text-gray-900">{item.title}</h4>
-                         <p className="text-xs text-gray-400 font-medium leading-relaxed">{item.desc}</p>
-                      </div>
-                   ))}
-                </div>
-
-                <div className="flex flex-col sm:flex-row items-center gap-6 pt-4">
-                   <Link href="/get-started" className="btn-primary px-10 py-4 text-xs tracking-widest uppercase">
-                      Get Started Free
-                   </Link>
-                   <Link href="#courses" className="px-10 py-4 border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-50 transition-all">
-                      Explore Courses
-                   </Link>
-                </div>
-             </motion.div>
-
-             <motion.div 
-               initial={{ opacity: 0, scale: 0.9 }} 
-               whileInView={{ opacity: 1, scale: 1 }} 
-               viewport={{ once: true }}
-               className="relative"
-             >
-                <div className="absolute inset-0 bg-blue-600/5 blur-[100px] rounded-full -z-10" />
-                <div className="card-premium p-4 bg-white/50 backdrop-blur-xl border-white overflow-hidden shadow-2xl">
-                   <img 
-                     src="/platform_overview_visual_1777487506937.png" 
-                     alt="Platform Ecosystem Visual" 
-                     className="w-full h-auto rounded-[2rem] hover:scale-105 transition-transform duration-700"
-                   />
-                </div>
-                {/* Floating Badge */}
-                <div className="absolute -bottom-10 -right-10 bg-white p-6 rounded-[2rem] shadow-2xl border border-gray-50 flex items-center gap-4 animate-bounce duration-[3000ms]">
-                   <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center">
-                      <Sparkles size={24} />
-                   </div>
-                   <div>
-                      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Verified Nodes</p>
-                      <p className="text-sm font-black text-gray-900 uppercase tracking-tight">5,000+ Enrolled</p>
-                   </div>
-                </div>
-             </motion.div>
-          </div>
-        </section>
-
-        {/* 3. Features Section */}
-        <section id="features" className="py-32 px-6 max-w-7xl mx-auto">
-          <div className="text-center space-y-4 mb-20">
-             <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.3em]">01. CORE_FEATURES</h2>
-             <h3 className="text-4xl md:text-5xl font-black tracking-tight">Engineering-First Learning.</h3>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-             {[
-               { icon: <BookOpen className="text-blue-600" />, title: "Structured Tracks", desc: "Follow meticulously crafted roadmaps from Java basics to advanced microservices." },
-               { icon: <Terminal className="text-blue-600" />, title: "Code Sandboxes", desc: "Execute and test technical snippets directly in your browser with zero setup." },
-               { icon: <Layout className="text-blue-600" />, title: "Visual Diagrams", desc: "High-resolution system architectures and data flow visualizations for better retention." },
-               { icon: <Bot className="text-blue-600" />, title: "AI Assistant", desc: "Get instant help with complex code errors or architectural doubts 24/7." },
-               { icon: <ShieldCheck className="text-blue-600" />, title: "Secure Auth", desc: "Enterprise-grade security with Google OAuth and JWT-based session management." },
-               { icon: <Award className="text-blue-600" />, title: "Verified Credentials", desc: "Earn blockchain-verifiable PDF certificates upon successful course completion." }
-             ].map((f, i) => (
-               <div key={i} className="card-premium p-10 space-y-6 group">
-                  <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
-                     {f.icon}
-                  </div>
-                  <h4 className="text-xl font-black uppercase tracking-tighter">{f.title}</h4>
-                  <p className="text-gray-500 text-sm font-medium leading-relaxed">{f.desc}</p>
-               </div>
-             ))}
-          </div>
-        </section>
-
-        {/* 4. Demo Section (Input -> Output) */}
-        <section id="demo" className="py-32 bg-gray-50 px-6">
-           <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-              <div className="space-y-8">
-                 <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.3em]">02. SYSTEM_DEMO</h2>
-                 <h3 className="text-5xl font-black tracking-tighter leading-none">From Complexity to <br/> <span className="text-blue-600">Clarity.</span></h3>
-                 <p className="text-gray-500 font-medium leading-relaxed">Our render engine converts raw technical data into intuitive learning modules. Experience the difference between reading and understanding.</p>
-                 <ul className="space-y-4">
-                    {["Markdown to UI Conversion", "Interactive Code Highlighting", "Real-time Architecture Rendering"].map((item, i) => (
-                      <li key={i} className="flex items-center gap-3 text-sm font-bold">
-                        <CheckCircle2 className="text-blue-600" size={18} /> {item}
-                      </li>
-                    ))}
-                 </ul>
-              </div>
-
-              <div className="bg-white p-4 rounded-[2.5rem] border border-gray-200 shadow-2xl relative overflow-hidden group">
-                 <div className="absolute inset-0 bg-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                 <div className="bg-gray-50 rounded-[2rem] overflow-hidden aspect-video relative flex flex-col border border-gray-200">
-                    <div className="flex gap-2 p-4 border-b border-gray-200 bg-white">
-                       <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
-                       <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
-                    </div>
-                    <div className="flex-1 grid grid-cols-2">
-                       <div className="p-6 border-r border-gray-200 font-mono text-[10px] text-blue-600/70">
-                          <span className="text-gray-400">// RAW_INPUT_NODE</span><br/>
-                          {"{"}<br/>
-                          {"  "}"type": "code",<br/>
-                          {"  "}"lang": "java",<br/>
-                          {"  "}"content": "System.out.println('Success')"<br/>
-                          {"}"}
-                       </div>
-                       <div className="p-6 bg-white flex flex-col items-center justify-center text-center space-y-4">
-                          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shadow-sm border border-blue-100">
-                             <Terminal size={24} />
-                          </div>
-                          <span className="text-[9px] text-gray-900 font-black uppercase tracking-widest">RENDERED_OUTPUT</span>
-                       </div>
-                    </div>
-                 </div>
-              </div>
-           </div>
-        </section>
-
-        {/* 5. Courses Section */}
-        <section id="courses" className="py-32 px-6 max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6">
-             <div className="space-y-4">
-                <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.3em]">03. COURSE_CATALOG</h2>
-                <h3 className="text-4xl md:text-5xl font-black tracking-tight leading-none">Build Your <br/> <span className="text-blue-600">Knowledge Stack.</span></h3>
-             </div>
-             <Link href="/courses" className="text-sm font-black uppercase tracking-widest text-blue-600 hover:gap-4 transition-all flex items-center gap-2">View Full Catalog <ArrowRight size={16}/></Link>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {coursesLoading ? (
-              [1, 2, 3, 4].map(i => <div key={i} className="h-[350px] bg-gray-100 rounded-[2rem] animate-pulse" />)
-            ) : (
-              courses.slice(0, 8).map(course => (
-                <CourseCard 
-                  key={course._id} 
-                  {...course} 
-                  id={course.slug || course._id} 
-                  href={`/dashboard/courses/${course.slug || course._id}`} 
+              <div className="absolute inset-0 bg-[#4270BD]/5 blur-[100px] rounded-full -z-10" />
+              <div className="bg-white p-2 rounded-3xl shadow-2xl border border-slate-100 overflow-hidden group">
+                <img 
+                  src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=2070" 
+                  alt="iSoftware Lab Platform" 
+                  className="rounded-2xl w-full h-auto group-hover:scale-[1.02] transition-transform duration-700"
                 />
-              ))
-            )}
+                <div className="absolute inset-0 flex items-center justify-center">
+                   <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-2xl text-[#1A4B6B] cursor-pointer hover:scale-110 transition-transform">
+                      <Play fill="currentColor" size={32} />
+                   </div>
+                </div>
+              </div>
+
+              {/* Floating Logos Collage */}
+              <div className="absolute -bottom-10 -left-10 bg-white p-6 rounded-2xl shadow-xl border border-slate-50 grid grid-cols-3 gap-4">
+                 {['Google', 'Amazon', 'Meta', 'Microsoft', 'Netflix', 'Apple'].map(company => (
+                    <div key={company} className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{company}</div>
+                 ))}
+              </div>
+            </motion.div>
           </div>
         </section>
 
-        {/* 6. About Section */}
-        <section id="about" className="py-32 bg-gray-50 px-6 overflow-hidden">
-           <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }} 
-                whileInView={{ opacity: 1, scale: 1 }} 
-                viewport={{ once: true }}
-                className="order-2 lg:order-1 relative"
-              >
-                 <div className="absolute inset-0 bg-blue-600/5 blur-[100px] rounded-full -z-10" />
-                 <div className="card-premium p-4 bg-white/50 backdrop-blur-xl border-white overflow-hidden shadow-2xl">
-                    <img 
-                      src="/about_us_visual_1777487568577.png" 
-                      alt="About iSoftware Lab" 
-                      className="w-full h-auto rounded-[2rem] hover:scale-105 transition-transform duration-700"
-                    />
-                 </div>
-              </motion.div>
+        {/* Tracks Section */}
+        <section className="py-24 bg-slate-50 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center space-y-4 mb-20">
+              <h2 className="text-[#4270BD] font-bold uppercase tracking-widest text-sm">Select Your Path</h2>
+              <h3 className="text-4xl md:text-5xl font-bold">World-Class Learning Tracks</h3>
+            </div>
 
-              <motion.div 
-                initial={{ opacity: 0, x: 30 }} 
-                whileInView={{ opacity: 1, x: 0 }} 
-                viewport={{ once: true }}
-                className="order-1 lg:order-2 space-y-8"
-              >
+            <div className="grid md:grid-cols-3 gap-8">
+              {tracks.map((track, i) => (
+                <div key={i} className="card-premium group overflow-hidden flex flex-col h-full">
+                  <div className={`h-2 bg-gradient-to-r ${track.gradient}`} />
+                  <div className="p-8 space-y-6 flex-1 flex flex-col">
+                    <div className="space-y-3">
+                      <h4 className="text-2xl font-bold">{track.title}</h4>
+                      <p className="text-slate-500 text-sm leading-relaxed">{track.desc}</p>
+                    </div>
+                    <ul className="space-y-3 flex-1">
+                      {track.features.map((f, j) => (
+                        <li key={j} className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+                          <CheckCircle2 className="text-green-500" size={16} /> {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <button className="w-full bg-slate-100 text-slate-900 py-3 rounded-xl font-bold group-hover:bg-[#1A4B6B] group-hover:text-white transition-all">
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Features / Why Us */}
+        <section className="py-32 px-6">
+           <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
+              <div className="space-y-12">
                  <div className="space-y-4">
-                    <h2 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.4em]">Section_04. ABOUT_US</h2>
-                    <h3 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter leading-none uppercase">
-                       The Mission Behind <br/> <span className="text-blue-600">The Lab.</span>
-                    </h3>
-                    <p className="text-gray-500 font-medium leading-relaxed">
-                       Founded by a collective of senior engineers from top-tier tech firms, iSoftware Academy was born from a simple observation: the gap between academic theory and production-grade engineering is too wide.
-                    </p>
+                    <h2 className="text-4xl font-bold">Why Developers Love <span className="text-[#4270BD]">iSoftware Lab?</span></h2>
+                    <p className="text-slate-500 leading-relaxed">We don't just teach code. We build careers with a structured approach that mirrors actual software engineering workflows.</p>
                  </div>
                  
-                 <div className="space-y-6">
+                 <div className="grid sm:grid-cols-2 gap-8">
                     {[
-                      { title: "Industry Led", desc: "Every module is vetted by active software architects." },
-                      { title: "Practical Output", desc: "We focus on building real-world deployment-ready assets." },
-                      { title: "Global Community", desc: "Join thousands of developers across 40+ countries." }
-                    ].map((point, i) => (
-                      <div key={i} className="flex gap-4">
-                         <div className="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0 mt-1">
-                            <CheckCircle2 size={14} />
-                         </div>
-                         <div>
-                            <h4 className="text-[10px] font-black text-gray-900 uppercase tracking-widest">{point.title}</h4>
-                            <p className="text-xs text-gray-400 font-medium">{point.desc}</p>
-                         </div>
-                      </div>
-                    ))}
-                 </div>
-              </motion.div>
-           </div>
-        </section>
-
-        {/* 7. Contact Section */}
-        <section id="contact" className="py-32 px-6">
-           <div className="max-w-4xl mx-auto text-center space-y-16">
-              <div className="space-y-4">
-                 <h2 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.4em]">Section_05. CONTACT_INIT</h2>
-                 <h3 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter leading-none uppercase">
-                    Have an Inquiry? <br/> <span className="text-blue-600">Sync With Us.</span>
-                 </h3>
-              </div>
-
-              <div className="card-premium p-10 md:p-16 text-left space-y-8 shadow-2xl shadow-blue-600/5">
-                 <form className="grid md:grid-cols-2 gap-8">
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Identification</label>
-                       <input type="text" placeholder="FULL_NAME" className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-6 text-xs font-bold focus:outline-none focus:border-blue-100 transition-all" />
-                    </div>
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Communication_Email</label>
-                       <input type="email" placeholder="EMAIL_INTERFACE" className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-6 text-xs font-bold focus:outline-none focus:border-blue-100 transition-all" />
-                    </div>
-                    <div className="md:col-span-2 space-y-2">
-                       <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-2">Message_Protocol</label>
-                       <textarea placeholder="HOW_CAN_WE_ASSIST_YOUR_EVOLUTION?" rows={4} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-6 text-xs font-bold focus:outline-none focus:border-blue-100 transition-all resize-none" />
-                    </div>
-                    <div className="md:col-span-2">
-                       <button className="w-full btn-primary py-5 text-[10px] uppercase tracking-[0.2em]">Dispatch_Message</button>
-                    </div>
-                 </form>
-
-                 <div className="pt-8 border-t border-gray-50 grid sm:grid-cols-3 gap-8">
-                    {[
-                      { icon: Globe, label: "Global Presence", val: "40+ Nodes" },
-                      { icon: MessageSquare, label: "Response Time", val: "< 24 Hours" },
-                      { icon: ShieldCheck, label: "Data Protection", val: "GDPR Compliant" }
+                      { icon: <Users />, title: "Live Mentorship", desc: "Interact with seniors from top tech firms directly." },
+                      { icon: <Star />, title: "Gamified Learning", desc: "Earn badges and compete on global leaderboards." },
+                      { icon: <BookOpen />, title: "360° Curriculum", desc: "From basic syntax to advanced system design." },
+                      { icon: <Terminal />, title: "Built-in IDE", desc: "Code, test, and debug without leaving the browser." }
                     ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-3">
-                         <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-                            <item.icon size={16} />
-                         </div>
-                         <div>
-                            <p className="text-[8px] font-black text-gray-300 uppercase tracking-widest leading-none">{item.label}</p>
-                            <p className="text-[10px] font-black text-gray-900 uppercase tracking-tight">{item.val}</p>
-                         </div>
+                      <div key={i} className="space-y-3">
+                         <div className="text-[#4270BD]">{item.icon}</div>
+                         <h5 className="font-bold">{item.title}</h5>
+                         <p className="text-sm text-slate-500">{item.desc}</p>
                       </div>
                     ))}
                  </div>
               </div>
-           </div>
-        </section>
 
-        {/* 8. Final CTA */}
-        <section className="py-32 px-6">
-           <div className="max-w-7xl mx-auto bg-blue-600 rounded-[3.5rem] p-16 md:p-24 text-center relative overflow-hidden group shadow-2xl shadow-blue-600/20">
-              <div className="absolute top-0 right-0 p-20 opacity-10 text-white pointer-events-none group-hover:scale-110 transition-transform duration-1000">
-                 <Globe size={400} />
-              </div>
-              <div className="relative z-10 space-y-10">
-                 <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter leading-none">Ready to start <br/> your <span className="text-blue-100">evolution?</span></h2>
-                 <p className="text-blue-50 text-lg md:text-xl max-w-2xl mx-auto font-medium">Join 5,000+ engineers mastering the future of software development on iSoftware Lab.</p>
-                 <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                    <Link href="/get-started" className="bg-white text-blue-600 px-12 py-5 text-lg font-black rounded-2xl hover:scale-105 transition-all shadow-xl shadow-white/10 uppercase tracking-widest">Try Now</Link>
-                    <Link href="#contact" className="px-12 py-5 bg-blue-700/50 border border-blue-400/30 text-white rounded-2xl text-lg font-bold hover:bg-blue-700 transition-all uppercase tracking-widest">Contact Sales</Link>
+              <div className="bg-[#1A4B6B] rounded-[2.5rem] p-12 text-white relative overflow-hidden">
+                 <div className="absolute top-0 right-0 p-20 opacity-10"><Star size={200} /></div>
+                 <div className="relative z-10 space-y-8">
+                    <h4 className="text-3xl font-bold leading-tight">Ready to join the elite?</h4>
+                    <p className="text-blue-100/80">Get access to mock interviews, resume reviews, and referrals to top product-based companies.</p>
+                    <button onClick={handleStartLearning} className="bg-white text-[#1A4B6B] px-8 py-4 rounded-xl font-bold hover:scale-105 transition-all">
+                       Explore Premium
+                    </button>
                  </div>
               </div>
            </div>
@@ -508,39 +253,84 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 pt-24 pb-12 px-6">
-         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-16 mb-24">
+      <footer className="bg-slate-900 text-slate-400 pt-24 pb-12 px-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Booklet Section */}
+          <div className="bg-white rounded-3xl p-10 mb-24 grid md:grid-cols-2 gap-12 items-center text-[#0F172A]">
+             <div className="space-y-6">
+                <h3 className="text-3xl font-bold">Download our <span className="text-[#4270BD]">Interview Guide</span></h3>
+                <ul className="grid sm:grid-cols-2 gap-4">
+                   {['HR Questions', 'Resume Tips', 'Salary Negotiation', 'Behavioral Prep'].map(t => (
+                      <li key={t} className="flex items-center gap-2 text-sm font-bold">
+                         <CheckCircle2 className="text-[#4270BD]" size={16} /> {t}
+                      </li>
+                   ))}
+                </ul>
+                <div className="flex gap-2">
+                   <input type="email" placeholder="Enter your email" className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#4270BD]" />
+                   <button className="bg-[#1A4B6B] text-white px-6 py-3 rounded-xl font-bold whitespace-nowrap">Send Me</button>
+                </div>
+             </div>
+             <div className="hidden md:block">
+                <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=2070" className="rounded-2xl h-48 w-full object-cover" alt="Guide" />
+             </div>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-16 mb-20">
             <div className="col-span-1 space-y-6">
-               <Link href="/" className="flex items-center gap-2">
-                  <div className="w-10 h-10 flex items-center justify-center">
-                    <svg viewBox="0 0 100 100" className="w-full h-full">
-                        <path d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z" fill="#2563eb" />
-                        <path d="M30 35 L50 25 L70 35 L70 65 L50 75 L30 65 Z" fill="white" />
-                    </svg>
-                  </div>
-                  <span className="text-xl font-black tracking-tighter uppercase text-gray-900">iSoftware <span className="text-blue-600">Lab</span></span>
-               </Link>
-               <p className="text-gray-500 text-sm font-medium leading-relaxed">Bridging the gap between theoretical mastery and enterprise-scale software engineering.</p>
-            </div>
-            {["Platform", "Community", "Legal"].map((col, i) => (
-              <div key={i} className="space-y-6">
-                 <h5 className="text-xs font-black uppercase tracking-widest text-gray-900">{col}</h5>
-                 <ul className="space-y-4 text-sm font-bold text-gray-500">
-                    <li><a href="#" className="hover:text-blue-600 transition-colors">Architecture</a></li>
-                    <li><a href="#" className="hover:text-blue-600 transition-colors">API Reference</a></li>
-                    <li><a href="#" className="hover:text-blue-600 transition-colors">Documentation</a></li>
-                 </ul>
+              <div className="flex items-center gap-2">
+                <img src="/uploads/logo.png" alt="iSoftware Lab Logo" className="w-8 h-8 object-contain" />
+                <span className="text-lg font-bold text-white">iSoftware Lab</span>
               </div>
-            ))}
-         </div>
-         <div className="max-w-7xl mx-auto border-t border-gray-100 pt-12 flex flex-col md:flex-row items-center justify-between gap-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
-            <p>© 2026 iSoftware Lab. Ver 2.0.0-SaaS</p>
-            <div className="flex gap-8">
-               <a href="#" className="hover:text-blue-600 transition-colors">Twitter</a>
-               <a href="#" className="hover:text-blue-600 transition-colors">LinkedIn</a>
-               <a href="#" className="hover:text-blue-600 transition-colors">GitHub</a>
+              <p className="text-sm leading-relaxed">The algorithm to become awesome at DSA & CP. Built by experts from MAANG companies.</p>
+              <div className="flex gap-4">
+                <a href="#" className="hover:text-white transition-colors">
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                </a>
+                <a href="#" className="hover:text-white transition-colors">
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.238 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                </a>
+                <a href="#" className="hover:text-white transition-colors">
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-8.779h-2.955v-3.437h2.955v-2.538c0-2.926 1.787-4.52 4.398-4.52 1.251 0 2.327.093 2.639.135v3.061l-1.811.001c-1.42 0-1.696.675-1.696 1.666v2.195h3.389l-.441 3.437h-2.948v8.779h6.116c.733 0 1.326-.593 1.326-1.324v-21.351c0-.732-.593-1.325-1.326-1.325z"/></svg>
+                </a>
+                <a href="#" className="hover:text-white transition-colors">
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186c-.273-1.029-1.082-1.838-2.111-2.111-1.861-.501-9.387-.501-9.387-.501s-7.526 0-9.387.501c-1.029.273-1.838 1.082-2.111 2.111-.501 1.861-.501 5.814-.501 5.814s0 3.953.501 5.814c.273 1.029 1.082 1.838 2.111 2.111 1.861.501 9.387.501 9.387.501s7.526 0 9.387-.501c1.029-.273 1.838-1.082 2.111-2.111.501-1.861.501-5.814.501-5.814s0-3.953-.501-5.814zm-14.831 7.147v-4.666l6.064 2.333-6.064 2.333z"/></svg>
+                </a>
+                <MessageSquare className="hover:text-white cursor-pointer transition-colors" size={20} />
+              </div>
             </div>
-         </div>
+
+            <div className="space-y-6">
+              <h5 className="text-white font-bold uppercase tracking-widest text-xs">Company</h5>
+              <ul className="space-y-4 text-sm font-semibold">
+                <li><Link href="#" className="hover:text-white transition-colors">About Us</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Careers</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Blogs</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              </ul>
+            </div>
+
+            <div className="space-y-6">
+              <h5 className="text-white font-bold uppercase tracking-widest text-xs">Programs</h5>
+              <ul className="space-y-4 text-sm font-semibold">
+                <li><Link href="#" className="hover:text-white transition-colors">Dev Track</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">DSA Course</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Mock Tests</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">Workshops</Link></li>
+              </ul>
+            </div>
+
+            <div className="space-y-6">
+              <h5 className="text-white font-bold uppercase tracking-widest text-xs">Contact</h5>
+              <p className="text-sm font-semibold">support@algozenith.com</p>
+              <p className="text-sm font-semibold">+91 98765 43210</p>
+            </div>
+          </div>
+
+          <div className="border-t border-slate-800 pt-12 text-center text-xs font-bold uppercase tracking-widest">
+            © 2026 iSoftware Lab. All Rights Reserved.
+          </div>
+        </div>
       </footer>
     </div>
   );
