@@ -76,7 +76,7 @@ export default function MyCoursesPage() {
          return mergeProgress(allCatalogCourses).filter(c => c.title.toLowerCase().includes(query));
       }
       if (activeTab === "In Progress") {
-         return courses.filter(c => c.title.toLowerCase().includes(query) && (c.progress || 0) > 0 && (c.progress || 0) < 100);
+         return courses.filter(c => c.title.toLowerCase().includes(query) && (c.progress || 0) < 100);
       }
       if (activeTab === "Completed") {
          return courses.filter(c => c.title.toLowerCase().includes(query) && (c.progress || 0) === 100);
