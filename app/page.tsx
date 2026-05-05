@@ -81,7 +81,16 @@ export default function Home() {
 
           <div className="hidden md:flex items-center gap-8">
             <Link href="/" className="nav-link">Home</Link>
-            <Link href="/courses" className="nav-link">Premium</Link>
+            <div className="relative group py-4">
+              <button className="nav-link flex items-center gap-1">
+                Courses <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-200" />
+              </button>
+              <div className="absolute top-full left-0 w-48 bg-white border border-slate-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 mt-[-8px]">
+                <Link href="/courses?type=free" className="block px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#1A4B6B]">Free Course</Link>
+                <Link href="/courses" className="block px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#1A4B6B]">Premium Course</Link>
+              </div>
+            </div>
+            <Link href="/certificates" className="nav-link">Certification</Link>
             <Link href="#" className="nav-link">Mocks</Link>
             <Link href="#" className="nav-link">Results</Link>
           </div>
@@ -106,7 +115,12 @@ export default function Home() {
         <div className="fixed inset-0 z-40 bg-white pt-24 px-6 md:hidden">
           <div className="flex flex-col gap-6">
             <Link href="/" className="text-lg font-bold" onClick={() => setMobileMenuOpen(false)}>Home</Link>
-            <Link href="/courses" className="text-lg font-bold" onClick={() => setMobileMenuOpen(false)}>Premium</Link>
+            <div className="flex flex-col gap-4">
+              <span className="text-lg font-bold text-slate-400">Courses</span>
+              <Link href="/courses?type=free" className="text-lg font-bold pl-4 border-l-2 border-slate-100" onClick={() => setMobileMenuOpen(false)}>Free Course</Link>
+              <Link href="/courses" className="text-lg font-bold pl-4 border-l-2 border-slate-100" onClick={() => setMobileMenuOpen(false)}>Premium Course</Link>
+            </div>
+            <Link href="/certificates" className="text-lg font-bold" onClick={() => setMobileMenuOpen(false)}>Certification</Link>
             <Link href="#" className="text-lg font-bold">Mocks</Link>
             <Link href="#" className="text-lg font-bold">Results</Link>
 
