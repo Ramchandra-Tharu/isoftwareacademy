@@ -82,10 +82,15 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white group-hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20">
-               <Cpu size={22} />
+            <div className="w-10 h-10 flex items-center justify-center transition-transform group-hover:scale-110">
+               <svg viewBox="0 0 100 100" className="w-full h-full">
+                  <path d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z" fill="#2563eb" />
+                  <path d="M50 15 L80 32 L80 68 L50 85 L20 68 L20 32 Z" fill="none" stroke="white" strokeWidth="2" opacity="0.2" />
+                  <path d="M30 35 L50 25 L70 35 L70 65 L50 75 L30 65 Z" fill="white" />
+                  <path d="M50 25 V75 M30 35 L70 65 M70 35 L30 65" stroke="#2563eb" strokeWidth="1" />
+               </svg>
             </div>
-            <span className="text-xl font-black tracking-tighter uppercase">iSoftware_<span className="text-blue-600">Academy</span></span>
+            <span className="text-xl font-black tracking-tighter uppercase text-gray-900">iSoftware <span className="text-blue-600">Lab</span></span>
           </Link>
           
           <div className="hidden md:flex items-center gap-10 text-sm font-bold uppercase tracking-widest text-gray-500">
@@ -221,7 +226,7 @@ export default function Home() {
                       Architecture Your <br/> <span className="text-blue-600">Future Success.</span>
                    </h3>
                    <p className="text-lg text-gray-500 font-medium leading-relaxed max-w-xl">
-                      iSoftware Academy is more than just a course platform. It is a comprehensive ecosystem designed to bridge the gap between theoretical mastery and enterprise-scale software engineering.
+                      iSoftware Lab is more than just a course platform. It is a comprehensive ecosystem designed to bridge the gap between theoretical mastery and enterprise-scale software engineering.
                    </p>
                 </div>
 
@@ -492,7 +497,7 @@ export default function Home() {
               </div>
               <div className="relative z-10 space-y-10">
                  <h2 className="text-4xl md:text-7xl font-black text-white tracking-tighter leading-none">Ready to start <br/> your <span className="text-blue-100">evolution?</span></h2>
-                 <p className="text-blue-50 text-lg md:text-xl max-w-2xl mx-auto font-medium">Join 5,000+ engineers mastering the future of software development on iSoftware Lab Academy.</p>
+                 <p className="text-blue-50 text-lg md:text-xl max-w-2xl mx-auto font-medium">Join 5,000+ engineers mastering the future of software development on iSoftware Lab.</p>
                  <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
                     <Link href="/get-started" className="bg-white text-blue-600 px-12 py-5 text-lg font-black rounded-2xl hover:scale-105 transition-all shadow-xl shadow-white/10 uppercase tracking-widest">Try Now</Link>
                     <Link href="#contact" className="px-12 py-5 bg-blue-700/50 border border-blue-400/30 text-white rounded-2xl text-lg font-bold hover:bg-blue-700 transition-all uppercase tracking-widest">Contact Sales</Link>
@@ -507,10 +512,13 @@ export default function Home() {
          <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-16 mb-24">
             <div className="col-span-1 space-y-6">
                <Link href="/" className="flex items-center gap-2">
-                  <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white">
-                    <Cpu size={22} />
+                  <div className="w-10 h-10 flex items-center justify-center">
+                    <svg viewBox="0 0 100 100" className="w-full h-full">
+                        <path d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z" fill="#2563eb" />
+                        <path d="M30 35 L50 25 L70 35 L70 65 L50 75 L30 65 Z" fill="white" />
+                    </svg>
                   </div>
-                  <span className="text-xl font-black tracking-tighter uppercase">iSoftware_<span className="text-blue-600">Academy</span></span>
+                  <span className="text-xl font-black tracking-tighter uppercase text-gray-900">iSoftware <span className="text-blue-600">Lab</span></span>
                </Link>
                <p className="text-gray-500 text-sm font-medium leading-relaxed">Bridging the gap between theoretical mastery and enterprise-scale software engineering.</p>
             </div>
@@ -526,7 +534,7 @@ export default function Home() {
             ))}
          </div>
          <div className="max-w-7xl mx-auto border-t border-gray-100 pt-12 flex flex-col md:flex-row items-center justify-between gap-6 text-[10px] font-black uppercase tracking-widest text-gray-400">
-            <p>© 2026 iSoftware Lab Academy. Ver 2.0.0-SaaS</p>
+            <p>© 2026 iSoftware Lab. Ver 2.0.0-SaaS</p>
             <div className="flex gap-8">
                <a href="#" className="hover:text-blue-600 transition-colors">Twitter</a>
                <a href="#" className="hover:text-blue-600 transition-colors">LinkedIn</a>

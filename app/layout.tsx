@@ -14,7 +14,7 @@ const merriweather = Merriweather({
 });
 
 export const metadata: Metadata = {
-  title: "iSoftware Lab Academy",
+  title: "iSoftware Lab",
   description: "Bridge the gap between theoretical knowledge and practical application.",
 };
 

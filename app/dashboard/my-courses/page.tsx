@@ -108,7 +108,7 @@ export default function MyCoursesPage() {
                   <div className="px-3 py-1 bg-black text-white text-[9px] font-bold rounded-sm uppercase tracking-[0.2em]">
                      Catalog Access
                   </div>
-                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Cloud_Registry</span>
+                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">iSoftware Lab</span>
                </div>
                <h1 className="text-5xl font-light tracking-tight text-black leading-none">
                   My Courses

@@ -53,11 +53,16 @@ export default function Sidebar() {
       )}>
         {!isCollapsed && (
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 bg-black rounded-sm flex items-center justify-center text-white group-hover:bg-gray-800 transition-colors">
-               <Cpu size={18} />
+            <div className="w-9 h-9 flex items-center justify-center transition-transform group-hover:scale-105">
+               <svg viewBox="0 0 100 100" className="w-full h-full">
+                  <path d="M50 5 L90 27.5 L90 72.5 L50 95 L10 72.5 L10 27.5 Z" fill="#0f172a" />
+                  <path d="M50 15 L80 32 L80 68 L50 85 L20 68 L20 32 Z" fill="none" stroke="#f8fafc" strokeWidth="2" opacity="0.2" />
+                  <path d="M30 35 L50 25 L70 35 L70 65 L50 75 L30 65 Z" fill="#f8fafc" />
+                  <path d="M50 25 V75 M30 35 L70 65 M70 35 L30 65" stroke="#0f172a" strokeWidth="1" />
+               </svg>
             </div>
-            <span className="text-xs font-bold tracking-tight text-gray-900">
-               ORACLE_<span className="font-light">CLOUD</span>
+            <span className="text-[11px] font-black tracking-tight text-gray-900 uppercase">
+               iSoftware <span className="text-blue-600">Lab</span>
             </span>
           </Link>
         )}
