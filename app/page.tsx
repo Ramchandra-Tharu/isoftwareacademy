@@ -44,19 +44,25 @@ export default function Home() {
       title: "Core DSA & CP",
       desc: "Master Algorithms, Data Structures and Competitive Programming from Scratch.",
       features: ["300+ Problems", "Live Mentorship", "Interview Ready"],
-      gradient: "from-blue-600 to-indigo-700",
+      gradient: "from-blue-600 to-indigo-600",
+      icon: <Terminal size={28} className="text-blue-600" />,
+      bg: "bg-blue-50"
     },
     {
       title: "Full Stack Web Dev",
       desc: "Build professional grade projects with React, Next.js, Node.js and more.",
       features: ["8+ Projects", "Frontend + Backend", "Deployment"],
-      gradient: "from-indigo-600 to-purple-700",
+      gradient: "from-indigo-600 to-purple-600",
+      icon: <Code2 size={28} className="text-indigo-600" />,
+      bg: "bg-indigo-50"
     },
     {
       title: "Interview Bootcamp",
       desc: "Intensive 4-week program covering frequently asked interview patterns.",
       features: ["Mock Interviews", "System Design", "OS & DBMS"],
-      gradient: "from-purple-600 to-pink-700",
+      gradient: "from-purple-600 to-pink-600",
+      icon: <Users size={28} className="text-purple-600" />,
+      bg: "bg-purple-50"
     }
   ];
 
@@ -130,32 +136,47 @@ export default function Home() {
         </section>
 
         {/* Tracks Section */}
-        <section className="py-24 bg-slate-50 px-6">
+        <section className="py-32 bg-slate-50 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="text-center space-y-4 mb-20">
               <h2 className="text-[#4270BD] font-bold uppercase tracking-widest text-sm">Select Your Path</h2>
-              <h3 className="text-4xl md:text-5xl font-bold">World-Class Learning Tracks</h3>
+              <h3 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900">World-Class Learning Tracks</h3>
+              <p className="text-slate-500 text-lg max-w-2xl mx-auto">Choose a specialized learning path designed to take you from beginner to industry-ready professional.</p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
               {tracks.map((track, i) => (
-                <div key={i} className="card-premium group overflow-hidden flex flex-col h-full">
-                  <div className={`h-2 bg-gradient-to-r ${track.gradient}`} />
-                  <div className="p-8 space-y-6 flex-1 flex flex-col">
-                    <div className="space-y-3">
-                      <h4 className="text-2xl font-bold">{track.title}</h4>
-                      <p className="text-slate-500 text-sm leading-relaxed">{track.desc}</p>
+                <div key={i} className="group relative bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col h-full overflow-hidden hover:-translate-y-2">
+                  <div className={`absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r ${track.gradient} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                  
+                  <div className="p-10 space-y-8 flex-1 flex flex-col">
+                    <div className="space-y-6">
+                      <div className={`w-16 h-16 rounded-2xl ${track.bg} flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300`}>
+                         {track.icon}
+                      </div>
+                      <div className="space-y-3">
+                        <h4 className="text-2xl font-bold text-slate-900 tracking-tight">{track.title}</h4>
+                        <p className="text-slate-500 leading-relaxed">{track.desc}</p>
+                      </div>
                     </div>
-                    <ul className="space-y-3 flex-1">
-                      {track.features.map((f, j) => (
-                        <li key={j} className="flex items-center gap-2 text-sm font-semibold text-slate-600">
-                          <CheckCircle2 className="text-green-500" size={16} /> {f}
-                        </li>
-                      ))}
-                    </ul>
-                    <button className="w-full bg-slate-100 text-slate-900 py-3 rounded-xl font-bold group-hover:bg-[#1A4B6B] group-hover:text-white transition-all">
-                      View Details
-                    </button>
+
+                    <div className="pt-6 mt-auto border-t border-slate-50 space-y-4">
+                      <h5 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">What's Included</h5>
+                      <ul className="space-y-3">
+                        {track.features.map((f, j) => (
+                          <li key={j} className="flex items-start gap-3 text-sm font-semibold text-slate-700">
+                            <CheckCircle2 className="text-[#4270BD] shrink-0 mt-0.5" size={16} /> 
+                            <span>{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="pt-8">
+                      <button className="w-full flex justify-center items-center gap-2 py-4 rounded-xl font-bold text-slate-600 bg-slate-50 group-hover:bg-[#1A4B6B] group-hover:text-white transition-all duration-300">
+                        Explore Track <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

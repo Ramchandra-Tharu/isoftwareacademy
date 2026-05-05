@@ -45,15 +45,7 @@ export default function PublicNavbar() {
               </div>
             </div>
 
-            <div className="relative group py-4">
-              <button className="flex items-center gap-1 text-sm font-semibold text-slate-600 group-hover:text-[#4270BD] transition-colors">
-                Certifications <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-200" />
-              </button>
-              <div className="absolute top-full left-0 w-48 bg-white border border-slate-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 mt-[-8px]">
-                <Link href="/certificates" className="block px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#1A4B6B]">Verify Certificate</Link>
-                <Link href="/certificates" className="block px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#1A4B6B]">How It Works</Link>
-              </div>
-            </div>
+            <Link href="/certificates" className="text-sm font-semibold text-slate-600 hover:text-[#4270BD] transition-colors">Certifications</Link>
 
             <Link href="#" className="text-sm font-semibold text-slate-600 hover:text-[#4270BD] transition-colors">About</Link>
             <Link href="#" className="text-sm font-semibold text-slate-600 hover:text-[#4270BD] transition-colors">Contact</Link>
@@ -61,29 +53,12 @@ export default function PublicNavbar() {
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            {status === "authenticated" ? (
-               <button 
-                  onClick={() => router.push("/dashboard")}
-                  className="bg-[#1A4B6B] text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-[#153a54] transition-all shadow-sm"
-                >
-                  Dashboard
-               </button>
-            ) : (
-               <>
-                 <button 
-                    onClick={() => router.push("/get-started")}
-                    className="text-sm font-bold text-slate-600 hover:text-[#1A4B6B] transition-colors px-4 py-2.5"
-                  >
-                    Login
-                 </button>
-                 <button 
-                    onClick={() => router.push("/get-started")}
-                    className="bg-[#4270BD] text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-[#325ca3] transition-all shadow-sm"
-                  >
-                    Sign Up
-                 </button>
-               </>
-            )}
+            <button 
+              onClick={() => router.push(status === "authenticated" ? "/dashboard" : "/get-started")}
+              className="bg-[#1A4B6B] text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-[#153a54] transition-all shadow-sm"
+            >
+              Start Learning
+            </button>
           </div>
 
           {/* Mobile Toggle */}
@@ -109,40 +84,19 @@ export default function PublicNavbar() {
                 <Link href="/courses?tab=premium" className="text-lg font-bold text-slate-800 pl-4 border-l-2 border-slate-100" onClick={() => setMobileMenuOpen(false)}>Premium Courses</Link>
               </div>
 
-              <div className="flex flex-col gap-4">
-                <span className="text-lg font-bold text-slate-400">Certifications</span>
-                <Link href="/certificates" className="text-lg font-bold text-slate-800 pl-4 border-l-2 border-slate-100" onClick={() => setMobileMenuOpen(false)}>Verify Certificate</Link>
-                <Link href="/certificates" className="text-lg font-bold text-slate-800 pl-4 border-l-2 border-slate-100" onClick={() => setMobileMenuOpen(false)}>How It Works</Link>
-              </div>
+              <Link href="/certificates" className="text-lg font-bold text-slate-800" onClick={() => setMobileMenuOpen(false)}>Certifications</Link>
 
               <Link href="#" className="text-lg font-bold text-slate-800" onClick={() => setMobileMenuOpen(false)}>About</Link>
               <Link href="#" className="text-lg font-bold text-slate-800" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
             </div>
 
             <div className="pt-8 border-t border-slate-100 flex flex-col gap-4">
-               {status === "authenticated" ? (
-                 <button 
-                    onClick={() => { setMobileMenuOpen(false); router.push("/dashboard"); }}
-                    className="w-full bg-[#1A4B6B] text-white px-6 py-4 rounded-xl text-lg font-bold hover:bg-[#153a54] transition-all shadow-sm text-center"
-                  >
-                    Go to Dashboard
-                 </button>
-               ) : (
-                 <>
-                   <button 
-                      onClick={() => { setMobileMenuOpen(false); router.push("/get-started"); }}
-                      className="w-full bg-slate-100 text-slate-700 px-6 py-4 rounded-xl text-lg font-bold hover:bg-slate-200 transition-all text-center"
-                    >
-                      Login
-                   </button>
-                   <button 
-                      onClick={() => { setMobileMenuOpen(false); router.push("/get-started"); }}
-                      className="w-full bg-[#4270BD] text-white px-6 py-4 rounded-xl text-lg font-bold hover:bg-[#325ca3] transition-all shadow-sm text-center"
-                    >
-                      Sign Up
-                   </button>
-                 </>
-               )}
+               <button 
+                  onClick={() => { setMobileMenuOpen(false); router.push(status === "authenticated" ? "/dashboard" : "/get-started"); }}
+                  className="w-full bg-[#1A4B6B] text-white px-6 py-4 rounded-xl text-lg font-bold hover:bg-[#153a54] transition-all shadow-sm text-center"
+                >
+                  Start Learning
+               </button>
             </div>
           </div>
         </div>
