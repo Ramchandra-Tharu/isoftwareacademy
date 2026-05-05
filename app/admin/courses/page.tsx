@@ -125,11 +125,17 @@ export default function CourseManagement() {
             <div className="p-10 space-y-6 flex-1">
               <div className="flex justify-between items-start">
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded-sm uppercase tracking-widest">{course.category || "General"}</span>
                     {course.isPublished && (
                       <span className="px-3 py-1 bg-black text-white text-[10px] font-bold rounded-sm uppercase tracking-widest">Live</span>
                     )}
+                    <span className={cn(
+                      "px-3 py-1 text-[10px] font-bold rounded-sm uppercase tracking-widest flex items-center gap-1",
+                      (!course.price || course.price === 0) ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                    )}>
+                      {(!course.price || course.price === 0) ? "Free" : "Premium"}
+                    </span>
                   </div>
                   <h3 className="text-3xl font-light text-black tracking-tight leading-tight">{course.title}</h3>
                 </div>
