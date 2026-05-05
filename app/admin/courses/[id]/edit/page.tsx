@@ -474,6 +474,20 @@ export default function EditCoursePage() {
                 <option value="UI/UX Design">UI_UX_DESIGN</option>
               </select>
             </div>
+
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                 <DollarSign size={12} /> Access_Type
+              </label>
+              <select 
+                value={formData.price === 0 ? "Free" : "Premium"} 
+                onChange={(e) => setFormData({ ...formData, price: e.target.value === "Free" ? 0 : 99 })} 
+                className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all appearance-none"
+              >
+                <option value="Free">FREE_COURSE</option>
+                <option value="Premium">PREMIUM_COURSE</option>
+              </select>
+            </div>
           </div>
         </div>
 

@@ -20,6 +20,7 @@ import {
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import PublicNavbar from "@/components/PublicNavbar";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -29,14 +30,6 @@ const fadeIn = {
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const handleStartLearning = () => {
     if (status === "authenticated") {
@@ -69,62 +62,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white text-[#0F172A] font-sans selection:bg-blue-100">
-      {/* Navigation */}
-      <nav className={`sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white/95 backdrop-blur-md shadow-sm py-4" : "bg-white py-6"
-      }`}>
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <img src="/uploads/logo.png" alt="iSoftware Lab Logo" className="w-10 h-10 object-contain" />
-            <span className="text-xl font-bold tracking-tight text-[#1A4B6B]">iSoftware Lab</span>
-          </Link>
-
-          <div className="hidden md:flex items-center gap-8">
-            <Link href="/" className="nav-link">Home</Link>
-            <div className="relative group py-4">
-              <button className="nav-link flex items-center gap-1">
-                Courses <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-200" />
-              </button>
-              <div className="absolute top-full left-0 w-48 bg-white border border-slate-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 mt-[-8px]">
-                <Link href="/courses" className="block px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#1A4B6B]">All Courses</Link>
-                <Link href="/courses?tab=free" className="block px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#1A4B6B]">Free Courses</Link>
-                <Link href="/courses?tab=premium" className="block px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#1A4B6B]">Premium Courses</Link>
-              </div>
-            </div>
-            <Link href="/certificates" className="nav-link">Certification</Link>
-          </div>
-
-          <div className="flex items-center gap-4">
-
-            <button 
-              onClick={handleStartLearning}
-              className="bg-[#1A4B6B] text-white px-6 py-2.5 rounded-lg text-sm font-bold hover:bg-[#153a54] transition-all"
-            >
-              Start Learning
-            </button>
-            <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              {mobileMenuOpen ? <X /> : <Menu />}
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-white pt-24 px-6 md:hidden">
-          <div className="flex flex-col gap-6">
-            <Link href="/" className="text-lg font-bold" onClick={() => setMobileMenuOpen(false)}>Home</Link>
-            <div className="flex flex-col gap-4">
-              <span className="text-lg font-bold text-slate-400">Courses</span>
-              <Link href="/courses" className="text-lg font-bold pl-4 border-l-2 border-slate-100" onClick={() => setMobileMenuOpen(false)}>All Courses</Link>
-              <Link href="/courses?tab=free" className="text-lg font-bold pl-4 border-l-2 border-slate-100" onClick={() => setMobileMenuOpen(false)}>Free Courses</Link>
-              <Link href="/courses?tab=premium" className="text-lg font-bold pl-4 border-l-2 border-slate-100" onClick={() => setMobileMenuOpen(false)}>Premium Courses</Link>
-            </div>
-            <Link href="/certificates" className="text-lg font-bold" onClick={() => setMobileMenuOpen(false)}>Certification</Link>
-
-          </div>
-        </div>
-      )}
+      <PublicNavbar />
 
       <main>
         {/* Hero Section */}
