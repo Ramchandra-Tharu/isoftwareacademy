@@ -74,13 +74,12 @@ export default function CertificatesPage() {
                 Courses <ChevronDown size={14} className="group-hover:rotate-180 transition-transform duration-200" />
               </button>
               <div className="absolute top-full left-0 w-48 bg-white border border-slate-100 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 mt-[-8px]">
-                <Link href="/courses?type=free" className="block px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#1A4B6B]">Free Course</Link>
-                <Link href="/courses" className="block px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#1A4B6B]">Premium Course</Link>
+                <Link href="/courses" className="block px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#1A4B6B]">All Courses</Link>
+                <Link href="/courses?tab=free" className="block px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#1A4B6B]">Free Courses</Link>
+                <Link href="/courses?tab=premium" className="block px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-[#1A4B6B]">Premium Courses</Link>
               </div>
             </div>
             <Link href="/certificates" className="nav-link text-[#1A4B6B]">Certification</Link>
-            <Link href="#" className="nav-link">Mocks</Link>
-            <Link href="#" className="nav-link">Results</Link>
           </div>
 
           <div className="flex items-center gap-4">
@@ -104,12 +103,11 @@ export default function CertificatesPage() {
             <Link href="/" className="text-lg font-bold" onClick={() => setMobileMenuOpen(false)}>Home</Link>
             <div className="flex flex-col gap-4">
               <span className="text-lg font-bold text-slate-400">Courses</span>
-              <Link href="/courses?type=free" className="text-lg font-bold pl-4 border-l-2 border-slate-100" onClick={() => setMobileMenuOpen(false)}>Free Course</Link>
-              <Link href="/courses" className="text-lg font-bold pl-4 border-l-2 border-slate-100" onClick={() => setMobileMenuOpen(false)}>Premium Course</Link>
+              <Link href="/courses" className="text-lg font-bold pl-4 border-l-2 border-slate-100" onClick={() => setMobileMenuOpen(false)}>All Courses</Link>
+              <Link href="/courses?tab=free" className="text-lg font-bold pl-4 border-l-2 border-slate-100" onClick={() => setMobileMenuOpen(false)}>Free Courses</Link>
+              <Link href="/courses?tab=premium" className="text-lg font-bold pl-4 border-l-2 border-slate-100" onClick={() => setMobileMenuOpen(false)}>Premium Courses</Link>
             </div>
             <Link href="/certificates" className="text-lg font-bold text-[#1A4B6B]" onClick={() => setMobileMenuOpen(false)}>Certification</Link>
-            <Link href="#" className="text-lg font-bold">Mocks</Link>
-            <Link href="#" className="text-lg font-bold">Results</Link>
           </div>
         </div>
       )}
