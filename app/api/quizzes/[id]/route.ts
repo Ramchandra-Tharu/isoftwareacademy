@@ -35,7 +35,7 @@ export async function GET(
       return NextResponse.json({ error: "Quiz not found" }, { status: 404 });
     }
 
-    if (!isAdmin && !quiz.isPublished) {
+    if (!isAdmin && quiz.status !== "Active") {
       return NextResponse.json({ error: "Quiz not available" }, { status: 403 });
     }
 

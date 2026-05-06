@@ -12,8 +12,8 @@ export async function GET() {
 
     await dbConnect();
 
-    // If admin, show all quizzes. If not, only published.
-    const query = isAdmin ? {} : { isPublished: true };
+    // If admin, show all quizzes. If not, only active.
+    const query = isAdmin ? {} : { status: "Active" };
     const quizzes = await Quiz.find(query).populate("courseId");
 
     if (isAdmin) {

@@ -16,7 +16,7 @@ export interface IQuiz extends Document {
   duration: string;
   passingScore: number;
   difficulty: "Easy" | "Medium" | "Hard";
-  isPublished: boolean;
+  status: "Draft" | "Active" | "Scheduled";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -79,9 +79,10 @@ const QuizSchema = new Schema<IQuiz>(
       enum: ["Easy", "Medium", "Hard"],
       default: "Medium",
     },
-    isPublished: {
-      type: Boolean,
-      default: false,
+    status: {
+      type: String,
+      enum: ["Draft", "Active", "Scheduled"],
+      default: "Draft",
     },
   },
   {

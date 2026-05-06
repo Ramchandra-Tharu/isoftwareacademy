@@ -301,9 +301,6 @@ export default function EditQuizPage() {
         <div className="space-y-8 pt-8 border-t border-gray-100">
           <div className="flex items-center justify-between">
             <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.3em] border-l-2 border-blue-600 pl-3">03. QUESTION_BANK</h2>
-            <button type="button" onClick={addQuestion} className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-900 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2">
-              <Plus size={14} /> ADD_QUESTION
-            </button>
           </div>
 
           <div className="space-y-6">
@@ -333,6 +330,12 @@ export default function EditQuizPage() {
                 </div>
               </div>
             ))}
+          </div>
+          
+          <div className="flex justify-end">
+            <button type="button" onClick={addQuestion} className="px-5 py-2.5 bg-gray-900 border border-gray-700 text-white hover:bg-black hover:border-gray-500 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-sm group">
+              <Plus size={14} className="group-hover:scale-110 transition-transform" /> ADD_QUESTION
+            </button>
           </div>
         </div>
 

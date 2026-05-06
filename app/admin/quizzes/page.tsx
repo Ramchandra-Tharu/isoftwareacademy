@@ -12,7 +12,8 @@ import {
   Globe, 
   Calendar,
   ShieldAlert,
-  Database
+  Database,
+  ArrowRight
 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -26,11 +27,11 @@ export default function QuizzesPage() {
   const [statusFilter, setStatusFilter] = useState("All");
 
   const quizzes = [
-    { id: "1", title: "Java Core Concepts", category: "Java", questions: 45, timeLimit: "60 mins", difficulty: "Intermediate", status: "Active", enrolled: 342, imageUrl: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80" },
-    { id: "2", title: "Python Data Structures", category: "Python", questions: 30, timeLimit: "45 mins", difficulty: "Advanced", status: "Active", enrolled: 128, imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80" },
-    { id: "3", title: "C++ Memory Management", category: "C++", questions: 50, timeLimit: "90 mins", difficulty: "Advanced", status: "Draft", enrolled: 0, imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80" },
-    { id: "4", title: "JavaScript ES6 Fundamentals", category: "JavaScript", questions: 25, timeLimit: "30 mins", difficulty: "Beginner", status: "Scheduled", enrolled: 45, imageUrl: "https://images.unsplash.com/photo-1627398240411-8cbc07d0ba26?auto=format&fit=crop&w=800&q=80" },
-    { id: "5", title: "SQL Database Design", category: "SQL", questions: 40, timeLimit: "60 mins", difficulty: "Intermediate", status: "Active", enrolled: 210, imageUrl: "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=800&q=80" },
+    { id: "1", title: "Java Core Concepts", description: "Master foundational Java elements, including OOP principles, syntax, and algorithms.", category: "Java", questions: 45, timeLimit: "60 mins", difficulty: "Intermediate", status: "Active", enrolled: 342, imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg" },
+    { id: "2", title: "Python Data Structures", description: "Deep dive into lists, dictionaries, sets, and tuples to optimize data manipulation.", category: "Python", questions: 30, timeLimit: "45 mins", difficulty: "Advanced", status: "Active", enrolled: 128, imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" },
+    { id: "3", title: "C++ Memory Management", description: "Understand pointers, references, and manual memory allocation for high-performance apps.", category: "C++", questions: 50, timeLimit: "90 mins", difficulty: "Advanced", status: "Draft", enrolled: 0, imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg" },
+    { id: "4", title: "JavaScript ES6 Fundamentals", description: "Learn modern JS syntax, arrow functions, promises, and modules for web development.", category: "JavaScript", questions: 25, timeLimit: "30 mins", difficulty: "Beginner", status: "Scheduled", enrolled: 45, imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg" },
+    { id: "5", title: "SQL Database Design", description: "Master relational database concepts, normalization, and complex querying architectures.", category: "SQL", questions: 40, timeLimit: "60 mins", difficulty: "Intermediate", status: "Active", enrolled: 210, imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg" },
   ];
 
   const filteredQuizzes = quizzes.filter(quiz => {
@@ -102,54 +103,55 @@ export default function QuizzesPage() {
          </div>
          <div className="p-8 bg-gray-50/30">
             {filteredQuizzes.length > 0 ? (
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
                   {filteredQuizzes.map((quiz) => (
                     <div key={quiz.id} className="group flex flex-col bg-white border border-gray-100 rounded-[2rem] hover:shadow-2xl hover:shadow-blue-600/10 hover:-translate-y-1 hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
                     
                     {/* Banner Image */}
-                    <div className="h-40 w-full relative overflow-hidden bg-gray-100">
-                       <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent z-10" />
+                    <div className="h-24 w-full relative overflow-hidden bg-gray-900 flex items-center justify-center p-4 border-b border-gray-800">
+                       <div className="absolute inset-0 bg-gradient-to-tr from-gray-900 to-gray-800 opacity-80" />
                        <img 
                           src={quiz.imageUrl} 
                           alt={quiz.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="relative z-10 h-full object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-2xl"
                        />
                        
-                       <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
-                          <Link href={`/admin/quizzes/${quiz.id}/edit`} className="w-8 h-8 rounded-full bg-white/90 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors shadow-sm backdrop-blur-sm">
-                             <Settings size={14} />
+                       <div className="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                          <Link href={`/admin/quizzes/${quiz.id}/edit`} className="w-7 h-7 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-blue-600 transition-colors shadow-sm backdrop-blur-sm border border-white/10">
+                             <Settings size={12} />
                           </Link>
                        </div>
 
-                       <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2">
-                          <div className={`w-2 h-2 rounded-full ${quiz.status === 'Active' ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : quiz.status === 'Draft' ? 'bg-gray-300' : 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]'}`} title={quiz.status} />
-                          <span className="text-[10px] font-black uppercase tracking-widest text-white shadow-sm">{quiz.status}</span>
+                       <div className="absolute bottom-3 left-3 z-20 flex items-center gap-2 bg-gray-900/80 backdrop-blur-md px-2 py-1 rounded-lg shadow-xl border border-white/10">
+                          <div className={`w-1 h-1 rounded-full ${quiz.status === 'Active' ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : quiz.status === 'Draft' ? 'bg-gray-400' : 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]'}`} title={quiz.status} />
+                          <span className="text-[8px] font-black uppercase tracking-widest text-white">{quiz.status}</span>
                        </div>
                     </div>
 
-                    <div className="p-6 flex-1 flex flex-col">
-                       <div className="flex-1 space-y-3">
+                    <div className="p-5 flex-1 flex flex-col">
+                       <div className="flex-1 space-y-2">
                           <div className="inline-flex">
-                             <span className="px-2.5 py-1 bg-blue-50 text-[9px] font-black uppercase tracking-widest text-blue-600 rounded-md">
+                             <span className="px-2 py-0.5 bg-blue-50 text-[9px] font-black uppercase tracking-widest text-blue-600 rounded-md">
                                 {quiz.category}
                              </span>
                           </div>
                           <div>
-                             <h3 className="text-base font-black text-gray-900 leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">{quiz.title}</h3>
+                             <h3 className="text-sm font-black text-gray-900 leading-snug group-hover:text-blue-600 transition-colors line-clamp-1">{quiz.title}</h3>
+                             <p className="text-[10px] font-medium text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">{quiz.description}</p>
                           </div>
                        </div>
 
-                       <div className="mt-6 pt-6 border-t border-gray-50 grid grid-cols-2 gap-4">
-                          <div className="space-y-1.5">
-                             <p className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-gray-400">
-                                <Clock size={10} className="text-blue-600/50" /> Duration
-                             </p>
+                       <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-2">
+                             <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <Clock size={14} />
+                             </div>
                              <p className="text-xs font-bold text-gray-700">{quiz.timeLimit}</p>
                           </div>
-                          <div className="space-y-1.5">
-                             <p className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-gray-400">
-                                <ClipboardList size={10} className="text-blue-600/50" /> Items
-                             </p>
+                          <div className="flex items-center gap-2">
+                             <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                                <ClipboardList size={14} />
+                             </div>
                              <p className="text-xs font-bold text-gray-700">{quiz.questions} Qs</p>
                           </div>
                        </div>
