@@ -70,7 +70,7 @@ export default function AdminDashboard() {
 
   const stats = [
     { label: "Total Candidates", value: adminData?.totalStudents || "1,248", icon: Users, color: "bg-blue-50 text-blue-600" },
-    { label: "Active Assessments", value: adminData?.totalCourses || "45", icon: ClipboardList, color: "bg-indigo-50 text-indigo-600" },
+    { label: "Active Quizzes", value: adminData?.totalCourses || "45", icon: ClipboardList, color: "bg-indigo-50 text-indigo-600" },
     { label: "Avg. Completion Rate", value: "84%", icon: BarChart3, color: "bg-emerald-50 text-emerald-600" },
     { label: "Certificates Issued", value: adminData?.totalCertificates || "892", icon: Award, color: "bg-amber-50 text-amber-600" },
   ];
@@ -84,8 +84,8 @@ export default function AdminDashboard() {
           <p className="text-sm text-gray-500 font-medium mt-1">Operational status: <span className="text-blue-600 font-black uppercase tracking-widest text-[10px]">Optimal</span>. Welcome back, {session?.user?.name || "Administrator"}.</p>
         </div>
         <div className="flex items-center gap-3">
-           <Link href="/admin/assessments/new" className="btn-primary flex items-center gap-2 text-xs">
-              <Plus size={16} /> Create Assessment
+           <Link href="/admin/quizzes/new" className="btn-primary flex items-center gap-2 text-xs">
+              <Plus size={16} /> Create Quiz
            </Link>
         </div>
       </div>
@@ -164,11 +164,11 @@ export default function AdminDashboard() {
       {/* Data Table Section */}
       <div className="card-premium overflow-hidden">
          <div className="p-8 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
-            <h4 className="text-xl font-black tracking-tight uppercase">Recent_Assessments</h4>
+            <h4 className="text-xl font-black tracking-tight uppercase">Recent_Quizzes</h4>
             <div className="flex items-center gap-4">
                <div className="relative group">
                   <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" />
-                  <input className="pl-9 pr-4 py-2 bg-white border border-gray-100 rounded-xl text-xs font-bold focus:outline-none focus:border-blue-100 transition-all shadow-sm" placeholder="Search Assessments..." />
+                  <input className="pl-9 pr-4 py-2 bg-white border border-gray-100 rounded-xl text-xs font-bold focus:outline-none focus:border-blue-100 transition-all shadow-sm" placeholder="Search Quizzes..." />
                </div>
             </div>
          </div>
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
                           </div>
                        </td>
                        <td className="px-8 py-6 text-right">
-                          <Link href={`/admin/assessments`} className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:underline">Manage</Link>
+                          <Link href={`/admin/quizzes`} className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:underline">Manage</Link>
                        </td>
                     </tr>
                   ))}

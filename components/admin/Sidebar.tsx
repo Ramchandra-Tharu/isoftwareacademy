@@ -14,7 +14,8 @@ import {
   Database,
   BarChart3,
   Award,
-  FileText
+  FileText,
+  BookOpen
 } from "lucide-react";
 
 import { clsx, type ClassValue } from "clsx";
@@ -26,8 +27,8 @@ function cn(...inputs: ClassValue[]) {
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
-  { icon: ClipboardList, label: "Assessments", href: "/admin/assessments" },
-  { icon: Database, label: "Question Bank", href: "/admin/questions" },
+  { icon: BookOpen, label: "Courses", href: "/admin/courses" },
+  { icon: ClipboardList, label: "Quizzes", href: "/admin/quizzes" },
   { icon: Users, label: "Candidates", href: "/admin/users" },
   { icon: BarChart3, label: "Analytics", href: "/admin/analytics" },
   { icon: Award, label: "Certificates", href: "/admin/certificates" },

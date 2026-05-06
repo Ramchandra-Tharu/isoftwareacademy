@@ -27,7 +27,7 @@ export default function EditQuizPage() {
     duration: "30m",
     passingScore: 80,
     difficulty: "Medium",
-    isPublished: false,
+    status: "Draft",
     questions: [
       {
         question: "",
@@ -64,7 +64,7 @@ export default function EditQuizPage() {
             duration: quizData.duration || "30m",
             passingScore: quizData.passingScore || 80,
             difficulty: quizData.difficulty || "Medium",
-            isPublished: quizData.isPublished || false,
+            status: quizData.status || "Draft",
             questions: quizData.questions && quizData.questions.length > 0 ? quizData.questions : [
               { question: "", options: ["", "", "", ""], correctAnswer: 0, explanation: "" }
             ]
@@ -271,15 +271,28 @@ export default function EditQuizPage() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                 Difficulty
-              </label>
-              <select value={formData.difficulty} onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all appearance-none">
-                <option value="Easy">EASY</option>
-                <option value="Medium">MEDIUM</option>
-                <option value="Hard">HARD</option>
-              </select>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                   Difficulty
+                </label>
+                <select value={formData.difficulty} onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all appearance-none">
+                  <option value="Easy">EASY</option>
+                  <option value="Medium">MEDIUM</option>
+                  <option value="Hard">HARD</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                   Status
+                </label>
+                <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all appearance-none">
+                  <option value="Draft">DRAFT</option>
+                  <option value="Active">ACTIVE</option>
+                  <option value="Scheduled">SCHEDULED</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -324,32 +337,17 @@ export default function EditQuizPage() {
         </div>
 
         <div className="pt-10 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-center gap-6">
-             <div className="flex items-center gap-3">
-                <div className="relative inline-block w-12 h-6">
-                  <input type="checkbox" id="publish" checked={formData.isPublished} onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })} className="sr-only peer" />
-                  <label htmlFor="publish" className="absolute inset-0 cursor-pointer bg-gray-200 rounded-full transition-colors peer-checked:bg-blue-600"></label>
-                  <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform peer-checked:translate-x-6"></div>
-                </div>
-                <label htmlFor="publish" className="text-[10px] font-black uppercase tracking-widest text-gray-500 cursor-pointer">
-                  LIVE_STATUS
-                </label>
-             </div>
-
-             <div className="h-6 w-px bg-gray-100"></div>
-
-             <div className="flex items-center gap-4">
-               {status === "success" && (
-                 <div className="flex items-center gap-2 text-green-500 text-[10px] font-black uppercase tracking-widest animate-pulse">
-                   <CheckCircle size={14} /> ASSET_UPDATED
-                 </div>
-               )}
-               {status === "error" && (
-                 <div className="flex items-center gap-2 text-red-500 text-[10px] font-black uppercase tracking-widest">
-                   <AlertCircle size={14} /> UPDATE_FAILED
-                 </div>
-               )}
-             </div>
+          <div className="flex items-center gap-4">
+             {status === "success" && (
+               <div className="flex items-center gap-2 text-green-500 text-[10px] font-black uppercase tracking-widest animate-pulse">
+                 <CheckCircle size={14} /> ASSET_UPDATED
+               </div>
+             )}
+             {status === "error" && (
+               <div className="flex items-center gap-2 text-red-500 text-[10px] font-black uppercase tracking-widest">
+                 <AlertCircle size={14} /> UPDATE_FAILED
+               </div>
+             )}
           </div>
           
           <button disabled={loading} type="submit" className="w-full md:w-auto px-12 py-5 bg-blue-600 text-white font-black rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-blue-600/20 flex items-center justify-center gap-3 uppercase text-xs tracking-widest">
