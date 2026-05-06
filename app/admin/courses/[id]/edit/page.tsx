@@ -274,6 +274,14 @@ export default function EditCoursePage() {
     }
   };
 
+  const handleCreateTopic = () => {
+    if (newTopicName.trim() && targetChapterName) {
+      handleAddLesson(targetChapterName, newTopicName.trim());
+      setNewTopicName("");
+      setShowTopicModal(false);
+    }
+  };
+
   const handleUpdateChapterName = async (oldName: string) => {
     if (!editingChapterName.trim() || oldName === editingChapterName.trim()) {
       setEditingChapter(null);
@@ -735,35 +743,34 @@ export default function EditCoursePage() {
 
                         <div className="space-y-6">
                           {(lesson.quiz || []).map((q: any, qIdx: number) => (
-                            <div key={qIdx} className="p-5 bg-gray-50/50 rounded-xl border border-gray-100 space-y-4 relative group/q">
+                            <div key={qIdx} className="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 space-y-5 relative group/q hover:bg-white hover:border-blue-200 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300">
                               <button 
                                 onClick={() => handleDeleteQuestion(lesson._id, qIdx)}
-                                className="absolute top-4 right-4 p-1.5 text-gray-300 hover:text-red-500 hover:bg-white rounded-lg transition-all shadow-sm opacity-0 group-hover/q:opacity-100"
+                                className="absolute top-4 right-4 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all shadow-sm opacity-0 group-hover/q:opacity-100"
                               >
-                                <Trash2 size={12} />
+                                <Trash2 size={14} />
                               </button>
 
                               <div className="space-y-2">
-                                <label className="text-[8px] font-black text-gray-400 uppercase tracking-widest">QUESTION_0{qIdx + 1}</label>
+                                <label className="text-[9px] font-black text-blue-600/60 uppercase tracking-widest">QUESTION_0{qIdx + 1}</label>
                                 <input 
                                   type="text"
                                   value={q.question}
                                   onChange={(e) => handleUpdateQuestion(lesson._id, qIdx, 'question', e.target.value)}
                                   onBlur={() => handleSaveQuestion(lesson._id)}
                                   placeholder="Enter quiz question..."
-                                  className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-[11px] font-bold outline-none focus:border-blue-400 transition-all shadow-sm"
+                                  className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3.5 text-xs font-bold outline-none hover:border-blue-300 focus:border-blue-400 focus:ring-4 focus:ring-blue-600/5 transition-all shadow-sm"
                                 />
                               </div>
 
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {q.options.map((opt: string, oIdx: number) => (
-                                  <div key={oIdx} className="flex items-center gap-3">
-                                    <button 
-                                      onClick={() => {
+                                  <div key={oIdx} className="flex items-center gap-3 group/opt p-2 rounded-xl border border-transparent hover:border-gray-100 hover:bg-gray-50/50 hover:shadow-sm transition-all cursor-pointer" onClick={() => {
                                         handleUpdateQuestion(lesson._id, qIdx, 'correctAnswer', oIdx);
                                         handleSaveQuestion(lesson._id);
-                                      }}
-                                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${q.correctAnswer === oIdx ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-gray-200'}`}
+                                      }}>
+                                    <button 
+                                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${q.correctAnswer === oIdx ? 'bg-emerald-500 border-emerald-500 text-white shadow-md shadow-emerald-500/20' : 'bg-white border-gray-200 group-hover/opt:border-blue-400'}`}
                                     >
                                       {q.correctAnswer === oIdx && <Check size={10} />}
                                     </button>
@@ -776,7 +783,8 @@ export default function EditCoursePage() {
                                         handleUpdateQuestion(lesson._id, qIdx, 'options', newOpts);
                                       }}
                                       onBlur={() => handleSaveQuestion(lesson._id)}
-                                      className="flex-1 bg-white border border-gray-100 rounded-xl px-3 py-2 text-[10px] font-medium outline-none focus:border-blue-300 transition-all"
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="flex-1 bg-white border border-gray-100 rounded-xl px-3 py-2.5 text-xs font-medium outline-none hover:border-blue-200 focus:border-blue-300 focus:ring-4 focus:ring-blue-600/5 transition-all"
                                     />
                                   </div>
                                 ))}

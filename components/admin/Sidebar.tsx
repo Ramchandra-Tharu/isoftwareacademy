@@ -6,18 +6,15 @@ import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, 
   Users, 
-  BookOpen, 
-  HelpCircle, 
-  Award, 
-  MessageSquare, 
   Settings, 
   LogOut,
   ChevronLeft,
   ChevronRight,
-  CreditCard,
+  ClipboardList,
+  Database,
   BarChart3,
-  Shield,
-  Cpu
+  Award,
+  FileText
 } from "lucide-react";
 
 import { clsx, type ClassValue } from "clsx";
@@ -29,13 +26,12 @@ function cn(...inputs: ClassValue[]) {
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
-  { icon: Users, label: "Users", href: "/admin/users" },
-  { icon: BookOpen, label: "Courses", href: "/admin/courses" },
-  { icon: BarChart3, label: "Programs", href: "/admin/programs" },
-  { icon: HelpCircle, label: "Quiz", href: "/admin/quizzes" },
-  { icon: Award, label: "Certificates", href: "/admin/certifications" },
-  { icon: CreditCard, label: "Payments", href: "/admin/payments" },
-  { icon: MessageSquare, label: "Moderation", href: "/admin/comments" },
+  { icon: ClipboardList, label: "Assessments", href: "/admin/assessments" },
+  { icon: Database, label: "Question Bank", href: "/admin/questions" },
+  { icon: Users, label: "Candidates", href: "/admin/users" },
+  { icon: BarChart3, label: "Analytics", href: "/admin/analytics" },
+  { icon: Award, label: "Certificates", href: "/admin/certificates" },
+  { icon: FileText, label: "Reports", href: "/admin/reports" },
   { icon: Settings, label: "Settings", href: "/admin/settings" },
 ];
 
