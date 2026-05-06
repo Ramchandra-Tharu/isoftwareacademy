@@ -17,7 +17,10 @@ import {
   Search,
   MoreHorizontal,
   CreditCard,
-  MessageSquare
+  MessageSquare,
+  ClipboardList,
+  CheckCircle,
+  Clock
 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -66,10 +69,10 @@ export default function AdminDashboard() {
   }
 
   const stats = [
-    { label: "Total Students", value: adminData?.totalStudents || "0", icon: Users, color: "bg-blue-50 text-blue-600" },
-    { label: "Active Courses", value: adminData?.totalCourses || "0", icon: BookOpen, color: "bg-indigo-50 text-indigo-600" },
-    { label: "Rev Revenue", value: "₹4.2L", icon: CreditCard, color: "bg-emerald-50 text-emerald-600" },
-    { label: "Certifications", value: adminData?.totalCertificates || "0", icon: Award, color: "bg-amber-50 text-amber-600" },
+    { label: "Total Candidates", value: adminData?.totalStudents || "1,248", icon: Users, color: "bg-blue-50 text-blue-600" },
+    { label: "Active Assessments", value: adminData?.totalCourses || "45", icon: ClipboardList, color: "bg-indigo-50 text-indigo-600" },
+    { label: "Avg. Completion Rate", value: "84%", icon: BarChart3, color: "bg-emerald-50 text-emerald-600" },
+    { label: "Certificates Issued", value: adminData?.totalCertificates || "892", icon: Award, color: "bg-amber-50 text-amber-600" },
   ];
 
   return (
@@ -81,8 +84,8 @@ export default function AdminDashboard() {
           <p className="text-sm text-gray-500 font-medium mt-1">Operational status: <span className="text-blue-600 font-black uppercase tracking-widest text-[10px]">Optimal</span>. Welcome back, {session?.user?.name || "Administrator"}.</p>
         </div>
         <div className="flex items-center gap-3">
-           <Link href="/admin/courses/new" className="btn-primary flex items-center gap-2 text-xs">
-              <Plus size={16} /> Create Asset
+           <Link href="/admin/assessments/new" className="btn-primary flex items-center gap-2 text-xs">
+              <Plus size={16} /> Create Assessment
            </Link>
         </div>
       </div>
@@ -161,11 +164,11 @@ export default function AdminDashboard() {
       {/* Data Table Section */}
       <div className="card-premium overflow-hidden">
          <div className="p-8 border-b border-gray-50 flex items-center justify-between bg-gray-50/30">
-            <h4 className="text-xl font-black tracking-tight uppercase">Recent_Deployments</h4>
+            <h4 className="text-xl font-black tracking-tight uppercase">Recent_Assessments</h4>
             <div className="flex items-center gap-4">
                <div className="relative group">
                   <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors" />
-                  <input className="pl-9 pr-4 py-2 bg-white border border-gray-100 rounded-xl text-xs font-bold focus:outline-none focus:border-blue-100 transition-all shadow-sm" placeholder="Search Catalog..." />
+                  <input className="pl-9 pr-4 py-2 bg-white border border-gray-100 rounded-xl text-xs font-bold focus:outline-none focus:border-blue-100 transition-all shadow-sm" placeholder="Search Assessments..." />
                </div>
             </div>
          </div>
@@ -185,7 +188,7 @@ export default function AdminDashboard() {
                        <td className="px-8 py-6">
                           <div className="flex items-center gap-3">
                              <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                                <BookOpen size={18} />
+                                <ClipboardList size={18} />
                              </div>
                              <span className="text-sm font-black text-gray-900 uppercase tracking-tight">{course.title}</span>
                           </div>
@@ -202,7 +205,7 @@ export default function AdminDashboard() {
                           </div>
                        </td>
                        <td className="px-8 py-6 text-right">
-                          <Link href={`/admin/courses/${course._id}/edit`} className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:underline">Configure</Link>
+                          <Link href={`/admin/assessments`} className="text-[10px] font-black uppercase tracking-widest text-blue-600 hover:underline">Manage</Link>
                        </td>
                     </tr>
                   ))}
