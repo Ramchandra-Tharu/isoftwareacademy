@@ -5,11 +5,19 @@ import Attempt from "@/models/Attempt";
 import Certificate from "@/models/Certificate";
 import User from "@/models/User";
 import Course from "@/models/Course";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../../auth/[...nextauth]/route";
 
 export async function POST(req: Request) {
   try {
     await dbConnect();
-    const { userId, quizId, courseId, answers, startTime, endTime } = await req.json();
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const userId = session.user.id;
+
+    const { quizId, courseId, answers, startTime, endTime } = await req.json();
 
     const quiz = await Quiz.findById(quizId);
     if (!quiz) {
@@ -21,7 +29,7 @@ export async function POST(req: Request) {
 
     let score = 0;
     quiz.questions.forEach((q, i) => {
-      if (answers[i] === q.correctAnswer) {
+      if (Number(answers[i]) === Number(q.correctAnswer)) {
         score++;
       }
     });

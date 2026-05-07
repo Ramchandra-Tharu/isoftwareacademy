@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   ClipboardList, 
@@ -13,7 +13,10 @@ import {
   Calendar,
   ShieldAlert,
   Database,
-  ArrowRight
+  ArrowRight,
+  Edit2,
+  Trash2,
+  Loader2
 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -25,19 +28,43 @@ function cn(...inputs: ClassValue[]) {
 export default function QuizzesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [quizzes, setQuizzes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const quizzes = [
-    { id: "1", title: "Java Core Concepts", description: "Master foundational Java elements, including OOP principles, syntax, and algorithms.", category: "Java", questions: 45, timeLimit: "60 mins", difficulty: "Intermediate", status: "Active", enrolled: 342, imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg" },
-    { id: "2", title: "Python Data Structures", description: "Deep dive into lists, dictionaries, sets, and tuples to optimize data manipulation.", category: "Python", questions: 30, timeLimit: "45 mins", difficulty: "Advanced", status: "Active", enrolled: 128, imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" },
-    { id: "3", title: "C++ Memory Management", description: "Understand pointers, references, and manual memory allocation for high-performance apps.", category: "C++", questions: 50, timeLimit: "90 mins", difficulty: "Advanced", status: "Draft", enrolled: 0, imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg" },
-    { id: "4", title: "JavaScript ES6 Fundamentals", description: "Learn modern JS syntax, arrow functions, promises, and modules for web development.", category: "JavaScript", questions: 25, timeLimit: "30 mins", difficulty: "Beginner", status: "Scheduled", enrolled: 45, imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg" },
-    { id: "5", title: "SQL Database Design", description: "Master relational database concepts, normalization, and complex querying architectures.", category: "SQL", questions: 40, timeLimit: "60 mins", difficulty: "Intermediate", status: "Active", enrolled: 210, imageUrl: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg" },
-  ];
+  useEffect(() => {
+    fetchQuizzes();
+  }, []);
+
+  const fetchQuizzes = async () => {
+    try {
+      const res = await fetch("/api/quizzes");
+      if (res.ok) {
+         const data = await res.json();
+         setQuizzes(data);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this quiz?")) return;
+    try {
+      const res = await fetch(`/api/quizzes/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setQuizzes(quizzes.filter(q => q._id !== id));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const filteredQuizzes = quizzes.filter(quiz => {
     const matchesSearch = searchQuery === "" || 
-      quiz.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      quiz.category.toLowerCase().includes(searchQuery.toLowerCase());
+      quiz.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      quiz.courseId?.category?.toLowerCase().includes(searchQuery.toLowerCase());
       
     const matchesStatus = statusFilter === "All" || quiz.status === statusFilter;
     
@@ -101,25 +128,33 @@ export default function QuizzesPage() {
                ))}
             </div>
          </div>
-         <div className="p-8 bg-gray-50/30">
-            {filteredQuizzes.length > 0 ? (
+         <div className="p-8 bg-gray-50/30 min-h-[40vh]">
+            {loading ? (
+               <div className="flex flex-col items-center justify-center h-full py-20 text-gray-400">
+                  <Loader2 size={32} className="animate-spin mb-4 text-blue-600" />
+                  <p className="text-xs font-black tracking-widest uppercase">Fetching Quizzes...</p>
+               </div>
+            ) : filteredQuizzes.length > 0 ? (
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
                   {filteredQuizzes.map((quiz) => (
-                    <div key={quiz.id} className="group flex flex-col bg-white border border-gray-100 rounded-[2rem] hover:shadow-2xl hover:shadow-blue-600/10 hover:-translate-y-1 hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+                    <div key={quiz._id} className="group flex flex-col bg-white border border-gray-100 rounded-[2rem] hover:shadow-2xl hover:shadow-blue-600/10 hover:-translate-y-1 hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
                     
                     {/* Banner Image */}
-                    <div className="h-24 w-full relative overflow-hidden bg-gray-900 flex items-center justify-center p-4 border-b border-gray-800">
-                       <div className="absolute inset-0 bg-gradient-to-tr from-gray-900 to-gray-800 opacity-80" />
+                    <div className="h-28 w-full relative overflow-hidden bg-gray-900 flex items-center justify-center border-b border-gray-800">
                        <img 
-                          src={quiz.imageUrl} 
+                          src={quiz.image || "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg"} 
                           alt={quiz.title}
-                          className="relative z-10 h-full object-contain group-hover:scale-110 transition-transform duration-500 drop-shadow-2xl"
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-90"
                        />
+                       <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-80" />
                        
-                       <div className="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
-                          <Link href={`/admin/quizzes/${quiz.id}/edit`} className="w-7 h-7 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-blue-600 transition-colors shadow-sm backdrop-blur-sm border border-white/10">
-                             <Settings size={12} />
+                       <div className="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0 flex items-center gap-2">
+                          <Link href={`/admin/quizzes/${quiz._id}/edit`} className="w-7 h-7 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-blue-600 transition-colors shadow-sm backdrop-blur-sm border border-white/10" title="Edit Quiz">
+                             <Edit2 size={12} />
                           </Link>
+                          <button onClick={() => handleDelete(quiz._id)} className="w-7 h-7 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-red-600 transition-colors shadow-sm backdrop-blur-sm border border-white/10" title="Delete Quiz">
+                             <Trash2 size={12} />
+                          </button>
                        </div>
 
                        <div className="absolute bottom-3 left-3 z-20 flex items-center gap-2 bg-gray-900/80 backdrop-blur-md px-2 py-1 rounded-lg shadow-xl border border-white/10">
@@ -132,12 +167,12 @@ export default function QuizzesPage() {
                        <div className="flex-1 space-y-2">
                           <div className="inline-flex">
                              <span className="px-2 py-0.5 bg-blue-50 text-[9px] font-black uppercase tracking-widest text-blue-600 rounded-md">
-                                {quiz.category}
+                                {quiz.courseId?.category || "General"}
                              </span>
                           </div>
                           <div>
                              <h3 className="text-sm font-black text-gray-900 leading-snug group-hover:text-blue-600 transition-colors line-clamp-1">{quiz.title}</h3>
-                             <p className="text-[10px] font-medium text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">{quiz.description}</p>
+                             <p className="text-[10px] font-medium text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">{quiz.description || "No description provided."}</p>
                           </div>
                        </div>
 
@@ -146,13 +181,13 @@ export default function QuizzesPage() {
                              <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
                                 <Clock size={14} />
                              </div>
-                             <p className="text-xs font-bold text-gray-700">{quiz.timeLimit}</p>
+                             <p className="text-xs font-bold text-gray-700">{quiz.duration}</p>
                           </div>
                           <div className="flex items-center gap-2">
                              <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
                                 <ClipboardList size={14} />
                              </div>
-                             <p className="text-xs font-bold text-gray-700">{quiz.questions} Qs</p>
+                             <p className="text-xs font-bold text-gray-700">{quiz.questions?.length || 0} Qs</p>
                           </div>
                        </div>
                     </div>

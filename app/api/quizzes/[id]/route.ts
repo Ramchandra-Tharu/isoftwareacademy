@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/utils/db";
 import Quiz from "@/models/Quiz";
 import Course from "@/models/Course";
+import Attempt from "@/models/Attempt";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 
@@ -46,6 +47,17 @@ export async function GET(
         const { correctAnswer, ...rest } = q;
         return rest;
       });
+
+      // Check if user has already passed this quiz
+      const passedAttempt = await Attempt.findOne({
+        userId: session.user.id,
+        quizId: quiz._id,
+        passed: true
+      });
+
+      if (passedAttempt) {
+        responseData.previousPassedAttempt = passedAttempt;
+      }
     }
 
     return NextResponse.json(responseData);
