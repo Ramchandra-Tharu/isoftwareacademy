@@ -33,11 +33,11 @@ export default function QuizDashboardPage() {
   const CHECK_CIRCLE = CheckCircle;
 
   const quizStats = [
-    { title: "Quizzes Attempted", value: 24, icon: HELP_CIRCLE, description: "total quizzes", trend: "+4", trendType: "positive" },
-    { title: "Average Score", value: "88%", icon: TARGET, description: "across all modules", trend: "Top Tier", trendType: "positive" },
-    { title: "Fastest Time", value: "4m 12s", icon: ZAP, description: "Next.js Basics", trend: "Record!", trendType: "positive" },
-    { title: "Pass Rate", value: "95%", icon: CHECK_CIRCLE, description: "successful attempts", trend: "Excellent", trendType: "positive" },
-  ] as const;
+    { title: "Total Quizzes", value: quizzes.length, icon: Layers, description: "course assessments" },
+    { title: "Overall Progress", value: "0%", icon: BarChart, description: "completion rate" },
+    { title: "Pending Quizzes", value: quizzes.length, icon: Clock, description: "to be attempted" },
+    { title: "Finished Quizzes", value: 0, icon: CheckCircle, description: "passed quizzes" },
+  ];
 
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -67,21 +67,21 @@ export default function QuizDashboardPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-           <h1 className="text-4xl font-bold font-serif text-white mb-2">Quiz Center</h1>
-           <p className="text-gray-400">Test your knowledge and earn exclusive badges.</p>
+           <h1 className="text-3xl font-black tracking-tight text-gray-900 uppercase">Quiz_Center</h1>
+           <p className="text-sm text-gray-500 font-medium mt-1">Test your knowledge and track your progress.</p>
         </div>
         
         <div className="flex items-center gap-3">
            <div className="relative group md:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-[#EBBB54] transition-colors" size={18} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={16} />
               <input 
                 type="text" 
                 placeholder="Search quizzes..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-[#EBBB54]/50 transition-all"
+                className="w-full pl-9 pr-4 py-3 bg-white border border-gray-100 rounded-xl text-xs font-bold focus:outline-none focus:border-blue-100 transition-all shadow-sm"
               />
            </div>
-           <button className="p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-gray-400 hover:text-white transition-all">
-              <Filter size={18} />
+           <button className="p-3 bg-white hover:bg-gray-50 border border-gray-100 rounded-xl text-gray-400 hover:text-gray-900 transition-all shadow-sm">
+              <Filter size={16} />
            </button>
         </div>
       </div>
@@ -94,52 +94,55 @@ export default function QuizDashboardPage() {
       </div>
 
       {/* Quizzes List */}
-      <div className="space-y-8">
+      <div className="space-y-6">
          <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-bold text-white flex items-center gap-3">
-               <Layers className="text-[#EBBB54]" /> Available Assessments
+            <h3 className="text-xl font-black text-gray-900 flex items-center gap-2 uppercase tracking-tight">
+               <Layers className="text-blue-600" size={20} /> Available Quizzes
             </h3>
          </div>
 
          {loading ? (
-            <div className="h-64 flex flex-col items-center justify-center text-gray-500 gap-4">
-               <Loader2 className="animate-spin text-[#EBBB54]" size={40} />
-               <p>Loading assessment center...</p>
+            <div className="h-64 flex flex-col items-center justify-center text-gray-400 gap-4">
+               <Loader2 className="animate-spin text-blue-600" size={32} />
+               <p className="text-xs font-black tracking-widest uppercase">Loading quiz center...</p>
             </div>
          ) : quizzes.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {quizzes.map((quiz) => {
               if (!quiz || !quiz._id) return null;
               return (
-                <div key={quiz._id} className="group bg-[#1a1a1a] border border-white/5 rounded-2xl overflow-hidden hover:border-[#EBBB54]/30 hover:bg-[#222222] transition-all duration-300 flex flex-col">
-                 <div className="h-40 overflow-hidden relative">
-                    <img src={quiz.image || "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&auto=format&fit=crop&q=60"} alt={quiz.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-60 group-hover:opacity-100" />
-                    <div className="absolute top-4 left-4 px-2 py-1 bg-black/60 rounded-lg text-[9px] font-bold uppercase tracking-wider border border-white/10 backdrop-blur-md">
-                       {quiz.difficulty}
+                 <div onClick={() => window.location.href = `/dashboard/quiz/${quiz._id}`} key={quiz._id} className="cursor-pointer group bg-white border border-gray-100 rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-blue-600/20 hover:-translate-y-1 hover:border-blue-300 transition-all duration-300 flex flex-col">
+                 <div className="h-28 overflow-hidden relative bg-gray-100 flex items-center justify-center border-b border-gray-100">
+                    <img src={quiz.image || "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg"} alt={quiz.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-60 group-hover:opacity-80 transition-opacity pointer-events-none" />
+                    
+                    <div className="absolute bottom-3 left-3 z-20 flex items-center gap-1.5 bg-white/95 backdrop-blur-md px-2 py-1 rounded-md shadow-sm border border-gray-100">
+                       <div className={`w-1.5 h-1.5 rounded-full ${quiz.difficulty === 'Easy' ? 'bg-emerald-500' : quiz.difficulty === 'Hard' ? 'bg-red-500' : 'bg-amber-500'}`} />
+                       <span className="text-[8px] font-black uppercase tracking-widest text-gray-700">{quiz.difficulty}</span>
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] to-transparent"></div>
                  </div>
 
-                 <div className="p-6 flex-1 flex flex-col justify-between space-y-6">
-                    <div className="space-y-2">
-                       <h4 className="text-lg font-bold text-white group-hover:text-[#EBBB54] transition-colors">{quiz.title}</h4>
-                       <div className="flex items-center gap-4 text-xs text-gray-500 pt-1">
-                          <span className="flex items-center gap-1.5"><HelpCircle size={14} /> {quiz.questions?.length || 0} Qs</span>
-                          <span className="flex items-center gap-1.5"><Clock size={14} /> {quiz.duration}</span>
-                       </div>
+                 <div className="p-4 flex-1 flex flex-col space-y-3">
+                    <div>
+                       <h4 className="text-[13px] font-black text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-1">{quiz.title}</h4>
+                       <p className="text-[9px] font-medium text-gray-500 line-clamp-2 leading-relaxed mt-1">{quiz.description || "Test your knowledge on this module."}</p>
                     </div>
 
-                    <div className="pt-4 border-t border-white/5 flex items-center justify-between">
-                       <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[#EBBB54]">
-                             <Award size={16} />
+                    <div className="mt-auto pt-3 border-t border-gray-50 flex items-center justify-between relative overflow-hidden min-h-[2.5rem]">
+                       <div className="flex items-center gap-4 transition-transform duration-300 group-hover:-translate-x-2">
+                          <div className="flex items-center gap-1.5 text-gray-500">
+                             <Clock size={12} />
+                             <span className="text-[10px] font-bold">{quiz.duration}</span>
                           </div>
-                          <span className="text-[10px] text-gray-400 font-bold max-w-[80px] leading-tight">Reward Unlockable</span>
+                          <div className="flex items-center gap-1.5 text-gray-500">
+                             <HelpCircle size={12} />
+                             <span className="text-[10px] font-bold">{quiz.questions?.length || 0} Qs</span>
+                          </div>
                        </div>
-                       
-                       <button className="px-4 py-2 bg-[#EBBB54] text-black rounded-xl text-xs font-bold hover:scale-105 transition-all flex items-center gap-2">
-                          Start Assessment <ArrowRight size={14} />
-                       </button>
+
+                       <div className="absolute right-0 flex items-center bg-blue-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest opacity-0 translate-x-8 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 gap-1.5 shadow-md">
+                          Start <ArrowRight size={10} />
+                       </div>
                     </div>
                  </div>
               </div>
@@ -147,9 +150,9 @@ export default function QuizDashboardPage() {
             })}
           </div>
          ) : (
-           <div className="h-64 border-2 border-dashed border-white/5 rounded-3xl flex flex-col items-center justify-center text-gray-600 gap-4">
-              <AlertCircle size={40} className="opacity-20" />
-              <p>No quizzes available for your current modules.</p>
+           <div className="h-64 bg-white border border-gray-100 rounded-3xl flex flex-col items-center justify-center text-gray-400 gap-4 shadow-sm">
+              <AlertCircle size={40} className="text-gray-300" />
+              <p className="text-xs font-bold uppercase tracking-widest text-gray-500">No quizzes available.</p>
            </div>
          )}
       </div>

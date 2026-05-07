@@ -29,7 +29,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
   { icon: BookOpen, label: "My Courses", href: "/dashboard/my-courses" },
   { icon: BarChart2, label: "Analytics", href: "/dashboard/progress" },
-  { icon: HelpCircle, label: "Assessments", href: "/dashboard/quiz" },
+  { icon: HelpCircle, label: "Quizzes", href: "/dashboard/quiz" },
   { icon: Award, label: "Certificates", href: "/dashboard/certificates" },
   { icon: MessageSquare, label: "Community", href: "/dashboard/comments" },
 ];
