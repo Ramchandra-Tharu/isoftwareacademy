@@ -21,6 +21,34 @@ export default function QuizAttemptPage() {
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [startTime, setStartTime] = useState<Date | null>(null);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+  const parseDurationToSeconds = (durationStr: string): number => {
+    if (!durationStr) return 600; // default 10 minutes
+    const cleaned = durationStr.toLowerCase().trim();
+    const matchMin = cleaned.match(/^(\d+)\s*(m|min|minutes)$/) || cleaned.match(/^(\d+)m$/) || cleaned.match(/^(\d+)\s*min$/);
+    if (matchMin) {
+      return parseInt(matchMin[1], 10) * 60;
+    }
+    const matchSec = cleaned.match(/^(\d+)\s*(s|sec|seconds)$/) || cleaned.match(/^(\d+)s$/) || cleaned.match(/^(\d+)\s*sec$/);
+    if (matchSec) {
+      return parseInt(matchSec[1], 10);
+    }
+    const rawNum = parseInt(cleaned, 10);
+    if (!isNaN(rawNum)) {
+      if (cleaned.includes("s") || cleaned.includes("sec")) {
+        return rawNum;
+      }
+      return rawNum * 60;
+    }
+    return 600;
+  };
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -35,6 +63,8 @@ export default function QuizAttemptPage() {
           } else {
             setAnswers(new Array(data.questions.length).fill(-1));
             setStartTime(new Date());
+            const seconds = parseDurationToSeconds(data.duration);
+            setTimeLeft(seconds);
           }
         } else {
           router.push("/dashboard/quiz");
@@ -48,13 +78,37 @@ export default function QuizAttemptPage() {
     fetchQuiz();
   }, [quizId, router]);
 
+  useEffect(() => {
+    if (timeLeft === null || result) return;
+    
+    if (timeLeft <= 0) {
+      submitQuiz(true);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => (prev !== null ? prev - 1 : null));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, result]);
+
   const selectAnswer = (index: number) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = index;
     setAnswers(newAnswers);
   };
 
+  const canNavigateTo = (targetIndex: number) => {
+    if (targetIndex <= currentQuestion) return true;
+    for (let k = currentQuestion; k < targetIndex; k++) {
+      if (answers[k] === -1) return false;
+    }
+    return true;
+  };
+
   const nextQuestion = () => {
+    if (answers[currentQuestion] === -1) return;
     if (currentQuestion < quiz.questions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
     }
@@ -66,8 +120,8 @@ export default function QuizAttemptPage() {
     }
   };
 
-  const submitQuiz = async () => {
-    if (answers.includes(-1)) {
+  const submitQuiz = async (isTimeout = false) => {
+    if (!isTimeout && answers.includes(-1)) {
       alert("Please answer all questions before submitting.");
       return;
     }
@@ -89,6 +143,9 @@ export default function QuizAttemptPage() {
       if (res.ok) {
         const data = await res.json();
         setResult(data.attempt);
+        if (isTimeout) {
+          alert("Time's up! Your quiz has been automatically submitted.");
+        }
       } else {
         alert("Failed to submit quiz.");
       }
@@ -173,6 +230,8 @@ export default function QuizAttemptPage() {
                   setAnswers(Array(quiz.questions.length).fill(-1));
                   setCurrentQuestion(0);
                   setStartTime(new Date());
+                  const seconds = parseDurationToSeconds(quiz.duration);
+                  setTimeLeft(seconds);
                }} className="px-8 py-3.5 bg-gray-900 hover:bg-blue-600 text-white font-black uppercase text-xs tracking-widest rounded-xl transition-all shadow-lg shadow-gray-900/20 hover:shadow-blue-600/40 hover:-translate-y-0.5 flex items-center gap-2 w-full sm:w-auto justify-center">
                  Retake Quiz <RefreshCw size={16} />
                </button>
@@ -189,57 +248,43 @@ export default function QuizAttemptPage() {
   const q = quiz.questions[currentQuestion];
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-20 mt-4">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-100 pb-6">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard/quiz" className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-500 hover:text-gray-900">
-            <ArrowLeft size={24} />
+    <div className="max-w-4xl mx-auto space-y-6 pb-4 -mt-4 md:-mt-8 px-4 md:px-0">
+      {/* Compact Seamless Header */}
+      <div className="flex items-center justify-between gap-4 pb-1">
+        <div className="flex items-center gap-2">
+          <Link href="/dashboard/quiz" className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-900 border border-gray-150 bg-white shadow-sm">
+            <ArrowLeft size={18} />
           </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{quiz.title}</h1>
-            <p className="text-sm text-gray-500 font-medium">Question {currentQuestion + 1} of {quiz.questions.length}</p>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-base md:text-lg font-bold text-gray-900 tracking-tight line-clamp-1">{quiz.title}</h1>
+            <span className="text-xs md:text-sm text-gray-400 font-bold bg-gray-50 border border-gray-150 px-2.5 py-0.5 rounded-md">Q {currentQuestion + 1} / {quiz.questions.length}</span>
           </div>
         </div>
         
-        <div className="flex items-center gap-2 text-blue-600 bg-blue-50 px-4 py-2 rounded-xl text-sm font-bold border border-blue-100">
-          <Clock size={16} />
-          <span>{quiz.duration} Limit</span>
+        <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-bold border transition-all shrink-0 ${timeLeft !== null && timeLeft < 15 ? 'text-red-600 bg-red-50 border-red-200 animate-pulse scale-105' : 'text-blue-600 bg-blue-50 border-blue-100 shadow-sm'}`}>
+          <Clock size={14} />
+          <span>{timeLeft !== null ? formatTime(timeLeft) : quiz.duration} Left</span>
         </div>
       </div>
 
-      {/* Progress */}
-      <div className="flex gap-2">
-        {quiz.questions.map((_: any, i: number) => (
-          <div key={i} className={`h-2 flex-1 rounded-full transition-all duration-300 ${i === currentQuestion ? 'bg-blue-600' : i < currentQuestion ? 'bg-blue-200' : 'bg-gray-100'}`}></div>
-        ))}
-      </div>
-
-      {/* Question Card */}
-      <div className="bg-white border border-gray-100 rounded-3xl p-6 md:p-8 space-y-8 shadow-xl relative overflow-hidden">
-        <div className="absolute -top-10 -right-10 text-gray-50">
-           <Brain size={200} />
-        </div>
-
-        <h2 className="text-xl md:text-2xl font-bold text-gray-900 relative z-10 leading-relaxed">
+      {/* Seamless Professional Question Content */}
+      <div className="space-y-6">
+        <h2 className="text-lg md:text-xl font-bold text-gray-900 leading-relaxed pt-2">
           {q.question}
         </h2>
 
-        <div className="grid grid-cols-1 gap-4 relative z-10">
+        <div className="flex flex-col">
           {q.options.map((opt: string, index: number) => (
             <button
               key={index}
               onClick={() => selectAnswer(index)}
-              className={`flex items-center gap-3 p-4 rounded-xl text-left transition-all duration-300 group
-                ${answers[currentQuestion] === index 
-                  ? 'bg-blue-50 border-2 border-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.08)]' 
-                  : 'bg-gray-50 border-2 border-transparent hover:border-blue-200 hover:bg-blue-50/50'}`}
+              className="flex items-center gap-3.5 py-4 px-1.5 w-full text-left transition-all duration-200 group border-b border-gray-100 last:border-b-0"
             >
-              <div className={`w-5 h-5 rounded-full flex items-center justify-center border-2 transition-colors shrink-0
-                ${answers[currentQuestion] === index ? 'border-blue-600 bg-blue-600' : 'border-gray-300 group-hover:border-blue-400'}`}>
-                {answers[currentQuestion] === index && <Check size={12} className="text-white stroke-[3]" />}
+              <div className={`w-5 h-5 rounded-full flex items-center justify-center border transition-all shrink-0
+                ${answers[currentQuestion] === index ? 'border-blue-600 bg-blue-600 ring-4 ring-blue-50' : 'border-gray-300 group-hover:border-blue-400 bg-white'}`}>
+                {answers[currentQuestion] === index && <div className="w-2 h-2 rounded-full bg-white" />}
               </div>
-              <span className={`text-[15px] font-medium leading-snug ${answers[currentQuestion] === index ? 'text-blue-900 font-bold' : 'text-gray-700 group-hover:text-gray-900'}`}>
+              <span className={`text-[15px] md:text-[16px] font-semibold leading-snug transition-colors ${answers[currentQuestion] === index ? 'text-blue-600 font-bold' : 'text-gray-700 group-hover:text-gray-900'}`}>
                 {opt}
               </span>
             </button>
@@ -247,11 +292,11 @@ export default function QuizAttemptPage() {
         </div>
 
         {/* Navigation */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-100 relative z-10">
+        <div className="flex items-center justify-between pt-6 border-t border-gray-150">
           <button 
             onClick={prevQuestion}
             disabled={currentQuestion === 0}
-            className={`px-5 py-2.5 text-sm rounded-xl font-bold transition-all ${currentQuestion === 0 ? 'opacity-50 cursor-not-allowed text-gray-400' : 'bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900'}`}
+            className={`px-5 py-2.5 text-xs md:text-sm rounded-lg font-bold transition-all ${currentQuestion === 0 ? 'opacity-50 cursor-not-allowed text-gray-400' : 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900'}`}
           >
             Previous
           </button>
@@ -260,8 +305,8 @@ export default function QuizAttemptPage() {
             <button 
               onClick={submitQuiz}
               disabled={submitting || answers.includes(-1)}
-              className={`flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white font-black uppercase tracking-widest text-xs rounded-xl transition-all
-                ${(submitting || answers.includes(-1)) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600 shadow-xl shadow-gray-900/10 hover:shadow-blue-600/20'}`}
+              className={`flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white font-black uppercase tracking-widest text-[11px] md:text-xs rounded-lg transition-all
+                ${(submitting || answers.includes(-1)) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600 shadow-lg shadow-gray-900/10 hover:shadow-blue-600/20'}`}
             >
               {submitting ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle size={16} />}
               Submit Quiz
@@ -269,7 +314,11 @@ export default function QuizAttemptPage() {
           ) : (
             <button 
               onClick={nextQuestion}
-              className="flex items-center gap-2 px-6 py-2.5 bg-gray-900 hover:bg-blue-600 text-white text-sm font-bold rounded-xl transition-colors shadow-md hover:shadow-blue-600/20"
+              disabled={answers[currentQuestion] === -1}
+              className={`flex items-center gap-2 px-6 py-2.5 text-xs md:text-sm font-bold rounded-lg transition-all
+                ${answers[currentQuestion] === -1 
+                  ? 'opacity-50 cursor-not-allowed bg-gray-200 text-gray-400' 
+                  : 'bg-gray-900 hover:bg-blue-600 text-white hover:shadow-blue-600/20 shadow-md'}`}
             >
               Next <ChevronRight size={16} />
             </button>

@@ -201,16 +201,24 @@ export async function GET() {
     ];
 
     // 3. Create or update the Java Quiz
+    const questionsWithNumbers = questions.map((q, index) => {
+      const startsWithNumber = /^\d+\.\s/.test(q.question);
+      return {
+        ...q,
+        question: startsWithNumber ? q.question : `${index + 1}. ${q.question}`
+      };
+    });
+
     const quizData = {
       courseId: course._id,
       title: "Java Fundamentals Quiz",
       slug: "java-fundamentals-quiz",
       description: "Test your knowledge of core Java concepts, syntax, variables, data types, and OOP basics with these 26 curated questions.",
-      questions,
+      questions: questionsWithNumbers,
       duration: "30m",
       passingScore: 80,
       difficulty: "Medium",
-      status: "Active",
+      status: "Draft",
     };
 
     const updatedQuiz = await Quiz.findOneAndUpdate(
