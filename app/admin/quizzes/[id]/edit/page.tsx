@@ -178,153 +178,162 @@ export default function EditQuizPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 font-sans pb-20">
+    <div className="max-w-4xl mx-auto space-y-6 font-sans pb-20 px-4">
       <div className="flex items-center gap-4">
-        <Link href="/admin/quizzes" className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400 hover:text-gray-900 border border-gray-100">
-          <ArrowLeft size={24} />
+        <Link href="/admin/quizzes" className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-900 border border-gray-200 bg-white shadow-sm">
+          <ArrowLeft size={20} />
         </Link>
         <div>
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight uppercase">UPDATE_<span className="text-blue-600">QUIZ</span></h1>
-          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Modifying assessment unit in quiz_db</p>
+          <h1 className="text-2xl font-bold text-gray-900">Edit Quiz</h1>
+          <p className="text-sm text-gray-500">Modify the existing quiz details and question bank.</p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="card-premium p-10 space-y-12 relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-8 opacity-5">
-           <Save size={120} />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Section 1: Core Identity */}
-          <div className="space-y-8">
-            <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.3em] border-l-2 border-blue-600 pl-3">01. CORE_IDENTITY</h2>
+      <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 md:p-8 space-y-8 relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Section 1: General Information */}
+          <div className="space-y-6">
+            <h2 className="text-sm font-semibold text-blue-600 uppercase tracking-wider border-l-2 border-blue-600 pl-3">01. General Information</h2>
             
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                <Type size={12} /> Quiz_Title
+            <div className="space-y-1.5">
+              <label className="flex items-center gap-2 text-xs font-medium text-gray-700">
+                <Type size={14} className="text-gray-400" /> Quiz Title
               </label>
-              <input required type="text" value={formData.title} onChange={handleTitleChange} placeholder="E.G. REACT_FUNDAMENTALS" className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
+              <input required type="text" value={formData.title} onChange={handleTitleChange} placeholder="e.g. React Fundamentals" className="w-full bg-white border border-gray-300 rounded-md py-2 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all" />
             </div>
 
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                <LinkIcon size={12} /> Access_Slug
+            <div className="space-y-1.5">
+              <label className="flex items-center gap-2 text-xs font-medium text-gray-700">
+                <LinkIcon size={14} className="text-gray-400" /> Access Slug
               </label>
-              <input required type="text" value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all font-mono text-blue-600/70" />
+              <input required type="text" value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })} placeholder="e.g. react-fundamentals" className="w-full bg-white border border-gray-300 rounded-md py-2 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all font-mono text-blue-600" />
             </div>
 
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                 Linked_Course
+            <div className="space-y-1.5">
+              <label className="flex items-center gap-2 text-xs font-medium text-gray-700">
+                 Linked Course
               </label>
-              <select required value={formData.courseId} onChange={(e) => setFormData({ ...formData, courseId: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all appearance-none">
-                <option value="">SELECT_COURSE</option>
-                {courses.map(c => (
-                  <option key={c._id} value={c._id}>{c.title}</option>
-                ))}
-              </select>
+              <div className="relative">
+                <select required value={formData.courseId} onChange={(e) => setFormData({ ...formData, courseId: e.target.value })} className="w-full bg-white border border-gray-300 rounded-md py-2 px-3 pr-8 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all appearance-none">
+                  <option value="">Select a Course</option>
+                  {courses.map(c => (
+                    <option key={c._id} value={c._id}>{c.title}</option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                </div>
+              </div>
             </div>
             
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Description</label>
-              <textarea rows={2} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="BRIEF_OVERVIEW..." className="w-full bg-gray-50 border border-gray-100 rounded-[24px] py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all resize-none" />
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-gray-700">Description</label>
+              <textarea rows={3} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Provide a brief overview of what this quiz covers..." className="w-full bg-white border border-gray-300 rounded-md py-2 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all resize-none" />
             </div>
 
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                <ImageIcon size={12} /> Quiz_Cover_Image
+            <div className="space-y-1.5">
+              <label className="flex items-center gap-2 text-xs font-medium text-gray-700">
+                <ImageIcon size={14} className="text-gray-400" /> Quiz Cover Image
               </label>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="relative flex-1">
-                  <input type="text" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} placeholder="IMAGE_URL..." className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 pr-12 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
+                  <input type="text" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} placeholder="Image URL..." className="w-full bg-white border border-gray-300 rounded-md py-2 px-3 pr-10 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all" />
                   {formData.image && (
-                    <img src={formData.image} alt="Preview" className="absolute right-3 top-1/2 -translate-y-1/2 h-8 w-8 rounded object-cover border border-white/20" />
+                    <img src={formData.image} alt="Preview" className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 rounded object-cover border border-gray-200" />
                   )}
                 </div>
                 <div className="relative">
                   <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                  <div className="flex items-center justify-center bg-gray-50 hover:bg-gray-100 border border-gray-100 rounded-2xl h-[54px] px-6 transition-all text-gray-900 font-bold text-xs uppercase tracking-widest gap-2">
-                    {uploadingImage ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                    {uploadingImage ? "UPLOADING..." : "UPLOAD"}
+                  <div className="flex items-center justify-center bg-gray-50 hover:bg-gray-100 border border-gray-300 rounded-md h-[38px] px-4 transition-all text-gray-700 font-medium text-xs gap-1.5">
+                    {uploadingImage ? <Loader2 size={14} className="animate-spin text-gray-500" /> : <Upload size={14} className="text-gray-500" />}
+                    {uploadingImage ? "Uploading..." : "Upload"}
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Section 2: Technical Metadata */}
-          <div className="space-y-8">
-            <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.3em] border-l-2 border-blue-600 pl-3">02. TECHNICAL_META</h2>
+          {/* Section 2: Quiz Settings */}
+          <div className="space-y-6">
+            <h2 className="text-sm font-semibold text-blue-600 uppercase tracking-wider border-l-2 border-blue-600 pl-3">02. Quiz Settings</h2>
             
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                  <Clock size={12} /> Duration
+              <div className="space-y-1.5">
+                <label className="flex items-center gap-2 text-xs font-medium text-gray-700">
+                  <Clock size={14} className="text-gray-400" /> Duration
                 </label>
-                <input required type="text" value={formData.duration} onChange={(e) => setFormData({ ...formData, duration: e.target.value })} placeholder="E.G. 30m" className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
+                <input required type="text" value={formData.duration} onChange={(e) => setFormData({ ...formData, duration: e.target.value })} placeholder="e.g. 30m" className="w-full bg-white border border-gray-300 rounded-md py-2 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all" />
               </div>
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                  <Target size={12} /> Passing_Score_%
+              <div className="space-y-1.5">
+                <label className="flex items-center gap-2 text-xs font-medium text-gray-700">
+                  <Target size={14} className="text-gray-400" /> Passing Score (%)
                 </label>
-                <input required type="number" min="1" max="100" value={formData.passingScore} onChange={(e) => setFormData({ ...formData, passingScore: Number(e.target.value) })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
+                <input required type="number" min="1" max="100" value={formData.passingScore} onChange={(e) => setFormData({ ...formData, passingScore: Number(e.target.value) })} className="w-full bg-white border border-gray-300 rounded-md py-2 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all" />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                   Difficulty
-                </label>
-                <select value={formData.difficulty} onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all appearance-none">
-                  <option value="Easy">EASY</option>
-                  <option value="Medium">MEDIUM</option>
-                  <option value="Hard">HARD</option>
-                </select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Difficulty</label>
+                <div className="relative">
+                  <select value={formData.difficulty} onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })} className="w-full bg-white border border-gray-300 rounded-md py-2 px-3 pr-8 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all appearance-none">
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                   Status
-                </label>
-                <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 px-5 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all appearance-none">
-                  <option value="Draft">DRAFT</option>
-                  <option value="Active">ACTIVE</option>
-                  <option value="Scheduled">SCHEDULED</option>
-                </select>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">Status</label>
+                <div className="relative">
+                  <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full bg-white border border-gray-300 rounded-md py-2 px-3 pr-8 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all appearance-none">
+                    <option value="Draft">Draft</option>
+                    <option value="Active">Active</option>
+                    <option value="Scheduled">Scheduled</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Section 3: Question Builder */}
-        <div className="space-y-8 pt-8 border-t border-gray-100">
+        <div className="space-y-6 pt-6 border-t border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-black text-blue-600 uppercase tracking-[0.3em] border-l-2 border-blue-600 pl-3">03. QUESTION_BANK</h2>
+            <h2 className="text-sm font-semibold text-blue-600 uppercase tracking-wider border-l-2 border-blue-600 pl-3">03. Questions</h2>
           </div>
 
           <div className="space-y-6">
             {formData.questions.map((q, qIndex) => (
-              <div key={qIndex} className="bg-gray-50/50 border border-gray-100 rounded-2xl p-6 space-y-6 relative">
+              <div key={qIndex} className="bg-gray-50 border border-gray-200 rounded-lg p-5 space-y-4 relative">
                 {formData.questions.length > 1 && (
-                  <button type="button" onClick={() => removeQuestion(qIndex)} className="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition-colors">
+                  <button type="button" onClick={() => removeQuestion(qIndex)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors">
                     <Trash2 size={16} />
                   </button>
                 )}
                 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Q_{qIndex + 1}_TEXT</label>
-                  <input required type="text" value={q.question} onChange={(e) => updateQuestion(qIndex, "question", e.target.value)} placeholder="WHAT IS NEXT.JS?" className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-sm font-bold tracking-tight focus:outline-none focus:border-blue-600/50 focus:bg-white transition-all" />
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-gray-700">Question {qIndex + 1}</label>
+                  <input required type="text" value={q.question} onChange={(e) => updateQuestion(qIndex, "question", e.target.value)} placeholder="e.g. What is Next.js?" className="w-full bg-white border border-gray-300 rounded-md py-2.5 px-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all" />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {q.options.map((opt, oIndex) => (
-                    <div key={oIndex} className="space-y-2">
+                    <div key={oIndex} className="space-y-1.5">
                       <div className="flex items-center gap-2">
-                        <input type="radio" name={`correct-${qIndex}`} checked={q.correctAnswer === oIndex} onChange={() => updateQuestion(qIndex, "correctAnswer", oIndex)} className="accent-blue-600 w-4 h-4" />
-                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">OPT_{oIndex + 1} {q.correctAnswer === oIndex && <span className="text-blue-600 ml-1">(CORRECT)</span>}</label>
+                        <input type="radio" name={`correct-${qIndex}`} checked={q.correctAnswer === oIndex} onChange={() => updateQuestion(qIndex, "correctAnswer", oIndex)} className="accent-blue-600 w-4 h-4 cursor-pointer" />
+                        <label className="text-xs font-medium text-gray-600 cursor-pointer">
+                          Option {oIndex + 1} {q.correctAnswer === oIndex && <span className="text-blue-600 font-semibold ml-1">(Correct Answer)</span>}
+                        </label>
                       </div>
-                      <input required type="text" value={opt} onChange={(e) => updateOption(qIndex, oIndex, e.target.value)} placeholder={`OPTION ${oIndex + 1}`} className={`w-full bg-gray-50 border rounded-xl py-3 px-4 text-sm font-bold tracking-tight focus:outline-none transition-all ${q.correctAnswer === oIndex ? 'border-blue-600/50 text-blue-600 bg-white' : 'border-gray-100 focus:border-blue-600/50 focus:bg-white'}`} />
+                      <input required type="text" value={opt} onChange={(e) => updateOption(qIndex, oIndex, e.target.value)} placeholder={`Option {oIndex + 1}`} className={`w-full bg-white border rounded-md py-2 px-3 text-sm text-gray-900 focus:outline-none transition-all ${q.correctAnswer === oIndex ? 'border-blue-500 ring-2 ring-blue-500/10' : 'border-gray-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500'}`} />
                     </div>
                   ))}
                 </div>
@@ -333,29 +342,29 @@ export default function EditQuizPage() {
           </div>
           
           <div className="flex justify-end">
-            <button type="button" onClick={addQuestion} className="px-5 py-2.5 bg-gray-900 border border-gray-700 text-white hover:bg-black hover:border-gray-500 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-sm group">
-              <Plus size={14} className="group-hover:scale-110 transition-transform" /> ADD_QUESTION
+            <button type="button" onClick={addQuestion} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm">
+              <Plus size={14} /> Add Question
             </button>
           </div>
         </div>
 
-        <div className="pt-10 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="pt-6 border-t border-gray-200 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
              {status === "success" && (
-               <div className="flex items-center gap-2 text-green-500 text-[10px] font-black uppercase tracking-widest animate-pulse">
-                 <CheckCircle size={14} /> ASSET_UPDATED
+               <div className="flex items-center gap-1.5 text-green-600 text-xs font-semibold animate-pulse">
+                 <CheckCircle size={16} /> Quiz updated successfully
                </div>
              )}
              {status === "error" && (
-               <div className="flex items-center gap-2 text-red-500 text-[10px] font-black uppercase tracking-widest">
-                 <AlertCircle size={14} /> UPDATE_FAILED
+               <div className="flex items-center gap-1.5 text-red-600 text-xs font-semibold">
+                 <AlertCircle size={16} /> Failed to update quiz
                </div>
              )}
           </div>
           
-          <button disabled={loading} type="submit" className="w-full md:w-auto px-12 py-5 bg-blue-600 text-white font-black rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-blue-600/20 flex items-center justify-center gap-3 uppercase text-xs tracking-widest">
-            {loading ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
-            <span>EXECUTE_DEPLOYMENT</span>
+          <button disabled={loading} type="submit" className="w-full md:w-auto px-6 py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-all flex items-center justify-center gap-2 text-sm shadow-sm">
+            {loading ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
+            <span>Save Changes</span>
           </button>
         </div>
       </form>
