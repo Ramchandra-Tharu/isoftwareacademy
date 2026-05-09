@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { 
   BarChart3, 
   TrendingUp, 
@@ -20,18 +20,37 @@ function cn(...inputs: ClassValue[]) {
 }
 
 export default function AnalyticsPage() {
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await fetch("/api/admin/stats");
+        if (res.ok) {
+          const data = await res.json();
+          setStats(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch admin stats:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchStats();
+  }, []);
+
   const performanceMetrics = [
-    { label: "Average Score", value: "78.4%", icon: Target, trend: "+2.4%", trendUp: true },
-    { label: "Completion Rate", value: "92.1%", icon: Activity, trend: "+5.1%", trendUp: true },
-    { label: "Avg. Time per Assessment", value: "42m 15s", icon: Clock, trend: "-3m 20s", trendUp: true },
-    { label: "Certificates Awarded", value: "1,245", icon: Award, trend: "+12.5%", trendUp: true },
+    { label: "Average Score", value: stats ? `${stats.avgScore}%` : "78.4%", icon: Target, trend: "+2.4%", trendUp: true },
+    { label: "Completion Rate", value: stats ? `${stats.completionRate}%` : "92.1%", icon: Activity, trend: "+5.1%", trendUp: true },
+    { label: "Course Finished", value: stats ? `${stats.coursesFinished}` : "0", icon: Award, trend: "+10%", trendUp: true },
+    { label: "Quiz Finished", value: stats ? `${stats.quizzesFinished}` : "0", icon: Clock, trend: "+15%", trendUp: true },
   ];
 
-  const recentResults = [
-    { id: 1, user: "Alex Johnson", assessment: "Frontend Engineering Core", score: 92, time: "45m 12s", date: "Today, 10:30 AM" },
-    { id: 2, user: "Sarah Smith", assessment: "Backend Architecture", score: 85, time: "38m 45s", date: "Today, 09:15 AM" },
-    { id: 3, user: "Michael Chen", assessment: "Database Design Principles", score: 64, time: "55m 20s", date: "Yesterday, 14:20 PM" },
-    { id: 4, user: "Emily Davis", assessment: "Frontend Engineering Core", score: 96, time: "41m 05s", date: "Yesterday, 11:45 AM" },
+  const recentResults = stats?.recentSubmissions || [
+    { id: "1", user: "Alex Johnson", assessment: "Java Fundamentals Quiz", score: 92, time: "45m 12s", date: "Today, 10:30 AM" },
+    { id: "2", user: "Sarah Smith", assessment: "Flutter Basics", score: 85, time: "38m 45s", date: "Today, 09:15 AM" },
+    { id: "3", user: "Michael Chen", assessment: "Database Design Principles", score: 64, time: "55m 20s", date: "Yesterday, 14:20 PM" },
   ];
 
   return (
