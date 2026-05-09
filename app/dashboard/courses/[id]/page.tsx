@@ -329,7 +329,7 @@ export default function CourseViewerPage() {
                                 {/* Topic Card Header */}
                                 <div 
                                   onClick={() => {
-                                    setExpandedTopics(prev => ({ ...prev, [lesson._id]: !prev[lesson._id] }));
+                                    setActiveLesson(lesson);
                                   }}
                                   className="p-5 md:p-6 cursor-pointer flex justify-between items-center select-none hover:bg-[#f0f8ff]/40 transition-colors"
                                 >
@@ -358,7 +358,13 @@ export default function CourseViewerPage() {
                                     </div>
 
                                     {/* Chevron */}
-                                    <div className="w-8 h-8 rounded-full bg-white border border-sky-100/60 flex items-center justify-center text-slate-500 shadow-sm">
+                                    <div 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setExpandedTopics(prev => ({ ...prev, [lesson._id]: !prev[lesson._id] }));
+                                      }}
+                                      className="w-8 h-8 rounded-full bg-white border border-sky-100/60 flex items-center justify-center text-slate-500 shadow-sm hover:bg-slate-50 transition-colors"
+                                    >
                                       {isExpanded ? (
                                         <svg className="w-4 h-4 text-[#1A4B6B]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
