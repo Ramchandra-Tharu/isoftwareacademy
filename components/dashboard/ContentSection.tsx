@@ -111,18 +111,6 @@ export default function ContentSection({
            <button className="p-3 bg-white border border-gray-100 text-gray-400 hover:text-blue-600 hover:border-blue-100 rounded-2xl transition-all shadow-sm">
               <Bookmark size={20} />
            </button>
-           <button 
-             onClick={handleComplete}
-             disabled={loading}
-             className={cn(
-               "flex items-center gap-3 px-8 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-xl",
-               isCompleted 
-                 ? "bg-emerald-500 text-white shadow-emerald-500/20" 
-                 : "bg-blue-600 text-white shadow-blue-600/20 hover:scale-105"
-             )}
-           >
-              {loading ? <span className="animate-pulse">Syncing...</span> : isCompleted ? <><CheckCircle2 size={16} /> Completed</> : "Mark_Complete"}
-           </button>
         </div>
       </div>
 
@@ -320,33 +308,47 @@ export default function ContentSection({
       )}
 
 
-      {/* Navigation */}
-      <div className="flex items-center justify-between pt-12 border-t border-gray-100">
-         <button 
-           onClick={onPrevious}
-           disabled={!onPrevious}
-           className="flex flex-col items-start gap-1 px-8 py-4 bg-white border border-gray-100 text-gray-400 hover:text-blue-600 hover:border-blue-100 rounded-2xl transition-all group shadow-sm disabled:opacity-30 disabled:cursor-not-allowed max-w-[45%]"
-         >
-            <span className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.2em] opacity-50">
-               <ChevronLeft size={10} className="group-hover:-translate-x-1 transition-transform" /> Previous_Module
-            </span>
-            <span className="text-[10px] font-bold uppercase tracking-tight truncate w-full text-left">
-               {prevUnitName || "Start_Of_Journey"}
-            </span>
-         </button>
+      {/* Navigation & Actions exactly matching reference screenshot */}
+      <div className="flex items-center justify-center gap-4 pt-10 border-t border-slate-100 mt-12">
+        {/* Back to top Button */}
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 hover:border-sky-300 text-slate-700 hover:text-sky-700 rounded-xl font-semibold text-sm transition-all shadow-sm select-none hover:scale-105 active:scale-95 cursor-pointer"
+        >
+          <span>Back to top</span>
+          <svg className="w-3.5 h-3.5 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+          </svg>
+        </button>
 
-         <button 
-           onClick={onNext}
-           disabled={!onNext}
-           className="flex flex-col items-end gap-1 px-8 py-4 bg-white border border-gray-100 text-gray-400 hover:text-blue-600 hover:border-blue-100 rounded-2xl transition-all group shadow-sm disabled:opacity-30 disabled:cursor-not-allowed max-w-[45%]"
-         >
-            <span className="flex items-center gap-2 text-[8px] font-black uppercase tracking-[0.2em] opacity-50">
-               Next_Module <ChevronRight size={10} className="group-hover:translate-x-1 transition-transform" />
-            </span>
-            <span className="text-[10px] font-bold uppercase tracking-tight truncate w-full text-right">
-               {nextUnitName || "End_Of_Curriculum"}
-            </span>
-         </button>
+        {/* Completed Button */}
+        <button
+          onClick={handleComplete}
+          disabled={loading}
+          className={cn(
+            "flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm border transition-all shadow-sm select-none hover:scale-105 active:scale-95 cursor-pointer",
+            isCompleted
+              ? "bg-[#EBF5FF] border-[#B3D7FF] text-[#0A4D80] font-bold"
+              : "bg-white border-slate-200 text-slate-700 hover:border-sky-300"
+          )}
+        >
+          <span>{loading ? "Syncing..." : isCompleted ? "Completed" : "Mark Complete"}</span>
+          <svg className="w-4 h-4 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+
+        {/* Next Item Button */}
+        <button
+          onClick={onNext}
+          disabled={!onNext}
+          className="flex items-center gap-2 px-6 py-3 bg-[#004D61] hover:bg-[#003B4A] disabled:opacity-30 disabled:cursor-not-allowed text-white rounded-xl font-semibold text-sm transition-all shadow-md shadow-[#004D61]/10 select-none hover:scale-105 active:scale-95 cursor-pointer"
+        >
+          <span>Next Item</span>
+          <svg className="w-3.5 h-3.5 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </button>
       </div>
     </div>
   );
