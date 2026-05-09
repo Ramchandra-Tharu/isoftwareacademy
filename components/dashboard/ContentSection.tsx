@@ -59,6 +59,7 @@ export default function ContentSection({
   const [loading, setLoading] = React.useState(false);
   const [selectedAnswers, setSelectedAnswers] = React.useState<Record<number, number>>({});
   const [showResults, setShowResults] = React.useState(false);
+  const [revealedAnswers, setRevealedAnswers] = React.useState<Record<number, boolean>>({});
 
   const handleComplete = async () => {
     if (!onToggleComplete || loading) return;
@@ -78,7 +79,7 @@ export default function ContentSection({
   };
 
   const handleOptionSelect = (qIdx: number, oIdx: number) => {
-    if (showResults) return;
+    if (showResults || revealedAnswers[qIdx]) return;
     setSelectedAnswers(prev => ({ ...prev, [qIdx]: oIdx }));
   };
 
@@ -203,7 +204,7 @@ export default function ContentSection({
 
       {/* Interactive Unit Quiz */}
       {quiz && quiz.length > 0 && (
-        <div className="pt-16 pb-8 border-t border-gray-100 space-y-10">
+        <div className="pt-16 pb-8 border-t border-gray-100 space-y-8">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
                <span className="w-8 h-[1px] bg-blue-600/30"></span>
@@ -212,69 +213,109 @@ export default function ContentSection({
             <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Concept Check</h2>
           </div>
 
-          <div className="space-y-12">
-            {quiz.map((q, qIdx) => (
-              <div key={qIdx} className="space-y-6">
-                <div className="flex gap-4">
-                  <span className="text-xs font-black text-blue-600/20 pt-1">0{qIdx + 1}</span>
-                  <p className="text-lg font-bold text-gray-800 leading-tight">{q.question}</p>
-                </div>
-                
-                <div className="grid gap-3 pl-8">
-                  {q.options.map((opt, oIdx) => {
-                    const isSelected = selectedAnswers[qIdx] === oIdx;
-                    const isCorrect = q.correctAnswer === oIdx;
-                    const showFeedback = showResults;
-                    
-                    return (
-                      <button
-                        key={oIdx}
-                        onClick={() => handleOptionSelect(qIdx, oIdx)}
-                        className={cn(
-                          "w-full text-left px-6 py-4 rounded-2xl border transition-all duration-300 font-bold text-[13px] tracking-tight flex items-center justify-between group",
-                          !showFeedback && isSelected ? "bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-600/20" : "bg-white border-gray-100 text-gray-600 hover:border-blue-200 hover:bg-blue-50/30",
-                          showFeedback && isCorrect ? "bg-emerald-500 border-emerald-500 text-white shadow-xl shadow-emerald-500/20" : "",
-                          showFeedback && isSelected && !isCorrect ? "bg-rose-500 border-rose-500 text-white shadow-xl shadow-rose-500/20" : "",
-                          showFeedback && !isCorrect && !isSelected ? "opacity-30" : ""
-                        )}
-                      >
-                        {opt}
-                        {showFeedback && isCorrect && <CheckCircle2 size={16} />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
+          <div className="space-y-8">
+            {quiz.map((q, qIdx) => {
+              const isSelectedAny = selectedAnswers[qIdx] !== undefined;
+              const isRevealed = !!revealedAnswers[qIdx];
 
-          {!showResults ? (
-            <button
-              onClick={() => setShowResults(true)}
-              disabled={Object.keys(selectedAnswers).length < quiz.length}
-              className="w-full py-5 bg-gray-900 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl hover:bg-black transition-all shadow-xl shadow-gray-900/10 disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              Verify_Answers
-            </button>
-          ) : (
-            <div className="p-8 bg-blue-50/50 rounded-3xl border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-6 animate-in zoom-in-95 duration-500">
-               <div className="space-y-1 text-center md:text-left">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-blue-600/60">Module_Result</p>
-                  <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight">
-                    SCORE: {Object.entries(selectedAnswers).filter(([qIdx, oIdx]) => quiz[parseInt(qIdx)].correctAnswer === oIdx).length} / {quiz.length}
-                  </h3>
-               </div>
-               <button 
-                 onClick={() => {
-                   setShowResults(false);
-                   setSelectedAnswers({});
-                 }}
-                 className="px-8 py-3 bg-white border border-blue-100 text-blue-600 font-black text-[10px] uppercase tracking-widest rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-               >
-                 Retake_Quiz
-               </button>
-            </div>
-          )}
+              return (
+                <div 
+                  key={qIdx} 
+                  className="bg-[#EAFBF1] rounded-[2rem] p-6 md:p-8 border border-[#BFF3D9] space-y-6 shadow-sm shadow-[#BFF3D9]/10 animate-in fade-in duration-300"
+                >
+                  <div className="space-y-3">
+                    <h3 className="text-xl font-extrabold text-[#115E59] tracking-tight">Quiz</h3>
+                    <p className="text-lg font-bold text-gray-900 leading-snug">{q.question}</p>
+                  </div>
+
+                  <div className="grid gap-3">
+                    {q.options.map((opt, oIdx) => {
+                      const isSelected = selectedAnswers[qIdx] === oIdx;
+                      const isCorrect = q.correctAnswer === oIdx;
+                      
+                      let btnClasses = "w-full text-left px-6 py-4 rounded-xl border-2 transition-all duration-300 font-bold text-sm flex items-center justify-between select-none ";
+                      
+                      if (isRevealed && isCorrect) {
+                        btnClasses += "bg-[#34A853] border-[#34A853] text-white shadow-md shadow-[#34A853]/15";
+                      } else if (isSelected) {
+                        if (isCorrect) {
+                          btnClasses += "bg-[#34A853] border-[#34A853] text-white shadow-md shadow-[#34A853]/15";
+                        } else {
+                          btnClasses += "bg-rose-500 border-rose-500 text-white shadow-md shadow-rose-500/15";
+                        }
+                      } else {
+                        btnClasses += "bg-white border-[#FFA480] hover:border-orange-400 text-gray-800 hover:bg-orange-50/5";
+                      }
+                      
+                      return (
+                        <button
+                          key={oIdx}
+                          onClick={() => handleOptionSelect(qIdx, oIdx)}
+                          disabled={isRevealed || isSelectedAny}
+                          className={btnClasses}
+                        >
+                          <span className="leading-tight">{opt}</span>
+                          
+                          {/* Premium Verification Icons */}
+                          {((isSelected && isCorrect) || (isRevealed && isCorrect)) && (
+                            <div className="flex items-center justify-center w-5 h-5 bg-white rounded-full text-[#34A853] shrink-0 shadow-sm ml-2 animate-in zoom-in-50 duration-200">
+                              <svg className="w-3.5 h-3.5 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
+                          )}
+                          {isSelected && !isCorrect && (
+                            <div className="flex items-center justify-center w-5 h-5 bg-white rounded-full text-rose-500 shrink-0 shadow-sm ml-2 animate-in zoom-in-50 duration-200">
+                              <svg className="w-3.5 h-3.5 stroke-[3.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-[#BFF3D9]/40">
+                    {/* Reset Quiz Button */}
+                    <button
+                      onClick={() => {
+                        setSelectedAnswers(prev => {
+                          const next = { ...prev };
+                          delete next[qIdx];
+                          return next;
+                        });
+                        setRevealedAnswers(prev => {
+                          const next = { ...prev };
+                          delete next[qIdx];
+                          return next;
+                        });
+                      }}
+                      className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200/80 hover:bg-slate-50 text-slate-800 rounded-xl font-bold text-xs shadow-sm transition-all select-none hover:scale-[1.03] active:scale-[0.97]"
+                    >
+                      <span>Reset Quiz</span>
+                      <svg className="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3-3 3 3" />
+                      </svg>
+                    </button>
+
+                    {/* Show Answer Button */}
+                    <button
+                      onClick={() => {
+                        setRevealedAnswers(prev => ({ ...prev, [qIdx]: true }));
+                      }}
+                      className="flex items-center gap-2 px-5 py-2.5 bg-[#E1F5FE] hover:bg-[#B3E5FC]/40 text-[#0288D1] border border-sky-100 rounded-xl font-bold text-xs transition-all shadow-sm select-none hover:scale-[1.03] active:scale-[0.97]"
+                    >
+                      <span>Show Answer</span>
+                      <svg className="w-3.5 h-3.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
