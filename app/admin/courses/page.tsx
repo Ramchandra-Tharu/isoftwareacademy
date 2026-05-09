@@ -119,93 +119,122 @@ export default function CourseManagement() {
       </div>
 
       {/* Course Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCourses.map((course) => (
-          <div key={course._id} className="card-premium group relative overflow-hidden flex flex-col">
-            <div className="p-10 space-y-6 flex-1">
-              <div className="flex justify-between items-start">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-bold rounded-sm uppercase tracking-widest">{course.category || "General"}</span>
-                    {course.isPublished && (
-                      <span className="px-3 py-1 bg-black text-white text-[10px] font-bold rounded-sm uppercase tracking-widest">Live</span>
-                    )}
-                    <span className={cn(
-                      "px-3 py-1 text-[10px] font-bold rounded-sm uppercase tracking-widest flex items-center gap-1",
-                      (!course.price || course.price === 0) ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
-                    )}>
-                      {(!course.price || course.price === 0) ? "Free" : "Premium"}
-                    </span>
-                  </div>
-                  <h3 className="text-3xl font-light text-black tracking-tight leading-tight">{course.title}</h3>
+          <div key={course._id} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full group">
+            {/* Thumbnail */}
+            <div className="relative aspect-[2/1] overflow-hidden bg-gray-50 border-b border-gray-50 shrink-0">
+              {course.thumbnail ? (
+                <img 
+                  src={course.thumbnail} 
+                  alt={course.title} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-sky-50 text-sky-400">
+                  <BookOpen size={40} />
                 </div>
-                <button className="text-gray-300 hover:text-black p-2"><MoreVertical size={20} /></button>
-              </div>
-
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                  <Clock size={14} /> Updated {new Date(course.updatedAt).toLocaleDateString()}
-                </div>
+              )}
+              
+              {/* Badges overlaid on thumbnail */}
+              <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                {course.isPublished && (
+                  <span className="px-2 py-0.5 bg-black/85 text-white text-[9px] font-black rounded-md uppercase tracking-widest backdrop-blur-sm">
+                    Live
+                  </span>
+                )}
+                <span className={cn(
+                  "px-2 py-0.5 text-[9px] font-black rounded-md uppercase tracking-widest backdrop-blur-sm",
+                  (!course.price || course.price === 0) ? "bg-emerald-500/90 text-white" : "bg-amber-500/90 text-white"
+                )}>
+                  {(!course.price || course.price === 0) ? "Free" : "Premium"}
+                </span>
               </div>
             </div>
 
-            <div className="p-8 border-t border-gray-50 bg-gray-50/30 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={async () => {
-                    const res = await fetch(`/api/courses/${course._id}`, {
-                      method: "PATCH",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ isPublished: !course.isPublished })
-                    });
-                    if (res.ok) fetchCourses();
-                  }}
-                  className={cn(
-                    "p-2.5 bg-white border rounded-xl transition-all shadow-sm flex items-center gap-2 text-[10px] font-black uppercase tracking-widest",
-                    course.isPublished ? "text-emerald-600 border-emerald-100 hover:bg-emerald-50" : "text-amber-600 border-amber-100 hover:bg-amber-50"
-                  )}
-                >
-                  {course.isPublished ? <Globe size={16} /> : <Layers size={16} />}
-                  {course.isPublished ? "Unpublish" : "Go Live"}
-                </button>
-
-                <button
-                  onClick={async () => {
-                    const res = await fetch(`/api/courses/${course._id}`, {
-                      method: "PATCH",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ featured: !course.featured })
-                    });
-                    if (res.ok) fetchCourses();
-                  }}
-                  className={cn(
-                    "p-2.5 bg-white border rounded-xl transition-all shadow-sm flex items-center gap-2 text-[10px] font-black uppercase tracking-widest",
-                    course.featured ? "text-blue-600 border-blue-100 bg-blue-50" : "text-gray-400 border-gray-100 hover:bg-gray-50"
-                  )}
-                >
-                  <Sparkles size={16} className={course.featured ? "fill-blue-600" : ""} />
-                  {course.featured ? "Featured" : "Feature"}
-                </button>
-
-                <div className="w-px h-8 bg-gray-100 mx-2"></div>
-                <Link href={`/dashboard/courses/${course.slug || course._id}`} className="p-2.5 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
-                  <Eye size={18} />
-                </Link>
-                <Link href={`/admin/courses/${course._id}/edit`} className="p-2.5 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm">
-                  <Edit2 size={18} />
-                </Link>
+            {/* Content */}
+            <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+              <div className="space-y-2">
+                <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[9px] font-bold rounded uppercase tracking-widest">
+                  {course.category || "General"}
+                </span>
+                <h3 className="text-sm font-bold text-gray-900 leading-snug line-clamp-2">
+                  {course.title}
+                </h3>
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-tight pt-1">
+                  <Clock size={12} /> Updated {new Date(course.updatedAt).toLocaleDateString()}
+                </div>
               </div>
-              <button
-                onClick={() => deleteCourse(course._id)}
-                className="p-2.5 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-red-600 hover:border-red-100 transition-all shadow-sm"
-              >
-                <Trash2 size={18} />
-              </button>
+
+              {/* Action Buttons */}
+              <div className="pt-4 border-t border-gray-50 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <button
+                    onClick={async () => {
+                      const res = await fetch(`/api/courses/${course._id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ isPublished: !course.isPublished })
+                      });
+                      if (res.ok) fetchCourses();
+                    }}
+                    className={cn(
+                      "p-2 bg-white border rounded-lg transition-all shadow-sm flex items-center gap-1 text-[9px] font-black uppercase tracking-wider",
+                      course.isPublished ? "text-emerald-600 border-emerald-100 hover:bg-emerald-50" : "text-amber-600 border-amber-100 hover:bg-amber-50"
+                    )}
+                  >
+                    {course.isPublished ? <Globe size={13} /> : <Layers size={13} />}
+                    {course.isPublished ? "Unpublish" : "Go Live"}
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      const res = await fetch(`/api/courses/${course._id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ featured: !course.featured })
+                      });
+                      if (res.ok) fetchCourses();
+                    }}
+                    className={cn(
+                      "p-2 bg-white border rounded-lg transition-all shadow-sm flex items-center gap-1 text-[9px] font-black uppercase tracking-wider",
+                      course.featured ? "text-blue-600 border-blue-100 bg-blue-50" : "text-gray-400 border-gray-100 hover:bg-gray-50"
+                    )}
+                  >
+                    <Sparkles size={13} className={course.featured ? "fill-blue-600" : ""} />
+                    {course.featured ? "Featured" : "Feature"}
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <Link 
+                    href={`/dashboard/courses/${course.slug || course._id}`} 
+                    className="p-2 bg-white border border-gray-100 rounded-lg text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm"
+                    title="View Course"
+                  >
+                    <Eye size={14} />
+                  </Link>
+                  <Link 
+                    href={`/admin/courses/${course._id}/edit`} 
+                    className="p-2 bg-white border border-gray-100 rounded-lg text-gray-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm"
+                    title="Edit Course"
+                  >
+                    <Edit2 size={14} />
+                  </Link>
+                  <button
+                    onClick={() => deleteCourse(course._id)}
+                    className="p-2 bg-white border border-gray-100 rounded-lg text-gray-400 hover:text-red-600 hover:border-red-100 transition-all shadow-sm"
+                    title="Delete Course"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         ))}
         {filteredCourses.length === 0 && (
-          <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-100 rounded-[3rem] text-gray-400 italic font-bold uppercase tracking-widest text-[10px]">No education assets found.</div>
+          <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-100 rounded-3xl text-gray-400 italic font-bold uppercase tracking-widest text-[10px]">No education assets found.</div>
         )}
       </div>
     </div>

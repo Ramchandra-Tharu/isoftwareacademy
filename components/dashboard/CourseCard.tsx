@@ -46,13 +46,13 @@ export default function CourseCard({
   const isFree = price === 0;
 
   return (
-    <div className="bg-white border border-blue-50 rounded-2xl overflow-hidden group hover:shadow-xl hover:shadow-blue-600/5 transition-all duration-300 flex flex-col h-full">
+    <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full group">
       {/* Thumbnail */}
       <div className="relative aspect-[2/1] overflow-hidden">
         <img 
           src={thumbnail} 
           alt={title} 
-          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         {isFree && (
           <div className="absolute top-3 right-3 px-2 py-0.5 bg-white/90 backdrop-blur-sm rounded-md shadow-sm border border-gray-100">
@@ -62,59 +62,52 @@ export default function CourseCard({
       </div>
 
       {/* Content */}
-      <div className="p-4 flex-1 flex flex-col space-y-2">
-        <h3 className="text-sm font-bold text-gray-900 leading-snug line-clamp-2">
-          {title}
-        </h3>
+      <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+        <div className="space-y-2">
+          <h3 className="text-sm font-bold text-gray-900 leading-snug line-clamp-2">
+            {title}
+          </h3>
 
-        <div className="relative h-16">
-           {/* Stats Section - Visible by default, hidden on hover */}
-           <div className="absolute inset-0 space-y-1.5 transition-all duration-300 group-hover:opacity-0 group-hover:-translate-y-2">
-              <div className="flex items-center gap-3">
-                 <div className="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-tight">
-                    <Clock size={14} className="text-gray-400" /> {duration}
-                 </div>
-                 <div className="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-tight">
-                    <BookOpen size={14} className="text-gray-400" /> {totalChapters || 0}
-                 </div>
-              </div>
-              <div className="flex items-center gap-3">
-                 <div className="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-tight">
-                    <Users size={14} className="text-gray-400" /> {enrolledCount}
-                 </div>
-                 <div className="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-tight">
-                    <BarChart size={14} className="text-gray-400" /> {difficulty}
-                 </div>
-              </div>
-           </div>
-
-           {/* View Course Action - Visible as link by default, transforms to button on hover */}
-           <div className="absolute inset-x-0 bottom-0 transition-all duration-300 translate-y-0 group-hover:translate-y-[-4px]">
-             <Link 
-               href={href || `/dashboard/courses/${id}`}
-               className={cn(
-                 "inline-flex items-center gap-1 text-xs font-bold text-blue-600 transition-all duration-300 w-full justify-start",
-                 "group-hover:bg-blue-600 group-hover:text-white group-hover:px-6 group-hover:py-2.5 group-hover:rounded-xl group-hover:shadow-lg group-hover:shadow-blue-600/20 group-hover:justify-center"
-               )}
-             >
-               <span>View Course</span>
-               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-             </Link>
-           </div>
+          {/* Stats Section - Statically visible */}
+          <div className="grid grid-cols-2 gap-2 text-[10px] text-gray-500 font-bold uppercase tracking-tight pt-1">
+             <div className="flex items-center gap-1.5">
+                <Clock size={14} className="text-gray-400 shrink-0" /> {duration}
+             </div>
+             <div className="flex items-center gap-1.5">
+                <BookOpen size={14} className="text-gray-400 shrink-0" /> {totalChapters || 0} Ch
+             </div>
+             <div className="flex items-center gap-1.5">
+                <Users size={14} className="text-gray-400 shrink-0" /> {enrolledCount}
+             </div>
+             <div className="flex items-center gap-1.5">
+                <BarChart size={14} className="text-gray-400 shrink-0" /> {difficulty}
+             </div>
+          </div>
         </div>
 
-        {/* Progress Bar (Always visible if exists) */}
-        {progress !== undefined && progress > 0 && (
-           <div className="pt-2 space-y-1">
-              <div className="h-1 w-full bg-blue-50 rounded-full overflow-hidden">
-                 <div 
-                   className="h-full bg-blue-600 rounded-full transition-all duration-700" 
-                   style={{ width: `${progress}%` }}
-                 ></div>
-              </div>
-              <span className="text-[8px] font-black text-blue-600 uppercase">{progress}% Complete</span>
-           </div>
-        )}
+        {/* Action button & progress bar */}
+        <div className="space-y-3 pt-2">
+          {/* Progress Bar (Visible if exists) */}
+          {progress !== undefined && progress > 0 && (
+             <div className="space-y-1">
+                <div className="h-1 w-full bg-blue-50 rounded-full overflow-hidden">
+                   <div 
+                     className="h-full bg-blue-600 rounded-full transition-all duration-700" 
+                     style={{ width: `${progress}%` }}
+                   ></div>
+                </div>
+                <div className="text-[8px] font-black text-blue-600 uppercase">{progress}% Complete</div>
+             </div>
+          )}
+
+          <Link 
+            href={href || `/dashboard/courses/${id}`}
+            className="flex items-center justify-center gap-2 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-sm shadow-blue-600/10 transition-all select-none"
+          >
+            <span>View Course</span>
+            <ArrowRight size={14} />
+          </Link>
+        </div>
       </div>
     </div>
   );
