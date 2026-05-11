@@ -90,7 +90,7 @@ export default function CourseManagement() {
           { label: "Draft Units", val: courses.filter(c => !c.isPublished).length, icon: Layers, bg: "bg-gray-50" },
         ].map((item, i) => (
           <div key={i} className="border border-gray-200 p-8 flex items-center gap-6 rounded-md">
-            <div className={cn("w-14 h-14 rounded-sm flex items-center justify-center bg-black text-white")}>
+            <div className={cn("w-14 h-14 rounded-sm flex items-center justify-center bg-blue-600 text-white")}>
               <item.icon size={22} />
             </div>
             <div>
@@ -139,7 +139,7 @@ export default function CourseManagement() {
               {/* Badges overlaid on thumbnail */}
               <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
                 {course.isPublished && (
-                  <span className="px-2 py-0.5 bg-black/85 text-white text-[9px] font-black rounded-md uppercase tracking-widest backdrop-blur-sm">
+                  <span className="px-2 py-0.5 bg-blue-600/90 text-white text-[9px] font-black rounded-md uppercase tracking-widest backdrop-blur-sm">
                     Live
                   </span>
                 )}

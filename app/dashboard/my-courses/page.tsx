@@ -105,12 +105,12 @@ export default function MyCoursesPage() {
          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
             <div className="space-y-4">
                <div className="flex items-center gap-3">
-                  <div className="px-3 py-1 bg-black text-white text-[9px] font-bold rounded-sm uppercase tracking-[0.2em]">
+                  <div className="px-3 py-1 bg-blue-600 text-white text-[9px] font-bold rounded-sm uppercase tracking-[0.2em]">
                      Catalog Access
                   </div>
                   <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">iSoftware Lab</span>
                </div>
-               <h1 className="text-5xl font-light tracking-tight text-black leading-none">
+               <h1 className="text-5xl font-light tracking-tight text-gray-900 leading-none">
                   My Courses
                </h1>
                <p className="text-gray-600 font-normal">Synchronizing your active learning modules and skill milestones.</p>
@@ -138,14 +138,14 @@ export default function MyCoursesPage() {
          {lastAccessed && searchQuery === "" && activeTab === "All Courses" && (
             <div className="relative group">
                <div className="absolute inset-0 bg-black/5 blur-3xl rounded-[3rem] -z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-               <Link href={`/dashboard/courses/${lastAccessed.slug}`} className="border border-gray-200 p-6 md:p-8 flex flex-col lg:flex-row items-center gap-10 bg-white rounded-lg hover:border-black transition-all">
+               <Link href={`/dashboard/courses/${lastAccessed.slug}`} className="border border-gray-200 p-6 md:p-8 flex flex-col lg:flex-row items-center gap-10 bg-white rounded-lg hover:border-blue-600 transition-all">
                   <div className="w-full lg:w-64 aspect-video rounded-md overflow-hidden transition-all duration-700">
                      <img src={lastAccessed.thumbnail} alt={lastAccessed.title} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 space-y-4">
                      <div className="space-y-2">
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Resume_Operation</p>
-                        <h2 className="text-3xl font-light text-black tracking-tight leading-none">{lastAccessed.title}</h2>
+                        <h2 className="text-3xl font-light text-gray-900 tracking-tight leading-none">{lastAccessed.title}</h2>
                         <p className="text-xs text-gray-500 font-normal">Continue from where you left off. 8 units remaining in this module.</p>
                      </div>
 
@@ -153,13 +153,13 @@ export default function MyCoursesPage() {
                         <div className="space-y-2">
                            <div className="flex items-center justify-between min-w-[180px]">
                               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Progress</span>
-                              <span className="text-[10px] font-bold text-black">{lastAccessed.progress}%</span>
+                              <span className="text-[10px] font-bold text-gray-900">{lastAccessed.progress}%</span>
                            </div>
                            <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
-                              <div className="h-full bg-black rounded-full" style={{ width: `${lastAccessed.progress}%` }} />
+                              <div className="h-full bg-blue-600 rounded-full" style={{ width: `${lastAccessed.progress}%` }} />
                            </div>
                         </div>
-                        <div className="px-6 py-2.5 bg-black text-white text-[10px] font-bold uppercase tracking-widest rounded-lg">
+                        <div className="px-6 py-2.5 bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg shadow-lg shadow-blue-600/20">
                            Access Module <ArrowRight size={14} className="ml-2 inline" />
                         </div>
                      </div>
@@ -178,7 +178,7 @@ export default function MyCoursesPage() {
                      className={cn(
                         "pb-4 text-[10px] font-black uppercase tracking-widest transition-all relative",
                         activeTab === tab
-                           ? "text-black border-b-2 border-black"
+                           ? "text-blue-600 border-b-2 border-blue-600"
                            : "text-gray-400 hover:text-gray-900"
                      )}
                   >

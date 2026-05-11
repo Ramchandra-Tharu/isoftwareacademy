@@ -96,7 +96,7 @@ export default function Sidebar() {
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50 text-gray-600 border border-gray-100 hover:bg-gray-100 transition-all group mb-6",
                 isCollapsed && "justify-center",
-                pathname === "/admin/comments" && "bg-black text-white border-black"
+                pathname === "/admin/comments" && "bg-blue-600 text-white border-blue-600"
               )}
             >
               <MessageSquare size={20} className={cn("shrink-0", pathname === "/admin/comments" ? "text-white" : "group-hover:scale-110")} />
@@ -114,8 +114,8 @@ export default function Sidebar() {
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group",
                 isActive 
-                  ? "bg-black text-white font-medium" 
-                  : "text-gray-600 hover:bg-gray-100 hover:text-black"
+                  ? "bg-blue-600 text-white font-medium shadow-md shadow-blue-600/10" 
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               )}
             >
               <item.icon size={18} className={cn(

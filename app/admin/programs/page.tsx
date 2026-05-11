@@ -75,82 +75,81 @@ export default function ProgramManagement() {
   }
 
   return (
-    <div className="space-y-8 font-mono">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-8 font-sans pb-20">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-gray-100">
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tighter uppercase">
-            PROGRAM <span className="text-[#EBBB54]">MANAGEMENT</span>
+          <h1 className="text-4xl font-light tracking-tight text-gray-900">
+            Program Management
           </h1>
-          <p className="text-gray-500 text-sm mt-1 uppercase font-bold tracking-widest">Group courses into professional tracks</p>
+          <p className="text-gray-500 text-sm mt-1 font-medium">Group courses into curated professional learning tracks.</p>
         </div>
-        <Link href="/admin/programs/new" className="flex items-center gap-2 px-6 py-3 bg-[#EBBB54] text-black font-black rounded-xl hover:scale-105 transition-all shadow-xl shadow-[#EBBB54]/10 uppercase text-xs">
+        <Link href="/admin/programs/new" className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 hover:scale-[1.02] transition-all shadow-lg shadow-blue-600/10 text-sm select-none">
           <Plus size={18} />
-          <span>New_Program</span>
+          <span>New Program</span>
         </Link>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-500">
+        <div className="p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-600 animate-in fade-in">
           <AlertCircle size={20} />
-          <p className="text-sm font-bold uppercase tracking-wider">{error}</p>
+          <p className="text-sm font-bold">{error}</p>
         </div>
       )}
 
       {/* Filters & Search */}
-      <div className="bg-black border border-white/5 p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center">
-        <div className="relative flex-1 w-full group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-[#EBBB54] transition-colors" size={18} />
-          <input 
-            type="text" 
-            placeholder="FILTER_BY_TITLE_OR_DESC..." 
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white/[0.02] border border-white/10 rounded-xl py-3 pl-12 pr-4 text-xs font-bold tracking-widest focus:outline-none focus:border-[#EBBB54]/30 focus:bg-white/5 transition-all"
-          />
-        </div>
+      <div className="relative group w-full max-w-2xl">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={18} />
+        <input 
+          type="text" 
+          placeholder="Search programs by title or description..." 
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full bg-white border border-gray-200 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-medium text-gray-900 focus:outline-none focus:border-blue-200 focus:ring-4 focus:ring-blue-600/5 transition-all shadow-sm"
+        />
       </div>
 
       {/* Programs List */}
       <div className="grid grid-cols-1 gap-4">
         {filteredPrograms.length > 0 ? (
           filteredPrograms.map((program) => (
-            <div key={program._id} className="bg-black border border-white/5 hover:border-white/20 p-6 rounded-2xl transition-all group flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="flex items-center gap-6">
-                <div className="w-16 h-16 rounded-2xl bg-[#EBBB54]/10 flex items-center justify-center text-[#EBBB54] border border-[#EBBB54]/20 group-hover:scale-110 transition-transform">
-                  <BarChart3 size={32} />
+            <div key={program._id} className="bg-white border border-gray-100 hover:border-blue-100 p-6 rounded-2xl transition-all shadow-sm hover:shadow-md group flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex items-center gap-5">
+                <div className="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100 shrink-0 group-hover:scale-105 transition-transform duration-300">
+                  <BarChart3 size={28} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-white group-hover:text-[#EBBB54] transition-colors uppercase tracking-tight">{program.title}</h3>
-                  <div className="flex items-center gap-4 mt-2">
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest flex items-center gap-1.5">
-                      <BookOpen size={12} className="text-[#EBBB54]" /> {program.courses?.length || 0} COURSES
-                    </span>
+                  <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors tracking-tight leading-tight">{program.title}</h3>
+                  <div className="flex flex-wrap items-center gap-4 mt-1.5">
+                    <div className="flex items-center gap-1.5 text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                      <BookOpen size={13} className="text-blue-500" /> {program.courses?.length || 0} Courses
+                    </div>
                     {program.duration && (
-                      <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                        DUR: {program.duration}
-                      </span>
+                      <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider border-l border-gray-200 pl-4">
+                        {program.duration}
+                      </div>
                     )}
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">ID: {program._id.slice(-6)}</span>
+                    <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider border-l border-gray-200 pl-4">
+                      ID: {program._id.slice(-6)}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                 <Link href={`/admin/programs/${program._id}/edit`} className="px-4 py-2 border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-white/5 transition-all flex items-center gap-2">
-                    <Edit2 size={14} /> EDIT
+              <div className="flex items-center gap-2">
+                 <Link href={`/admin/programs/${program._id}/edit`} className="px-4 py-2 bg-white border border-gray-200 text-gray-700 text-xs font-bold rounded-lg hover:bg-gray-50 transition-all flex items-center gap-2 shadow-sm">
+                    <Edit2 size={14} /> Edit
                  </Link>
-                 <button onClick={() => handleDelete(program._id)} className="px-4 py-2 border border-red-500/10 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-500/5 transition-all flex items-center gap-2">
-                    <Trash2 size={14} /> DELETE
-                 </button>
-                 <button className="p-2 text-gray-600 hover:text-white transition-colors">
-                    <MoreVertical size={20} />
+                 <button onClick={() => handleDelete(program._id)} className="px-4 py-2 bg-white border border-gray-200 text-red-600 hover:text-red-700 text-xs font-bold rounded-lg hover:bg-red-50 hover:border-red-100 transition-all flex items-center gap-2 shadow-sm">
+                    <Trash2 size={14} /> Delete
                  </button>
               </div>
             </div>
           ))
         ) : (
-          <div className="h-40 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-3xl text-gray-600">
-            <p className="text-xs font-bold uppercase tracking-[0.2em]">No programs found in system</p>
+          <div className="py-24 flex flex-col items-center justify-center border-2 border-dashed border-gray-100 rounded-3xl text-gray-400 text-center space-y-2 bg-gray-50/50">
+             <BarChart3 size={40} className="text-gray-300 mb-2" />
+             <p className="text-sm font-bold text-gray-900 uppercase tracking-widest">No programs found</p>
+             <p className="text-xs text-gray-500 font-medium">Start organizing tracks by clicking "New Program".</p>
           </div>
         )}
       </div>
