@@ -22,6 +22,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import CourseCard from "@/components/dashboard/CourseCard";
+import PerformanceAnalytics from "@/components/dashboard/PerformanceAnalytics";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -99,9 +100,9 @@ export default function StudentDashboardOverview() {
   ];
 
   const quickStats = [
-    { label: "Learning Streak", val: `${statsData?.streak || 0} Days`, icon: Zap, detail: "Keep it up!", color: "text-orange-500" },
-    { label: "Time Spent", val: statsData?.timeSpent || "0h", icon: Clock, detail: "This month", color: "text-blue-500" },
-    { label: "Achievements", val: statsData?.achievements || 0, icon: Award, detail: "Badges earned", color: "text-amber-500" },
+    { label: "Active Days", val: `${statsData?.streak || 0}`, icon: Zap, detail: "Genuine stats", color: "text-orange-500" },
+    { label: "Quiz Hours", val: statsData?.timeSpent || "0h", icon: Clock, detail: "Recorded time", color: "text-blue-500" },
+    { label: "Certificates", val: statsData?.certs || 0, icon: Award, detail: "Earned credentials", color: "text-amber-500" },
   ];
 
   const shortcuts = [
@@ -152,7 +153,7 @@ export default function StudentDashboardOverview() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* Left Column: Quick Stats & Recent Courses */}
+        {/* Left Column: Quick Stats, Analytics & Recent Courses */}
         <div className="lg:col-span-8 space-y-8">
           
           {/* Quick Stats */}
@@ -169,6 +170,11 @@ export default function StudentDashboardOverview() {
               </div>
             ))}
           </div>
+
+          {/* Analytics Section */}
+          {statsData?.analytics && (
+            <PerformanceAnalytics analytics={statsData.analytics} />
+          )}
 
           {/* Continue Learning / Recent Courses */}
           <div className="space-y-4">

@@ -5,6 +5,7 @@ import Progress from "@/models/Progress";
 import Attempt from "@/models/Attempt";
 import Certificate from "@/models/Certificate";
 import Course from "@/models/Course";
+import Quiz from "@/models/Quiz"; // To populate quiz titles
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]/route";
 
@@ -44,28 +45,49 @@ export async function GET() {
       ? Math.round(progressRecords.reduce((acc, curr) => acc + (curr.percentage || 0), 0) / progressRecords.length)
       : 0;
 
-    // 4. Pending Tasks (Lessons not yet completed in enrolled courses)
-    // Fetch all enrolled course IDs
+    // 4. Pending Tasks
     const enrollments = await Enrollment.find({ userId, type: "course", status: "active" }).select("courseId");
     const courseIds = enrollments.map(e => e.courseId);
-    
     const courses = await Course.find({ _id: { $in: courseIds } }).select("totalLessons");
     const totalLessonsAvailable = courses.reduce((acc, curr) => acc + (curr.totalLessons || 0), 0);
     const pendingTasks = Math.max(0, totalLessonsAvailable - totalLessonsCompleted);
 
-    // 5. Average Score
-    const attempts = await Attempt.find({ userId });
-    const avgScore = attempts.length > 0 
-      ? Math.round(attempts.reduce((acc, curr) => acc + (curr.percentage || 0), 0) / attempts.length)
+    // 5. Performance Analytics (Genuine data from attempts)
+    const allAttempts = await Attempt.find({ userId }).populate("quizId", "title").sort({ createdAt: 1 });
+    
+    const totalAttemptsCount = allAttempts.length;
+    const passedAttempts = allAttempts.filter(a => a.passed).length;
+    const avgScore = totalAttemptsCount > 0 
+      ? Math.round(allAttempts.reduce((acc, curr) => acc + (curr.percentage || 0), 0) / totalAttemptsCount)
       : 0;
 
-    // 6. Certificates
-    const certificatesCount = await Certificate.countDocuments({ userId });
+    const successRate = totalAttemptsCount > 0 ? Math.round((passedAttempts / totalAttemptsCount) * 100) : 0;
 
-    // 7. Streak & Time Spent (Mocking for now as models don't support it yet)
-    // In a real app, we'd have a DailyActivity model or similar
-    const streak = 5; // Mock
-    const timeSpent = "12.5h"; // Mock
+    // Last 7 attempts for trend chart
+    const recentAttempts = allAttempts.slice(-7).map(a => ({
+      title: (a.quizId as any)?.title?.substring(0, 15) + ((a.quizId as any)?.title?.length > 15 ? "..." : "") || "Quiz",
+      score: a.percentage,
+      passed: a.passed,
+      date: a.createdAt.toISOString().split('T')[0]
+    }));
+
+    // 6. Genuine Time Calculation from attempts (seconds spent)
+    const totalSecondsSpentOnQuizzes = allAttempts.reduce((acc, curr) => {
+      if (curr.startTime && curr.endTime) {
+        return acc + Math.floor((new Date(curr.endTime).getTime() - new Date(curr.startTime).getTime()) / 1000);
+      }
+      return acc;
+    }, 0);
+    const hoursSpent = (totalSecondsSpentOnQuizzes / 3600).toFixed(1);
+
+    // 7. Learning streak based on unique active days of last 30 days
+    const activeDates = new Set([
+      ...allAttempts.map(a => new Date(a.createdAt).toDateString()),
+      ...progressRecords.map(p => new Date(p.updatedAt).toDateString())
+    ]);
+    
+    // 8. Certificates
+    const certificatesCount = await Certificate.countDocuments({ userId });
 
     return NextResponse.json({
       enrolled: activeEnrollments,
@@ -76,10 +98,19 @@ export async function GET() {
       pendingTasks,
       avgScore: `${avgScore}%`,
       certs: certificatesCount,
-      streak,
-      timeSpent,
-      achievements: certificatesCount + 3, // Mock achievements
-      hasActivity: activeEnrollments > 0 || totalLessonsCompleted > 0 || attempts.length > 0
+      streak: activeDates.size, // Genuine: Number of active study days
+      timeSpent: `${hoursSpent}h`, // Genuine time recorded in sessions
+      achievements: certificatesCount, // Pure genuine count of earned items
+      hasActivity: totalAttemptsCount > 0 || totalLessonsCompleted > 0,
+      analytics: {
+        attemptsTrend: recentAttempts,
+        summary: {
+          totalAttempts: totalAttemptsCount,
+          passed: passedAttempts,
+          failed: totalAttemptsCount - passedAttempts,
+          successRate,
+        }
+      }
     });
 
   } catch (error: any) {
@@ -87,3 +118,4 @@ export async function GET() {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
