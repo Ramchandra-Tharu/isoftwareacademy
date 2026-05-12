@@ -26,31 +26,43 @@ function cn(...inputs: ClassValue[]) {
 
 export default function ProgressTrackingPage() {
   const [progressData, setProgressData] = useState<any[]>([]);
+  const [statsData, setStatsData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const totalFinished = progressData.reduce((acc, curr) => acc + (curr.completedLessons?.length || 0), 0);
-
-  const learningStats = [
-    { title: "Learning Streak", value: "12 Days", icon: TrendingUp, description: "consistent sync", trend: "Hot!", trendType: "positive" },
-    { title: "Engagement Time", value: "84.5h", icon: Clock, description: "total uptime", trend: "+12h", trendType: "positive" },
-    { title: "Units Finished", value: totalFinished, icon: BookOpen, description: "deployed modules", trend: "On track", trendType: "positive" },
-    { title: "Achievements", value: 15, icon: Award, description: "milestones hit", trend: "Level 4", trendType: "positive" },
-  ] as const;
-
   useEffect(() => {
-    const fetchProgress = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch("/api/progress");
-        const data = await res.json();
-        setProgressData(Array.isArray(data) ? data : []);
+        const [progRes, statsRes] = await Promise.all([
+           fetch("/api/progress"),
+           fetch("/api/dashboard/stats")
+        ]);
+        
+        const pData = await progRes.json();
+        const sData = await statsRes.json();
+
+        setProgressData(Array.isArray(pData) ? pData : []);
+        setStatsData(sData);
       } catch (err) {
-        console.error(err);
+        console.error("Analytics error:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchProgress();
+    fetchData();
   }, []);
+
+  const totalFinished = progressData.reduce((acc, curr) => acc + (curr.completedLessons?.length || 0), 0);
+
+  const learningStats = [
+    { title: "Learning Streak", value: `${statsData?.streak || 0} Days`, icon: TrendingUp, description: "consistent sync", trend: "Hot!", trendType: "positive" },
+    { title: "Engagement Time", value: statsData?.timeSpent || "0h", icon: Clock, description: "total uptime", trend: "+Active", trendType: "positive" },
+    { title: "Units Finished", value: totalFinished, icon: BookOpen, description: "deployed modules", trend: "On track", trendType: "positive" },
+    { title: "Achievements", value: statsData?.achievements || 0, icon: Award, description: "milestones hit", trend: `Level ${Math.floor((statsData?.achievements || 0) / 5) + 1}`, trendType: "positive" },
+  ] as const;
+
+  // Handle scaling of weekly activities safely
+  const rawWeekly = statsData?.analytics?.weeklyActivity || [0,0,0,0,0,0,0];
+  const maxActivity = Math.max(...rawWeekly, 1); // Prevent division by zero
 
   if (loading) {
     return (
@@ -95,12 +107,16 @@ export default function ProgressTrackingPage() {
            </div>
 
            <div className="h-64 flex items-end justify-between gap-6 px-4">
-              {[4, 6, 3, 8, 5, 7, 2].map((height, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center gap-5 group">
+              {rawWeekly.map((count: number, i: number) => (
+                <div key={i} className="flex-1 flex flex-col items-center gap-5 group relative">
+                   {/* Tooltip showing exact count */}
+                   <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-gray-900 text-white text-[8px] font-bold px-2 py-1 rounded transition-opacity pointer-events-none">
+                      {count} Events
+                   </div>
                    <div className="w-full bg-gray-50 rounded-2xl relative overflow-hidden transition-all group-hover:bg-blue-50 border border-gray-100/50" style={{ height: `100%` }}>
                       <div 
-                        className="absolute bottom-0 left-0 w-full bg-blue-600 rounded-2xl transition-all duration-1000 group-hover:scale-y-105" 
-                        style={{ height: `${height * 10}%` }} 
+                        className="absolute bottom-0 left-0 w-full bg-blue-600 rounded-2xl transition-all duration-1000 group-hover:scale-y-105 group-hover:brightness-110" 
+                        style={{ height: `${Math.max(4, (count / maxActivity) * 100)}%`, opacity: count === 0 ? 0.1 : 1 }} 
                       />
                    </div>
                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}</span>

@@ -80,13 +80,22 @@ export async function GET() {
     }, 0);
     const hoursSpent = (totalSecondsSpentOnQuizzes / 3600).toFixed(1);
 
-    // 7. Learning streak based on unique active days of last 30 days
-    const activeDates = new Set([
-      ...allAttempts.map(a => new Date(a.createdAt).toDateString()),
-      ...progressRecords.map(p => new Date(p.updatedAt).toDateString())
-    ]);
+    // 8. Genuine Daily Activity Array (Mon - Sun distribution over all time or last 7 days)
+    const weeklyActivity = [0, 0, 0, 0, 0, 0, 0]; // M T W T F S S
+    const now = new Date();
     
-    // 8. Certificates
+    [...allAttempts.map(a => a.createdAt), ...progressRecords.map(p => p.updatedAt)].forEach(dateStr => {
+        const date = new Date(dateStr);
+        // Only aggregate last 7 days of behavior to match the UI label
+        const daysDiff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+        if (daysDiff < 7) {
+            let dayIdx = date.getDay(); // 0=Sun
+            let mappedIdx = dayIdx === 0 ? 6 : dayIdx - 1; // M=0...S=6
+            weeklyActivity[mappedIdx] += 1;
+        }
+    });
+
+    // 9. Certificates
     const certificatesCount = await Certificate.countDocuments({ userId });
 
     return NextResponse.json({
@@ -104,6 +113,7 @@ export async function GET() {
       hasActivity: totalAttemptsCount > 0 || totalLessonsCompleted > 0,
       analytics: {
         attemptsTrend: recentAttempts,
+        weeklyActivity,
         summary: {
           totalAttempts: totalAttemptsCount,
           passed: passedAttempts,
