@@ -12,9 +12,10 @@ export async function GET() {
 
     await dbConnect();
 
-    // If admin, show all quizzes. If not, only active.
     const query = isAdmin ? {} : { status: "Active" };
     const quizzes = await Quiz.find(query).populate("courseId");
+
+    const userId = session?.user?.id;
 
     if (isAdmin) {
       const quizzesWithAttempts = await Promise.all(
@@ -26,7 +27,25 @@ export async function GET() {
       return NextResponse.json(quizzesWithAttempts);
     }
 
-    return NextResponse.json(quizzes);
+    // For regular users, augment each quiz with their personal high score / passed state
+    const quizzesWithUserData = await Promise.all(
+      quizzes.map(async (quiz) => {
+        if (!userId) return quiz.toObject();
+        const highestPassed = await Attempt.findOne({ 
+          userId, 
+          quizId: quiz._id,
+          passed: true 
+        }).sort({ percentage: -1 });
+
+        return { 
+          ...quiz.toObject(), 
+          isPassed: !!highestPassed,
+          bestScore: highestPassed ? highestPassed.percentage : null
+        };
+      })
+    );
+
+    return NextResponse.json(quizzesWithUserData);
   } catch (error: any) {
     console.error("Fetch quizzes error:", error);
     return NextResponse.json(
