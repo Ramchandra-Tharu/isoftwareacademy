@@ -63,14 +63,9 @@ export default function CommunityDiscussionsPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        // Add to local state temporarily
+        // Permanently keep the local state updated
         setComments([data, ...comments]);
         setNewComment("");
-        
-        // Remove from local state after 2 seconds as requested
-        setTimeout(() => {
-          setComments(prev => prev.filter(c => c._id !== data._id));
-        }, 2000);
       }
     } catch (err) {
       console.error(err);
@@ -81,41 +76,32 @@ export default function CommunityDiscussionsPage() {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
         <Loader2 className="animate-spin text-blue-600" size={40} />
-        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Syncing Community Frequency...</p>
+        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Connecting to network...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-12 pb-20 font-sans">
-      <div className="space-y-4">
-        <h1 className="text-5xl font-light tracking-tight text-black leading-none uppercase">Community_Sync</h1>
-        <p className="text-sm text-gray-500 font-normal">Connect with the academic collective and exchange operational protocols.</p>
-      </div>
-
-      <div className="bg-blue-600 rounded-[2rem] p-8 text-center space-y-6 shadow-xl shadow-blue-600/10 border border-blue-500/20 relative overflow-hidden group">
-         <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 opacity-50"></div>
-         <div className="relative z-10 flex flex-col items-center">
-            <button className="w-full max-w-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold uppercase tracking-[0.3em] py-4 rounded-xl hover:bg-white/20 transition-all">
-               Explore Guidelines
-            </button>
-         </div>
+    <div className="space-y-10 pb-20">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-black tracking-tight text-gray-900 uppercase">Community Hub</h1>
+        <p className="text-sm text-gray-500 font-medium">Connect with other learners, share insights, and discuss concepts.</p>
       </div>
 
         {/* Feed Column */}
-        <div className="xl:col-span-12 space-y-12">
-           {/* Message Input - Styled to match image */}
-           <div className="card-premium p-10 bg-white border border-blue-50/50 shadow-2xl shadow-blue-600/5 relative group">
-              <form onSubmit={handleSubmit} className="flex gap-8">
-                 <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 text-xl font-bold shadow-inner shrink-0">
-                    {session?.user?.name?.charAt(0) || "S"}
+        <div className="xl:col-span-12 space-y-10">
+           {/* Message Input */}
+           <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-xl shadow-blue-600/5 relative group">
+              <form onSubmit={handleSubmit} className="flex gap-6">
+                 <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 text-lg font-bold shadow-sm shrink-0">
+                    {session?.user?.name?.charAt(0) || "U"}
                  </div>
                  
-                 <div className="flex-1 space-y-10">
+                 <div className="flex-1 space-y-6">
                     <textarea 
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
-                      placeholder="INITIALIZE_DISCUSSION_PROTOCOL..."
+                      placeholder="Share an idea or ask a question to the community..."
                       className="w-full bg-transparent border-none text-gray-800 placeholder:text-gray-300 focus:ring-0 resize-none min-h-[120px] text-lg font-normal leading-relaxed"
                     />
                     
@@ -131,9 +117,9 @@ export default function CommunityDiscussionsPage() {
                        
                        <button 
                          type="submit" 
-                         className="flex items-center gap-4 px-12 py-5 bg-[#1a56db] text-white text-[11px] font-bold uppercase tracking-[0.2em] rounded-2xl hover:bg-blue-700 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-blue-600/30"
+                         className="flex items-center gap-3 px-8 py-3.5 bg-blue-600 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-md"
                        >
-                          Dispatch Message <Send size={18} />
+                          Post Comment <Send size={16} />
                        </button>
                     </div>
                  </div>
@@ -141,55 +127,55 @@ export default function CommunityDiscussionsPage() {
            </div>
 
            {/* Feed */}
-           <div className="space-y-8">
+           <div className="space-y-6">
               {comments.length > 0 ? (
                 comments.map((comment) => (
-                   <div key={comment._id} className="card-premium p-10 space-y-8 hover:border-blue-100 transition-all group">
+                   <div key={comment._id} className="bg-white border border-gray-100 rounded-3xl p-8 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-600/5 transition-all duration-300 group flex flex-col space-y-4">
                       <div className="flex justify-between items-start">
-                         <div className="flex items-center gap-5">
-                            <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 border border-gray-100 text-xl font-black group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors shadow-sm overflow-hidden">
+                         <div className="flex items-center gap-4">
+                            <div className="w-11 h-11 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-100 text-lg font-black group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors overflow-hidden">
                                {comment.userId?.image ? <img src={comment.userId.image} /> : (comment.userId?.name?.charAt(0) || "U")}
                             </div>
                             <div>
-                               <h4 className="text-sm font-black text-gray-900 uppercase tracking-tight flex items-center gap-3">
-                                  {comment.userId?.name || "Anonymous Learner"}
+                               <h4 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                                  {comment.userId?.name || "Learner"}
                                   {comment.userId?.role === "admin" && (
-                                    <span className="px-2 py-0.5 bg-blue-600 text-white text-[8px] font-black uppercase rounded-lg shadow-sm">Staff_Core</span>
+                                    <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[8px] font-black uppercase rounded">ADMIN</span>
                                   )}
                                </h4>
-                               <p className="text-[9px] text-slate-400 uppercase font-bold tracking-widest mt-1 flex items-center gap-2">
-                                  <MessageSquare size={12} /> {new Date(comment.createdAt).toLocaleString()}
-                               </p>
+                               <p className="text-[10px] text-gray-400 flex items-center gap-1.5">
+                                  <MessageSquare size={10} /> {new Date(comment.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
+                                </p>
                             </div>
                          </div>
-                         <button className="text-gray-300 hover:text-gray-900 transition-colors"><MoreVertical size={20} /></button>
+                         <button className="text-gray-300 hover:text-gray-900 transition-colors"><MoreVertical size={18} /></button>
                       </div>
 
-                      <div className="text-gray-600 text-sm font-medium leading-relaxed whitespace-pre-wrap px-2 border-l-2 border-gray-50 italic">
-                         "{comment.content}"
+                      <div className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap bg-gray-50/50 p-4 rounded-xl border border-gray-50">
+                         {comment.content}
                       </div>
 
-                      <div className="flex items-center gap-10 pt-6 border-t border-gray-50">
-                         <button className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors">
-                            <ThumbsUp size={16} /> {comment.likes || 0} Helpful
+                      <div className="flex items-center gap-6 pt-2">
+                         <button className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-400 hover:text-blue-600 transition-colors">
+                            <ThumbsUp size={14} /> {comment.likes || 0} Helpful
                          </button>
-                         <button className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors">
-                            <Reply size={16} /> Reply_Thread
+                         <button className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-400 hover:text-blue-600 transition-colors">
+                            <Reply size={14} /> Reply
                          </button>
-                         <button className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-gray-300 hover:text-red-500 transition-colors ml-auto">
-                            <Flag size={16} /> Report
+                         <button className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-300 hover:text-red-500 transition-colors ml-auto">
+                            <Flag size={14} /> Report
                          </button>
                       </div>
                    </div>
                 ))
               ) : (
-                <div className="h-80 card-premium border-dashed flex flex-col items-center justify-center text-gray-400 gap-6">
-                   <MessageSquare size={60} className="opacity-10" />
+                <div className="h-64 bg-white border border-gray-100 rounded-3xl border-dashed flex flex-col items-center justify-center text-gray-400 gap-4 shadow-sm">
+                   <MessageSquare size={48} className="opacity-10" />
                    <div className="text-center">
-                      <p className="text-[10px] font-black uppercase tracking-widest">Network Silent</p>
-                      <p className="text-xs text-gray-400 mt-2 font-medium">No community transmissions detected in this frequency.</p>
+                      <p className="text-xs font-black uppercase tracking-widest text-gray-900">No Discussions Yet</p>
+                      <p className="text-[10px] text-gray-500 mt-1">Be the first to share a question or resource with the community.</p>
                    </div>
-                   <button onClick={() => {}} className="btn-primary text-xs">Start Transmission</button>
+                   <button onClick={() => document.querySelector('textarea')?.focus()} className="px-6 py-2 bg-gray-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-600 transition-all shadow-md">Start Topic</button>
                 </div>
               )}
            </div>
