@@ -53,7 +53,7 @@ export async function POST(req: Request) {
       parentId: parentId || null,
       rating,
       isSpam: spamCheck.isSpam,
-      status: spamCheck.isSpam ? "rejected" : "pending"
+      status: spamCheck.isSpam ? "rejected" : "approved"
     });
 
     // If it's a reply, notify the parent comment owner
